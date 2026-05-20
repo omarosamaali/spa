@@ -29,8 +29,8 @@ html {
 }
 
 body {
-    background-color: #fdf8f5;
-    color: #1a1a1a;
+    background-color: #1a1a1a;
+    color: #e8e0dd;
 }
 
 /* Gradient backgrounds */
@@ -51,12 +51,63 @@ body {
     width: 6px;
 }
 ::-webkit-scrollbar-track {
-    background: #fdf8f5;
+    background: #1a1a1a;
 }
 ::-webkit-scrollbar-thumb {
     background: #e8b4b8;
     border-radius: 3px;
 }
+
+/* Swiper overrides */
+.swiper-pagination-bullet {
+    background: rgba(255,255,255,0.5) !important;
+    width: 10px !important;
+    height: 10px !important;
+    opacity: 1 !important;
+}
+.swiper-pagination-bullet-active {
+    background: #e8b4b8 !important;
+    width: 28px !important;
+    border-radius: 5px !important;
+    transition: width 0.3s ease !important;
+}
+.swiper-button-prev,
+.swiper-button-next {
+    color: white !important;
+    background: rgba(255,255,255,0.12) !important;
+    backdrop-filter: blur(6px) !important;
+    border-radius: 50% !important;
+    width: 48px !important;
+    height: 48px !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    transition: background 0.3s !important;
+}
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+    background: rgba(232,180,184,0.3) !important;
+}
+.swiper-button-prev::after,
+.swiper-button-next::after {
+    font-size: 16px !important;
+    font-weight: 900 !important;
+}
+.hero-slide-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+@keyframes hero-text-in {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.swiper-slide-active .hero-slide-content > * {
+    animation: hero-text-in 0.8s ease forwards;
+}
+.swiper-slide-active .hero-slide-content > *:nth-child(2) { animation-delay: 0.1s; }
+.swiper-slide-active .hero-slide-content > *:nth-child(3) { animation-delay: 0.2s; }
+.swiper-slide-active .hero-slide-content > *:nth-child(4) { animation-delay: 0.3s; }
 
 /* Animations */
 @keyframes fadeInUp {
@@ -123,29 +174,33 @@ body {
 
 /* Card styles */
 .service-card {
-    background: white;
+    background: #2a2a2a;
     border-radius: 20px;
     overflow: hidden;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(232,180,184,0.08);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
 }
 
 .service-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(232, 180, 184, 0.25);
+    border-color: rgba(232,180,184,0.3);
+    box-shadow: 0 15px 40px rgba(232, 180, 184, 0.15);
 }
 
 .testimonial-card {
-    background: white;
+    background: #2a2a2a;
     border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(232,180,184,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
 }
 
 .testimonial-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(232, 180, 184, 0.2);
+    border-color: rgba(232,180,184,0.3);
+    box-shadow: 0 10px 30px rgba(232, 180, 184, 0.12);
 }
 
 /* Step styles */
