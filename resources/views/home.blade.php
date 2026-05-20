@@ -9,8 +9,8 @@
 @section('content')
 
 {{-- =================== HERO SLIDER =================== --}}
-<section class="relative overflow-hidden" style="height:100vh; min-height:600px;">
-    <div class="swiper hero-swiper" style="height:100%;">
+<section class="relative overflow-hidden w-full max-w-full" style="height:100vh; min-height:600px; max-height:100dvh;">
+    <div class="swiper hero-swiper w-full max-w-full" style="height:100%;">
         <div class="swiper-wrapper">
 
             {{-- Slide 1 – VIDEO (Spa Ambiance – first thing visitors see) --}}
@@ -24,7 +24,7 @@
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(18,8,14,0.88) 0%,rgba(18,8,14,0.42) 55%,rgba(40,18,28,0.75) 100%);"></div>
                 </div>
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
-                    <div class="max-w-7xl mx-auto px-6 w-full">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-6 w-full max-w-full box-border">
                         <div class="max-w-xl">
                             <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -57,7 +57,7 @@
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(20,8,12,0.9) 0%,rgba(20,8,12,0.5) 55%,rgba(50,30,35,0.75) 100%);"></div>
                 </div>
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
-                    <div class="max-w-7xl mx-auto px-6 w-full">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-6 w-full max-w-full box-border">
                         <div class="max-w-xl">
                             <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -87,7 +87,7 @@
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(10,18,28,0.9) 0%,rgba(10,18,28,0.5) 55%,rgba(20,35,50,0.78) 100%);"></div>
                 </div>
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
-                    <div class="max-w-7xl mx-auto px-6 w-full">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-6 w-full max-w-full box-border">
                         <div class="max-w-xl">
                             <div class="badge-spa mb-5 inline-flex" style="background:rgba(201,169,110,0.15);color:#c9a96e;border-color:rgba(201,169,110,0.35);">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -117,7 +117,7 @@
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(28,8,18,0.9) 0%,rgba(28,8,18,0.5) 55%,rgba(55,18,35,0.78) 100%);"></div>
                 </div>
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
-                    <div class="max-w-7xl mx-auto px-6 w-full">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-6 w-full max-w-full box-border">
                         <div class="max-w-xl">
                             <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -521,12 +521,15 @@
     // Hero Swiper
     const heroSwiper = new Swiper('.hero-swiper', {
         loop: true,
+        rtl: true,
         speed: 900,
         autoplay: { delay: 7000, disableOnInteraction: false, pauseOnMouseEnter: true },
         effect: 'fade',
         fadeEffect: { crossFade: true },
-        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-        pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: { nextEl: '.hero-swiper .swiper-button-next', prevEl: '.hero-swiper .swiper-button-prev' },
+        pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
+        watchOverflow: true,
+        resistanceRatio: 0,
         on: {
             init() {
                 // Play video on first slide immediately
@@ -550,10 +553,12 @@
     // Testimonials Swiper
     new Swiper('.testimonials-swiper', {
         loop: true,
+        rtl: true,
         speed: 700,
         autoplay: { delay: 5000, disableOnInteraction: false },
         slidesPerView: 1,
         pagination: { el: '.testimonials-pagination', clickable: true },
+        watchOverflow: true,
     });
 
     // Category filter

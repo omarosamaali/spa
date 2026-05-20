@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'NAY SPA - جمالك يستحق العناية')</title>
     <meta name="description" content="@yield('description', 'أحدث العلاجات وأفضل الخبرات في مكان واحد. احجزي موعدك الآن واستمتعي بتجربة فريدة.')">
@@ -17,12 +17,12 @@
     {{-- Navbar --}}
     <nav class="navbar gradient-hero py-4" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-2 min-w-0">
                 {{-- Logo --}}
-                <a href="{{ route('home') }}" class="flex items-center gap-2 text-white no-underline">
-                    <div class="text-right">
-                        <div class="text-xl font-black tracking-wider" style="letter-spacing:3px">NAY SPA</div>
-                        <div class="text-xs opacity-70" style="color:#e8b4b8">جمالك يستحق العناية</div>
+                <a href="{{ route('home') }}" class="flex items-center gap-2 text-white no-underline min-w-0 flex-shrink">
+                    <div class="text-right min-w-0">
+                        <div class="navbar-brand-text text-xl font-black tracking-wider" style="letter-spacing:3px">NAY SPA</div>
+                        <div class="navbar-tagline text-xs opacity-70" style="color:#e8b4b8">جمالك يستحق العناية</div>
                     </div>
                     <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <ellipse cx="20" cy="14" rx="5" ry="10" fill="url(#lpetal1)" opacity="0.9"/>
@@ -54,8 +54,8 @@
                 </div>
 
                 {{-- Book Now Button --}}
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('booking') }}" class="btn-primary hidden sm:inline-flex">
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="{{ route('booking') }}" class="btn-primary hidden sm:inline-flex text-sm" style="padding:0.5rem 1rem;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                         احجز الآن
                     </a>
