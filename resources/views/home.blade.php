@@ -17,7 +17,7 @@
             <div class="swiper-slide relative">
                 <div class="absolute inset-0 overflow-hidden">
                     <video class="hero-slide-video" autoplay muted loop playsinline preload="auto"
-                           poster="https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1920&q=60&auto=format&fit=crop">
+                           poster="https://images.unsplash.com/photo-1583416750470-965b2707b355?w=1920&q=60&auto=format&fit=crop">
                         <source src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4" type="video/mp4">
                         <source src="https://videos.pexels.com/video-files/3214436/3214436-hd_1920_1080_25fps.mp4" type="video/mp4">
                     </video>
@@ -52,7 +52,7 @@
             {{-- Slide 2 – Luxury Spa Interior --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1920&q=80&auto=format&fit=crop"
+                    <img src="https://images.unsplash.com/photo-1583416750470-965b2707b355?w=1920&q=80&auto=format&fit=crop"
                          alt="مركز ناي سبا" class="w-full h-full object-cover">
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(20,8,12,0.9) 0%,rgba(20,8,12,0.5) 55%,rgba(50,30,35,0.75) 100%);"></div>
                 </div>
@@ -112,7 +112,7 @@
             {{-- Slide 4 – Spa Products --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1920&q=80&auto=format&fit=crop"
+                    <img src="https://images.unsplash.com/photo-1556760544-74068565f05c?w=1920&q=80&auto=format&fit=crop"
                          alt="منتجات العناية" class="w-full h-full object-cover">
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(28,8,18,0.9) 0%,rgba(28,8,18,0.5) 55%,rgba(55,18,35,0.78) 100%);"></div>
                 </div>
@@ -199,7 +199,7 @@
                 'laser'   => 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=500&h=350&q=75&auto=format&fit=crop',
                 'skin'    => 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=500&h=350&q=75&auto=format&fit=crop',
                 'massage' => 'https://images.unsplash.com/photo-1563788240-4a32624c5e46?w=500&h=350&q=75&auto=format&fit=crop',
-                'botox'   => 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=350&q=75&auto=format&fit=crop',
+                'botox'   => 'https://images.unsplash.com/photo-1556760544-74068565f05c?w=500&h=350&q=75&auto=format&fit=crop',
                 'nails'   => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500&h=350&q=75&auto=format&fit=crop',
             ];
             @endphp
@@ -347,7 +347,7 @@
             <div class="absolute inset-0" style="background:radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.12) 0%, transparent 60%);"></div>
             {{-- Decorative spa image instead of woman --}}
             <div class="absolute inset-0 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&q=60&auto=format&fit=crop"
+                <img src="https://images.unsplash.com/photo-1556760544-74068565f05c?w=800&h=400&q=60&auto=format&fit=crop"
                      alt="" class="absolute left-0 top-0 h-full w-1/2 object-cover opacity-20" style="object-position:center;">
             </div>
             <div class="relative z-10 p-10 lg:p-14 text-center md:text-right">
@@ -384,9 +384,9 @@
 
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;" class="md:grid-cols-3">
             @foreach([
-                ['url'=>'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'قاعة السبا الفاخرة'],
+                ['url'=>'https://images.unsplash.com/photo-1583416750470-965b2707b355?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'قاعة السبا الفاخرة'],
                 ['url'=>'https://images.unsplash.com/photo-1563788240-4a32624c5e46?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أحجار الاسترخاء'],
-                ['url'=>'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'منتجات العناية'],
+                ['url'=>'https://images.unsplash.com/photo-1556760544-74068565f05c?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'منتجات العناية'],
                 ['url'=>'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'كريمات البشرة'],
                 ['url'=>'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أجواء السبا'],
                 ['url'=>'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'غرفة الاسترخاء'],
