@@ -13,7 +13,43 @@
     <div class="swiper hero-swiper" style="height:100%;">
         <div class="swiper-wrapper">
 
-            {{-- Slide 1 – Luxury Spa Interior --}}
+            {{-- Slide 1 – VIDEO (Spa Ambiance – first thing visitors see) --}}
+            <div class="swiper-slide relative">
+                <div class="absolute inset-0 overflow-hidden">
+                    <video class="hero-slide-video" autoplay muted loop playsinline preload="auto"
+                           poster="https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1920&q=60&auto=format&fit=crop">
+                        <source src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4" type="video/mp4">
+                        <source src="https://videos.pexels.com/video-files/3214436/3214436-hd_1920_1080_25fps.mp4" type="video/mp4">
+                    </video>
+                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(18,8,14,0.88) 0%,rgba(18,8,14,0.42) 55%,rgba(40,18,28,0.75) 100%);"></div>
+                </div>
+                <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
+                    <div class="max-w-7xl mx-auto px-6 w-full">
+                        <div class="max-w-xl">
+                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                تجربة NAY SPA الفعلية
+                            </div>
+                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
+                                اكتشفي<br><span style="color:#e8b4b8;">عالم الفخامة</span>
+                            </h1>
+                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.7;">تجربة سبا فاخرة في أجواء هادئة ومريحة</p>
+                            <div class="flex flex-wrap gap-3 mt-8">
+                                <a href="{{ route('booking') }}" class="btn-primary">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    احجزي موعدك الآن
+                                </a>
+                                <a href="https://wa.me/9647701234567" class="btn-outline">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.095.541 4.063 1.49 5.776L0 24l6.385-1.474A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.853 0-3.584-.504-5.074-1.38l-.361-.214-3.741.863.933-3.638-.235-.374A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                                    تواصل معنا
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Slide 2 – Luxury Spa Interior --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0">
                     <img src="https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1920&q=80&auto=format&fit=crop"
@@ -34,22 +70,19 @@
                             <div class="flex flex-wrap gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    احجزي موعدك الآن
+                                    احجزي الآن
                                 </a>
-                                <a href="https://wa.me/9647701234567" class="btn-outline">
-                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.095.541 4.063 1.49 5.776L0 24l6.385-1.474A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.853 0-3.584-.504-5.074-1.38l-.361-.214-3.741.863.933-3.638-.235-.374A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-                                    تواصل معنا
-                                </a>
+                                <a href="{{ route('services') }}" class="btn-outline">جميع الخدمات</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Slide 2 – Spa Candles & Stones --}}
+            {{-- Slide 3 – Spa Candles & Stones (NO body) --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1920&q=80&auto=format&fit=crop&crop=focalpoint&fp-y=0.3"
+                    <img src="https://images.unsplash.com/photo-1508380702597-707c1b00695c?w=1920&q=80&auto=format&fit=crop"
                          alt="جلسات استرخاء" class="w-full h-full object-cover">
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(10,18,28,0.9) 0%,rgba(10,18,28,0.5) 55%,rgba(20,35,50,0.78) 100%);"></div>
                 </div>
@@ -76,7 +109,7 @@
                 </div>
             </div>
 
-            {{-- Slide 3 – Spa Products --}}
+            {{-- Slide 4 – Spa Products --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0">
                     <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1920&q=80&auto=format&fit=crop"
@@ -94,39 +127,6 @@
                                 منتجات<br><span style="color:#e8b4b8;">تُعنى بك</span>
                             </h1>
                             <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;">أفضل منتجات العناية العالمية لنتائج مضمونة</p>
-                            <div class="flex flex-wrap gap-3 mt-8">
-                                <a href="{{ route('booking') }}" class="btn-primary">
-                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    احجزي الآن
-                                </a>
-                                <a href="{{ route('contact') }}" class="btn-outline">تواصلي معنا</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Slide 4 – Video (Spa Ambiance) --}}
-            <div class="swiper-slide relative">
-                <div class="absolute inset-0 overflow-hidden">
-                    <video class="hero-slide-video" autoplay muted loop playsinline preload="none"
-                           poster="https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1920&q=60&auto=format&fit=crop">
-                        <source src="https://videos.pexels.com/video-files/3214436/3214436-hd_1920_1080_25fps.mp4" type="video/mp4">
-                        <source src="https://videos.pexels.com/video-files/4132325/4132325-hd_1920_1080_30fps.mp4" type="video/mp4">
-                    </video>
-                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(18,8,14,0.9) 0%,rgba(18,8,14,0.45) 55%,rgba(40,18,28,0.78) 100%);"></div>
-                </div>
-                <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
-                    <div class="max-w-7xl mx-auto px-6 w-full">
-                        <div class="max-w-xl">
-                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                تجربة NAY SPA الفعلية
-                            </div>
-                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
-                                اكتشفي<br><span style="color:#e8b4b8;">عالم الفخامة</span>
-                            </h1>
-                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;">تجربة سبا فاخرة في أجواء هادئة ومريحة</p>
                             <div class="flex flex-wrap gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -522,16 +522,27 @@
     const heroSwiper = new Swiper('.hero-swiper', {
         loop: true,
         speed: 900,
-        autoplay: { delay: 6000, disableOnInteraction: false, pauseOnMouseEnter: true },
+        autoplay: { delay: 7000, disableOnInteraction: false, pauseOnMouseEnter: true },
         effect: 'fade',
         fadeEffect: { crossFade: true },
         navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
         pagination: { el: '.swiper-pagination', clickable: true },
         on: {
+            init() {
+                // Play video on first slide immediately
+                const first = this.slides[this.activeIndex];
+                const v = first?.querySelector('video');
+                if (v) { v.muted = true; v.play().catch(() => {}); }
+            },
             slideChangeTransitionStart() {
+                // Pause all videos, play only the active one
+                this.slides.forEach(slide => {
+                    const v = slide.querySelector('video');
+                    if (v) v.pause();
+                });
                 const active = this.slides[this.activeIndex];
-                const video = active?.querySelector('video');
-                if (video) video.play().catch(() => {});
+                const av = active?.querySelector('video');
+                if (av) { av.currentTime = 0; av.play().catch(() => {}); }
             }
         }
     });
