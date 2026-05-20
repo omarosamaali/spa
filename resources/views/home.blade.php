@@ -196,11 +196,11 @@
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;" class="md:grid-cols-4" id="services-grid">
             @php
             $sImgs = [
-                'laser'   => 'https://images.unsplash.com/photo-1576426863848-c21f53c60b19?w=500&h=350&q=75&auto=format&fit=crop',
+                'laser'   => 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=500&h=350&q=75&auto=format&fit=crop',
                 'skin'    => 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=500&h=350&q=75&auto=format&fit=crop',
                 'massage' => 'https://images.unsplash.com/photo-1563788240-4a32624c5e46?w=500&h=350&q=75&auto=format&fit=crop',
-                'botox'   => 'https://images.unsplash.com/photo-1519638381913-37b8c89bef64?w=500&h=350&q=75&auto=format&fit=crop',
-                'nails'   => 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500&h=350&q=75&auto=format&fit=crop',
+                'botox'   => 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=350&q=75&auto=format&fit=crop',
+                'nails'   => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500&h=350&q=75&auto=format&fit=crop',
             ];
             @endphp
             @forelse($services as $service)
@@ -384,12 +384,12 @@
 
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;" class="md:grid-cols-3">
             @foreach([
-                ['url'=>'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'قاعة السبا'],
-                ['url'=>'https://images.unsplash.com/photo-1563788240-4a32624c5e46?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أحجار الحمام المعدني'],
+                ['url'=>'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'قاعة السبا الفاخرة'],
+                ['url'=>'https://images.unsplash.com/photo-1563788240-4a32624c5e46?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أحجار الاسترخاء'],
                 ['url'=>'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'منتجات العناية'],
                 ['url'=>'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'كريمات البشرة'],
-                ['url'=>'https://images.unsplash.com/photo-1519638381913-37b8c89bef64?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أدوات العناية'],
-                ['url'=>'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'تصميم الأظافر'],
+                ['url'=>'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أجواء السبا'],
+                ['url'=>'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'غرفة الاسترخاء'],
             ] as $gimg)
             <div class="rounded-2xl overflow-hidden group cursor-pointer" style="height:220px;">
                 <img src="{{ $gimg['url'] }}" alt="{{ $gimg['alt'] }}"
