@@ -13,25 +13,25 @@
     <div class="swiper hero-swiper" style="height:100%;">
         <div class="swiper-wrapper">
 
-            {{-- Slide 1 --}}
+            {{-- Slide 1 – Luxury Spa Interior --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1920&q=80&auto=format&fit=crop"
-                         alt="جلسة بشرة" class="w-full h-full object-cover">
-                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(26,10,14,0.88) 0%,rgba(26,10,14,0.45) 55%,rgba(61,43,46,0.7) 100%);"></div>
+                    <img src="https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1920&q=80&auto=format&fit=crop"
+                         alt="مركز ناي سبا" class="w-full h-full object-cover">
+                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(20,8,12,0.9) 0%,rgba(20,8,12,0.5) 55%,rgba(50,30,35,0.75) 100%);"></div>
                 </div>
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
                     <div class="max-w-7xl mx-auto px-6 w-full">
-                        <div class="max-w-xl hero-slide-content">
-                            <div class="badge-spa mb-5 inline-flex opacity-0" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
+                        <div class="max-w-xl">
+                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                                 أحدث تقنيات • أفضل تجربة
                             </div>
-                            <h1 class="font-black text-white mb-4 opacity-0" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
+                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
                                 جمالك<br>يبدأ <span style="color:#e8b4b8;">هنا</span>
                             </h1>
-                            <p class="mb-3 opacity-0" style="color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.7;">منصة حجز ذكية لجميع خدمات التجميل والعناية</p>
-                            <div class="flex flex-wrap gap-3 mt-8 opacity-0">
+                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.7;">منصة حجز ذكية لجميع خدمات التجميل والعناية</p>
+                            <div class="flex flex-wrap gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     احجزي موعدك الآن
@@ -46,25 +46,25 @@
                 </div>
             </div>
 
-            {{-- Slide 2 --}}
+            {{-- Slide 2 – Spa Candles & Stones --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1920&q=80&auto=format&fit=crop"
-                         alt="مساج" class="w-full h-full object-cover">
-                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(10,20,30,0.88) 0%,rgba(10,20,30,0.45) 55%,rgba(20,40,50,0.75) 100%);"></div>
+                    <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1920&q=80&auto=format&fit=crop&crop=focalpoint&fp-y=0.3"
+                         alt="جلسات استرخاء" class="w-full h-full object-cover">
+                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(10,18,28,0.9) 0%,rgba(10,18,28,0.5) 55%,rgba(20,35,50,0.78) 100%);"></div>
                 </div>
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
                     <div class="max-w-7xl mx-auto px-6 w-full">
-                        <div class="max-w-xl hero-slide-content">
-                            <div class="badge-spa mb-5 inline-flex opacity-0" style="background:rgba(201,169,110,0.15);color:#c9a96e;border-color:rgba(201,169,110,0.35);">
+                        <div class="max-w-xl">
+                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(201,169,110,0.15);color:#c9a96e;border-color:rgba(201,169,110,0.35);">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                                 استرخاء تام • تجديد الحيوية
                             </div>
-                            <h1 class="font-black text-white mb-4 opacity-0" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
-                                جلسات مساج<br><span style="color:#c9a96e;">تُذيب كل التعب</span>
+                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
+                                جلسات<br><span style="color:#c9a96e;">تُجدد طاقتك</span>
                             </h1>
-                            <p class="mb-3 opacity-0" style="color:rgba(255,255,255,0.75);font-size:1rem;">جلسات علاجية وترفيهية لتجديد الطاقة والراحة التامة</p>
-                            <div class="flex flex-wrap gap-3 mt-8 opacity-0">
+                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;">جلسات علاجية وترفيهية لتجديد الطاقة والراحة التامة</p>
+                            <div class="flex flex-wrap gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     احجزي الآن
@@ -76,25 +76,25 @@
                 </div>
             </div>
 
-            {{-- Slide 3 --}}
+            {{-- Slide 3 – Spa Products --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1920&q=80&auto=format&fit=crop"
-                         alt="أظافر" class="w-full h-full object-cover">
-                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(30,10,20,0.88) 0%,rgba(30,10,20,0.45) 55%,rgba(61,20,40,0.7) 100%);"></div>
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1920&q=80&auto=format&fit=crop"
+                         alt="منتجات العناية" class="w-full h-full object-cover">
+                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(28,8,18,0.9) 0%,rgba(28,8,18,0.5) 55%,rgba(55,18,35,0.78) 100%);"></div>
                 </div>
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
                     <div class="max-w-7xl mx-auto px-6 w-full">
-                        <div class="max-w-xl hero-slide-content">
-                            <div class="badge-spa mb-5 inline-flex opacity-0" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
+                        <div class="max-w-xl">
+                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                أناقة • إبداع • تميّز
+                                منتجات فاخرة • نتائج مذهلة
                             </div>
-                            <h1 class="font-black text-white mb-4 opacity-0" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
-                                أظافر تُحكي<br><span style="color:#e8b4b8;">قصة جمالك</span>
+                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
+                                منتجات<br><span style="color:#e8b4b8;">تُعنى بك</span>
                             </h1>
-                            <p class="mb-3 opacity-0" style="color:rgba(255,255,255,0.75);font-size:1rem;">أحدث ستايلات وأرقى التصاميم مع خبيرات متخصصات</p>
-                            <div class="flex flex-wrap gap-3 mt-8 opacity-0">
+                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;">أفضل منتجات العناية العالمية لنتائج مضمونة</p>
+                            <div class="flex flex-wrap gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     احجزي الآن
@@ -106,27 +106,28 @@
                 </div>
             </div>
 
-            {{-- Slide 4 – Video --}}
+            {{-- Slide 4 – Video (Spa Ambiance) --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0 overflow-hidden">
                     <video class="hero-slide-video" autoplay muted loop playsinline preload="none"
-                           poster="https://images.unsplash.com/photo-1552693673-1bf958298935?w=1920&q=60&auto=format&fit=crop">
-                        <source src="https://videos.pexels.com/video-files/3760529/3760529-hd_1920_1080_25fps.mp4" type="video/mp4">
+                           poster="https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1920&q=60&auto=format&fit=crop">
+                        <source src="https://videos.pexels.com/video-files/3214436/3214436-hd_1920_1080_25fps.mp4" type="video/mp4">
+                        <source src="https://videos.pexels.com/video-files/4132325/4132325-hd_1920_1080_30fps.mp4" type="video/mp4">
                     </video>
-                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(20,10,15,0.88) 0%,rgba(20,10,15,0.45) 55%,rgba(40,20,30,0.7) 100%);"></div>
+                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(18,8,14,0.9) 0%,rgba(18,8,14,0.45) 55%,rgba(40,18,28,0.78) 100%);"></div>
                 </div>
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
                     <div class="max-w-7xl mx-auto px-6 w-full">
-                        <div class="max-w-xl hero-slide-content">
-                            <div class="badge-spa mb-5 inline-flex opacity-0" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
+                        <div class="max-w-xl">
+                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                                 تجربة NAY SPA الفعلية
                             </div>
-                            <h1 class="font-black text-white mb-4 opacity-0" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
-                                شاهدي الفرق<br><span style="color:#e8b4b8;">بنفسك</span>
+                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
+                                اكتشفي<br><span style="color:#e8b4b8;">عالم الفخامة</span>
                             </h1>
-                            <p class="mb-3 opacity-0" style="color:rgba(255,255,255,0.75);font-size:1rem;">نقدم لك أفضل تجربة تجميل في بيئة مريحة وفاخرة</p>
-                            <div class="flex flex-wrap gap-3 mt-8 opacity-0">
+                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;">تجربة سبا فاخرة في أجواء هادئة ومريحة</p>
+                            <div class="flex flex-wrap gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     احجزي الآن
@@ -149,15 +150,15 @@
 {{-- =================== STATS BAR =================== --}}
 <section style="background:#1a1a1a;padding:2.5rem 0;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;" class="md:grid-cols-4">
             @foreach([
-                ['val'=> ($stats['clients']>0 ? '+'.$stats['clients'] : '+500'), 'label'=>'جلسة مكتملة',     'icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','c'=>'#e8b4b8'],
-                ['val'=> $stats['rating'].'/5',                                 'label'=>'تقييم العملاء',    'icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','c'=>'#c9a96e'],
-                ['val'=> '10+',                                                 'label'=>'خبراء متخصصين',    'icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','c'=>'#e8b4b8'],
-                ['val'=> $stats['rating'].'%',                                 'label'=>'رضا العميلات',     'icon'=>'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>','c'=>'#c9a96e'],
+                ['val'=> ($stats['clients']>0 ? '+'.$stats['clients'] : '+500'), 'label'=>'جلسة مكتملة',  'icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','c'=>'#e8b4b8'],
+                ['val'=> '4.9',                                                  'label'=>'تقييم العملاء','icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','c'=>'#c9a96e'],
+                ['val'=> '10+',                                                  'label'=>'خبراء متخصصين','icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','c'=>'#e8b4b8'],
+                ['val'=> '100%',                                                 'label'=>'رضا العميلات', 'icon'=>'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>','c'=>'#c9a96e'],
             ] as $s)
             <div class="stat-card text-center">
-                <div class="w-11 h-11 rounded-xl flex items-center justify-center mx-auto mb-3" style="background:rgba({{ $s['c']==='#e8b4b8'?'232,180,184':'201,169,110' }},0.1);">
+                <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;background:rgba({{ $s['c']==='#e8b4b8'?'232,180,184':'201,169,110' }},0.1);">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ $s['c'] }}" stroke-width="2" stroke-linecap="round">{!! $s['icon'] !!}</svg>
                 </div>
                 <div class="text-3xl font-black mb-1" style="color:{{ $s['c'] }};">{{ $s['val'] }}</div>
@@ -169,7 +170,7 @@
 </section>
 
 {{-- =================== SERVICES + CATEGORY TABS =================== --}}
-<section class="py-20 reveal" style="background:#1a1a1a;" id="services-section">
+<section class="py-20" style="background:#1a1a1a;" id="services-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-10">
@@ -181,13 +182,10 @@
 
         {{-- Category Tabs --}}
         <div class="flex flex-wrap justify-center gap-2 mb-10" id="cat-tabs">
-            @php
-            $cats = ['all'=>'الكل','laser'=>'الليزر','skin'=>'البشرة','massage'=>'المساج','botox'=>'البوتوكس','nails'=>'الأظافر'];
-            @endphp
+            @php $cats = ['all'=>'الكل','laser'=>'الليزر','skin'=>'البشرة','massage'=>'المساج','botox'=>'البوتوكس','nails'=>'الأظافر']; @endphp
             @foreach($cats as $key => $label)
-            <button onclick="filterServices('{{ $key }}')"
-                    data-cat="{{ $key }}"
-                    class="cat-tab px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 {{ $key==='all' ? 'cat-tab-active' : '' }}"
+            <button onclick="filterServices('{{ $key }}')" data-cat="{{ $key }}"
+                    class="cat-tab px-5 py-2 rounded-full text-sm font-bold transition-all duration-200"
                     style="{{ $key==='all' ? 'background:linear-gradient(135deg,#e8b4b8,#c9888e);color:white;' : 'background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.1);' }}">
                 {{ $label }}
             </button>
@@ -195,45 +193,47 @@
         </div>
 
         {{-- Services Grid --}}
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5" id="services-grid">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;" class="md:grid-cols-4" id="services-grid">
+            @php
+            $sImgs = [
+                'laser'   => 'https://images.unsplash.com/photo-1576426863848-c21f53c60b19?w=500&h=350&q=75&auto=format&fit=crop',
+                'skin'    => 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=500&h=350&q=75&auto=format&fit=crop',
+                'massage' => 'https://images.unsplash.com/photo-1563788240-4a32624c5e46?w=500&h=350&q=75&auto=format&fit=crop',
+                'botox'   => 'https://images.unsplash.com/photo-1519638381913-37b8c89bef64?w=500&h=350&q=75&auto=format&fit=crop',
+                'nails'   => 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500&h=350&q=75&auto=format&fit=crop',
+            ];
+            @endphp
             @forelse($services as $service)
             <div class="service-card group" data-category="{{ $service->category ?? 'all' }}">
                 <div class="relative overflow-hidden" style="height:190px;">
-                    @php
-                    $sImgs=['laser'=>'https://images.unsplash.com/photo-1559599101-f09722fb4948?w=500&h=350&q=75&auto=format&fit=crop','skin'=>'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=500&h=350&q=75&auto=format&fit=crop','massage'=>'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=500&h=350&q=75&auto=format&fit=crop','botox'=>'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=500&h=350&q=75&auto=format&fit=crop','nails'=>'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500&h=350&q=75&auto=format&fit=crop'];
-                    $img=$service->image ? asset('storage/'.$service->image) : ($sImgs[$service->category??'']??$sImgs['skin']);
-                    @endphp
+                    @php $img = $service->image ? asset('storage/'.$service->image) : ($sImgs[$service->category??'']??$sImgs['skin']); @endphp
                     <img src="{{ $img }}" alt="{{ $service->name }}"
                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                     <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(26,26,26,0.95) 0%,transparent 55%);"></div>
                     <div class="absolute bottom-3 right-3 left-3">
                         <div class="font-black text-white text-sm">{{ $service->name }}</div>
-                        @if($service->price)
-                        <div class="text-xs mt-0.5" style="color:#e8b4b8;">{{ number_format($service->price) }} د.ع</div>
-                        @endif
+                        @if($service->price)<div class="text-xs mt-0.5" style="color:#e8b4b8;">{{ number_format($service->price) }} د.ع</div>@endif
                     </div>
                 </div>
                 <div class="p-4">
                     <p class="text-xs mb-4 leading-relaxed" style="color:rgba(255,255,255,0.5);">{{ $service->description }}</p>
-                    <a href="{{ route('booking',['service_id'=>$service->id]) }}"
-                       class="btn-primary text-xs w-full justify-center" style="padding:0.5rem;">احجزي الآن</a>
+                    <a href="{{ route('booking',['service_id'=>$service->id]) }}" class="btn-primary text-xs w-full justify-center" style="padding:0.5rem;">احجزي الآن</a>
                 </div>
             </div>
             @empty
             @foreach([
-                ['name'=>'جلسات الليزر',       'cat'=>'laser',   'price'=>'150','desc'=>'إزالة الشعر بتقنيات حديثة آمنة وفعالة'],
-                ['name'=>'البشرة والنضارة',    'cat'=>'skin',    'price'=>'120','desc'=>'جلسات تنظيف ونضارة وتثبيت البشرة'],
-                ['name'=>'مساج الجسم',         'cat'=>'massage', 'price'=>'100','desc'=>'استرخاء تام وتجديد الحيوية'],
-                ['name'=>'البوتوكس والفيلر',   'cat'=>'botox',   'price'=>'300','desc'=>'إبراز جمالك بشكل طبيعي وآمن'],
-                ['name'=>'الأظافر',            'cat'=>'nails',   'price'=>'80', 'desc'=>'تصميم الأظافر بأحدث الستايلات'],
-                ['name'=>'تنظيف البشرة',       'cat'=>'skin',    'price'=>'90', 'desc'=>'جلسة تنظيف عميق وإشراق البشرة'],
-                ['name'=>'تدليك الوجه',        'cat'=>'massage', 'price'=>'85', 'desc'=>'ترطيب وإشراق وتخفيف التوتر'],
-                ['name'=>'إزالة الشعر',        'cat'=>'laser',   'price'=>'130','desc'=>'إزالة الشعر بتقنية الليزر الحديثة'],
+                ['name'=>'جلسات الليزر',      'cat'=>'laser',   'price'=>'150','desc'=>'إزالة الشعر بتقنيات حديثة آمنة وفعالة'],
+                ['name'=>'البشرة والنضارة',   'cat'=>'skin',    'price'=>'120','desc'=>'جلسات تنظيف ونضارة وتثبيت البشرة'],
+                ['name'=>'مساج الجسم',        'cat'=>'massage', 'price'=>'100','desc'=>'استرخاء تام وتجديد الحيوية'],
+                ['name'=>'البوتوكس والفيلر',  'cat'=>'botox',   'price'=>'300','desc'=>'إبراز جمالك بشكل طبيعي وآمن'],
+                ['name'=>'الأظافر',           'cat'=>'nails',   'price'=>'80', 'desc'=>'تصميم الأظافر بأحدث الستايلات'],
+                ['name'=>'تنظيف البشرة',      'cat'=>'skin',    'price'=>'90', 'desc'=>'جلسة تنظيف عميق وإشراق البشرة'],
+                ['name'=>'إزالة الشعر',       'cat'=>'laser',   'price'=>'130','desc'=>'إزالة الشعر بتقنية الليزر الحديثة'],
+                ['name'=>'علاجات الاسترخاء',  'cat'=>'massage', 'price'=>'110','desc'=>'جلسات استرخاء علاجية متخصصة'],
             ] as $s)
-            @php $imgs=['laser'=>'https://images.unsplash.com/photo-1559599101-f09722fb4948?w=500&h=350&q=75&auto=format&fit=crop','skin'=>'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=500&h=350&q=75&auto=format&fit=crop','massage'=>'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=500&h=350&q=75&auto=format&fit=crop','botox'=>'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=500&h=350&q=75&auto=format&fit=crop','nails'=>'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=500&h=350&q=75&auto=format&fit=crop']; @endphp
             <div class="service-card group" data-category="{{ $s['cat'] }}">
                 <div class="relative overflow-hidden" style="height:190px;">
-                    <img src="{{ $imgs[$s['cat']] }}" alt="{{ $s['name'] }}"
+                    <img src="{{ $sImgs[$s['cat']] }}" alt="{{ $s['name'] }}"
                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                     <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(26,26,26,0.95) 0%,transparent 55%);"></div>
                     <div class="absolute bottom-3 right-3 left-3">
@@ -260,7 +260,7 @@
 </section>
 
 {{-- =================== BOOKING STEPS VERTICAL TIMELINE =================== --}}
-<section class="py-20 reveal" style="background:#131313;">
+<section class="py-20" style="background:#131313;">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-14">
@@ -270,7 +270,6 @@
         </div>
 
         <div class="relative">
-            {{-- Vertical line --}}
             <div class="absolute hidden md:block" style="right:2.5rem;top:24px;bottom:24px;width:2px;background:linear-gradient(to bottom,rgba(232,180,184,0.6),rgba(232,180,184,0.1));border-radius:2px;"></div>
 
             @foreach([
@@ -278,17 +277,15 @@
                 ['num'=>'02','title'=>'اختاري الوقت','desc'=>'حددي التاريخ والوقت المناسب لك','svg'=>'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'],
                 ['num'=>'03','title'=>'بياناتك','desc'=>'أدخلي بياناتك للتأكيد','svg'=>'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>'],
                 ['num'=>'04','title'=>'تم الحجز','desc'=>'تم حجز موعدك بنجاح، نراكِ قريباً','svg'=>'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'],
-            ] as $i => $step)
+            ] as $step)
             <div class="flex items-start gap-6 mb-10 last:mb-0 relative">
-                {{-- Icon circle --}}
                 <div class="relative flex-shrink-0 z-10">
-                    <div class="w-20 h-20 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg,rgba(232,180,184,0.15),rgba(232,180,184,0.05));border:1px solid rgba(232,180,184,0.25);">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e8b4b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="w-20 h-20 rounded-2xl flex items-center justify-center" style="background:rgba(232,180,184,0.08);border:1px solid rgba(232,180,184,0.25);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e8b4b8" stroke-width="1.8" stroke-linecap="round">
                             {!! $step['svg'] !!}
                         </svg>
                     </div>
                 </div>
-                {{-- Content --}}
                 <div class="flex-1 pt-3">
                     <div class="flex items-center gap-4 mb-2">
                         <h3 class="text-lg font-black text-white">{{ $step['title'] }}</h3>
@@ -310,7 +307,7 @@
 </section>
 
 {{-- =================== WHY US - STATS 2x2 =================== --}}
-<section class="py-20 reveal" style="background:#1e1e1e;">
+<section class="py-20" style="background:#1e1e1e;">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-14">
@@ -319,7 +316,7 @@
             <div class="section-divider mt-4"></div>
         </div>
 
-        <div class="grid grid-cols-2 gap-5">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;">
             @foreach([
                 ['val'=>($stats['clients']>0?'+'.$stats['clients']:'+500'),'label'=>'جلسة مكتملة',   'sub'=>'عميلة وثقت بنا','icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','c'=>'#e8b4b8'],
                 ['val'=>'4.9',                                              'label'=>'تقييم العملاء','sub'=>'من أصل 5 نجوم','icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','c'=>'#c9a96e'],
@@ -343,44 +340,40 @@
     </div>
 </section>
 
-{{-- =================== CTA - ROSE CARD =================== --}}
-<section class="py-16 reveal" style="background:#1a1a1a;">
+{{-- =================== CTA - ROSE CARD (no women image) =================== --}}
+<section class="py-16" style="background:#1a1a1a;">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="rounded-3xl overflow-hidden relative" style="background:linear-gradient(135deg,#c9888e 0%,#e8b4b8 50%,#d4a0a5 100%);">
             <div class="absolute inset-0" style="background:radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.12) 0%, transparent 60%);"></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 items-center">
-                <div class="p-10 lg:p-14 relative z-10">
-                    <div class="text-xs font-bold mb-3 px-3 py-1 rounded-full inline-block" style="background:rgba(255,255,255,0.2);color:white;">عرض خاص لأول مرة</div>
-                    <h2 class="text-3xl md:text-4xl font-black text-white mb-3 leading-tight">جاهزة للتجربة؟</h2>
-                    <p class="text-lg mb-2 text-white font-bold" style="opacity:0.9;">احجزي موعدك الآن</p>
-                    <p class="text-sm mb-2" style="color:rgba(255,255,255,0.8);">واستمتعي بتجربة عناية فاخرة</p>
-                    <div class="flex items-center gap-2 mb-8">
-                        <span class="text-4xl font-black text-white">15%</span>
-                        <div>
-                            <div class="font-bold text-white text-sm">خصم خاص</div>
-                            <div class="text-xs" style="color:rgba(255,255,255,0.8);">على جميع الخدمات للحجوزات الأولى</div>
-                        </div>
+            {{-- Decorative spa image instead of woman --}}
+            <div class="absolute inset-0 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&q=60&auto=format&fit=crop"
+                     alt="" class="absolute left-0 top-0 h-full w-1/2 object-cover opacity-20" style="object-position:center;">
+            </div>
+            <div class="relative z-10 p-10 lg:p-14 text-center md:text-right">
+                <div class="text-xs font-bold mb-3 px-3 py-1 rounded-full inline-block" style="background:rgba(255,255,255,0.2);color:white;">عرض خاص لأول مرة</div>
+                <h2 class="text-3xl md:text-4xl font-black text-white mb-3 leading-tight">جاهزة للتجربة؟</h2>
+                <p class="text-lg mb-2 text-white font-bold" style="opacity:0.9;">احجزي موعدك الآن</p>
+                <p class="text-sm mb-3" style="color:rgba(255,255,255,0.8);">واستمتعي بتجربة عناية فاخرة</p>
+                <div class="flex items-center justify-center md:justify-start gap-2 mb-8">
+                    <span class="text-5xl font-black text-white">15%</span>
+                    <div>
+                        <div class="font-bold text-white text-sm">خصم خاص</div>
+                        <div class="text-xs" style="color:rgba(255,255,255,0.8);">على جميع الخدمات للحجوزات الأولى</div>
                     </div>
-                    <a href="{{ route('booking') }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-black text-base transition-all hover:scale-105"
-                       style="background:#1a1a1a;color:white;box-shadow:0 8px 25px rgba(0,0,0,0.3);">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                        احجزي الآن
-                    </a>
                 </div>
-                <div class="hidden md:block relative h-80">
-                    <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&h=500&q=80&auto=format&fit=crop&crop=right"
-                         alt="تجربة ناي سبا"
-                         class="absolute inset-0 w-full h-full object-cover"
-                         style="mix-blend-mode:multiply;opacity:0.7;">
-                    <div class="absolute inset-0" style="background:linear-gradient(to right,rgba(201,136,142,0.5) 0%,transparent 60%);"></div>
-                </div>
+                <a href="{{ route('booking') }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-black text-base transition-all hover:scale-105"
+                   style="background:#1a1a1a;color:white;box-shadow:0 8px 25px rgba(0,0,0,0.3);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    احجزي الآن
+                </a>
             </div>
         </div>
     </div>
 </section>
 
-{{-- =================== GALLERY SECTION =================== --}}
-<section class="py-20 reveal" style="background:#131313;">
+{{-- =================== GALLERY (SPA INTERIORS ONLY) =================== --}}
+<section class="py-20" style="background:#131313;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-12">
@@ -389,14 +382,14 @@
             <div class="section-divider mt-4"></div>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;" class="md:grid-cols-3">
             @foreach([
-                ['url'=>'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'جلسة علاج'],
-                ['url'=>'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'عناية بالبشرة'],
-                ['url'=>'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'تجميل'],
-                ['url'=>'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'سبا'],
-                ['url'=>'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'جلسة'],
-                ['url'=>'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'استرخاء'],
+                ['url'=>'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'قاعة السبا'],
+                ['url'=>'https://images.unsplash.com/photo-1563788240-4a32624c5e46?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أحجار الحمام المعدني'],
+                ['url'=>'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'منتجات العناية'],
+                ['url'=>'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'كريمات البشرة'],
+                ['url'=>'https://images.unsplash.com/photo-1519638381913-37b8c89bef64?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أدوات العناية'],
+                ['url'=>'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'تصميم الأظافر'],
             ] as $gimg)
             <div class="rounded-2xl overflow-hidden group cursor-pointer" style="height:220px;">
                 <img src="{{ $gimg['url'] }}" alt="{{ $gimg['alt'] }}"
@@ -415,7 +408,7 @@
 </section>
 
 {{-- =================== TESTIMONIALS SLIDER =================== --}}
-<section class="py-20 reveal" style="background:#1a1a1a;">
+<section class="py-20" style="background:#1a1a1a;">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-12">
@@ -434,11 +427,10 @@
                         </div>
                         <p class="text-base leading-relaxed mb-8" style="color:rgba(255,255,255,0.75);">{{ $t->content }}</p>
                         <div class="flex items-center justify-center gap-4">
-                            <img src="https://i.pravatar.cc/70?u={{ urlencode($t->client_name) }}"
-                                 alt="{{ $t->client_name }}"
-                                 class="w-14 h-14 rounded-full object-cover"
-                                 style="border:2px solid rgba(232,180,184,0.4);"
-                                 onerror="this.style.display='none'">
+                            <div class="w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0"
+                                 style="background:linear-gradient(135deg,#e8b4b8,#c9888e);border:2px solid rgba(232,180,184,0.4);">
+                                {{ mb_substr($t->client_name, 0, 1) }}
+                            </div>
                             <div class="text-right">
                                 <div class="font-black text-white">{{ $t->client_name }}</div>
                                 @if($t->client_city)<div class="text-xs" style="color:rgba(255,255,255,0.4);">{{ $t->client_city }}</div>@endif
@@ -451,9 +443,9 @@
                 </div>
                 @empty
                 @foreach([
-                    ['name'=>'سارة محمد','city'=>'بغداد','text'=>'أفضل تجربة ليزر وبشرة! المكان نظيف والعاملات راقيات جداً والعمالة متميزة','stars'=>5,'av'=>1],
-                    ['name'=>'نور الهدى','city'=>'النجف','text'=>'جلسات البشرة غيّرت بشرتي ١٨٠ درجة، أنصح الجميع بالتجربة ولن تندمي','stars'=>5,'av'=>5],
-                    ['name'=>'رنا أحمد','city'=>'البصرة','text'=>'خدمة ممتازة ونتائج رائعة، الفريق محترف ومؤدب وسأعود دائماً','stars'=>5,'av'=>9],
+                    ['name'=>'سارة م.','city'=>'بغداد','text'=>'أفضل تجربة ليزر وبشرة! المكان نظيف والعاملات راقيات جداً والنتائج مذهلة','stars'=>5],
+                    ['name'=>'نور الهدى','city'=>'النجف','text'=>'جلسات البشرة غيّرت بشرتي ١٨٠ درجة، أنصح الجميع بالتجربة ولن تندمي','stars'=>5],
+                    ['name'=>'رنا أ.','city'=>'البصرة','text'=>'خدمة ممتازة ونتائج رائعة، الفريق محترف ومؤدب وسأعود دائماً','stars'=>5],
                 ] as $t)
                 <div class="swiper-slide">
                     <div class="testimonial-card text-center mx-auto" style="max-width:640px;">
@@ -462,10 +454,10 @@
                         </div>
                         <p class="text-base leading-relaxed mb-8" style="color:rgba(255,255,255,0.75);">{{ $t['text'] }}</p>
                         <div class="flex items-center justify-center gap-4">
-                            <img src="https://i.pravatar.cc/70?img={{ $t['av'] }}"
-                                 alt="{{ $t['name'] }}"
-                                 class="w-14 h-14 rounded-full object-cover"
-                                 style="border:2px solid rgba(232,180,184,0.4);">
+                            <div class="w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0"
+                                 style="background:linear-gradient(135deg,#e8b4b8,#c9888e);border:2px solid rgba(232,180,184,0.4);">
+                                {{ mb_substr($t['name'], 0, 1) }}
+                            </div>
                             <div class="text-right">
                                 <div class="font-black text-white">{{ $t['name'] }}</div>
                                 <div class="text-xs" style="color:rgba(255,255,255,0.4);">{{ $t['city'] }}</div>
@@ -485,7 +477,7 @@
 </section>
 
 {{-- =================== CONTACT INFO SECTION =================== --}}
-<section class="py-20 reveal" style="background:#131313;">
+<section class="py-20" style="background:#131313;">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-12">
@@ -494,14 +486,12 @@
             <div class="section-divider mt-4"></div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div style="display:grid;grid-template-columns:repeat(1,1fr);gap:1rem;" class="md:grid-cols-2">
             @foreach([
                 ['icon'=>'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.82 19.79 19.79 0 01.21 1.22 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.86-.86a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/>','label'=>'اتصال / واتساب','val'=>'+964 456 123 770','c'=>'#e8b4b8'],
                 ['icon'=>'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>','label'=>'راسلينا','val'=>'info@nayspa.iq','c'=>'#c9a96e'],
                 ['icon'=>'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>','label'=>'موقعنا','val'=>'بغداد - المنصور - شارع 14 رمضان','c'=>'#e8b4b8'],
-                ['icon'=>'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>','label'=>'السبت - الخميس','val'=>'10:00 ص - 10:00 م','c'=>'#c9a96e'],
-                ['icon'=>'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>','label'=>'الجمعة','val'=>'2:00 م - 10:00 م','c'=>'#e8b4b8'],
-                ['icon'=>'<path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>','label'=>'احجزي الآن','val'=>'موعد فوري عبر الموقع','c'=>'#c9a96e'],
+                ['icon'=>'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>','label'=>'ساعات العمل','val'=>'السبت - الخميس: 10ص - 10م | الجمعة: 2م - 10م','c'=>'#c9a96e'],
             ] as $ci)
             <div class="flex items-center gap-4 p-5 rounded-2xl" style="background:#2a2a2a;border:1px solid rgba(255,255,255,0.05);">
                 <div class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center"
@@ -532,7 +522,7 @@
     const heroSwiper = new Swiper('.hero-swiper', {
         loop: true,
         speed: 900,
-        autoplay: { delay: 5500, disableOnInteraction: false, pauseOnMouseEnter: true },
+        autoplay: { delay: 6000, disableOnInteraction: false, pauseOnMouseEnter: true },
         effect: 'fade',
         fadeEffect: { crossFade: true },
         navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
@@ -550,17 +540,15 @@
     new Swiper('.testimonials-swiper', {
         loop: true,
         speed: 700,
-        autoplay: { delay: 4500, disableOnInteraction: false },
+        autoplay: { delay: 5000, disableOnInteraction: false },
         slidesPerView: 1,
-        spaceBetween: 20,
         pagination: { el: '.testimonials-pagination', clickable: true },
     });
 
     // Category filter
     function filterServices(cat) {
         document.querySelectorAll('.service-card').forEach(card => {
-            const match = cat === 'all' || card.dataset.category === cat;
-            card.style.display = match ? '' : 'none';
+            card.style.display = (cat === 'all' || card.dataset.category === cat) ? '' : 'none';
         });
         document.querySelectorAll('.cat-tab').forEach(btn => {
             const active = btn.dataset.cat === cat;
