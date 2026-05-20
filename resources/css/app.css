@@ -468,6 +468,16 @@ body {
     z-index: 10;
 }
 
+/* Mobile hero buttons - full width & centered */
+@media (max-width: 639px) {
+    .hero-cta-wrap { width: 100%; }
+    .hero-cta-wrap .btn-primary,
+    .hero-cta-wrap .btn-outline {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 /* Dark form inputs (booking + contact) */
 .booking-label {
     display: block;

@@ -34,7 +34,7 @@
                                 اكتشفي<br><span style="color:#e8b4b8;">عالم الفخامة</span>
                             </h1>
                             <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.7;">تجربة سبا فاخرة في أجواء هادئة ومريحة</p>
-                            <div class="flex flex-wrap gap-3 mt-8">
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     احجزي موعدك الآن
@@ -67,7 +67,7 @@
                                 جمالك<br>يبدأ <span style="color:#e8b4b8;">هنا</span>
                             </h1>
                             <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.7;">منصة حجز ذكية لجميع خدمات التجميل والعناية</p>
-                            <div class="flex flex-wrap gap-3 mt-8">
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     احجزي الآن
@@ -97,7 +97,7 @@
                                 جلسات<br><span style="color:#c9a96e;">تُجدد طاقتك</span>
                             </h1>
                             <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;">جلسات علاجية وترفيهية لتجديد الطاقة والراحة التامة</p>
-                            <div class="flex flex-wrap gap-3 mt-8">
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     احجزي الآن
@@ -127,7 +127,7 @@
                                 منتجات<br><span style="color:#e8b4b8;">تُعنى بك</span>
                             </h1>
                             <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;">أفضل منتجات العناية العالمية لنتائج مضمونة</p>
-                            <div class="flex flex-wrap gap-3 mt-8">
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
                                 <a href="{{ route('booking') }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     احجزي الآن
