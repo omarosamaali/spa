@@ -16,7 +16,7 @@
             {{-- Slide 1 – VIDEO (Spa Ambiance – first thing visitors see) --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0 overflow-hidden">
-                    <video class="hero-slide-video" autoplay muted loop playsinline preload="auto"
+                    <video class="hero-slide-video" autoplay loop playsinline preload="auto"
                            poster="https://images.unsplash.com/photo-1583416750470-965b2707b355?w=1920&q=60&auto=format&fit=crop">
                         <source src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4" type="video/mp4">
                         <source src="https://videos.pexels.com/video-files/3214436/3214436-hd_1920_1080_25fps.mp4" type="video/mp4">
@@ -518,6 +518,33 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+    function playVideoWithSound(video) {
+        if (!video) return Promise.resolve();
+        video.muted = false;
+        video.defaultMuted = false;
+        video.volume = 1;
+        return video.play().catch(() => {});
+    }
+
+    function pauseAllHeroVideos(slides) {
+        slides.forEach(slide => {
+            const v = slide.querySelector('video');
+            if (v) v.pause();
+        });
+    }
+
+    // Browsers may block autoplay with sound until first tap — enable then
+    function unlockVideoSound() {
+        document.querySelectorAll('.hero-slide-video').forEach(v => {
+            v.muted = false;
+            v.volume = 1;
+        });
+        const active = document.querySelector('.hero-swiper .swiper-slide-active video');
+        if (active) playVideoWithSound(active);
+    }
+    document.addEventListener('click', unlockVideoSound, { once: true, passive: true });
+    document.addEventListener('touchstart', unlockVideoSound, { once: true, passive: true });
+
     // Hero Swiper
     const heroSwiper = new Swiper('.hero-swiper', {
         loop: true,
@@ -532,20 +559,17 @@
         resistanceRatio: 0,
         on: {
             init() {
-                // Play video on first slide immediately
                 const first = this.slides[this.activeIndex];
-                const v = first?.querySelector('video');
-                if (v) { v.muted = true; v.play().catch(() => {}); }
+                playVideoWithSound(first?.querySelector('video'));
             },
             slideChangeTransitionStart() {
-                // Pause all videos, play only the active one
-                this.slides.forEach(slide => {
-                    const v = slide.querySelector('video');
-                    if (v) v.pause();
-                });
+                pauseAllHeroVideos(this.slides);
                 const active = this.slides[this.activeIndex];
                 const av = active?.querySelector('video');
-                if (av) { av.currentTime = 0; av.play().catch(() => {}); }
+                if (av) {
+                    av.currentTime = 0;
+                    playVideoWithSound(av);
+                }
             }
         }
     });
