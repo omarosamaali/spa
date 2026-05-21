@@ -48,6 +48,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/services/{service}', [DashboardController::class, 'destroyService'])->name('services.destroy');
     Route::patch('/services/{service}/toggle', [DashboardController::class, 'toggleService'])->name('services.toggle');
 
+    // Branding (colors, logo, favicon)
+    Route::get('/branding-settings', [DashboardController::class, 'brandingSettings'])->name('branding-settings');
+    Route::put('/branding-settings', [DashboardController::class, 'updateBrandingSettings'])->name('branding-settings.update');
+
     // Contact & WhatsApp settings
     Route::get('/contact-settings', [DashboardController::class, 'contactSettings'])->name('contact-settings');
     Route::put('/contact-settings', [DashboardController::class, 'updateContactSettings'])->name('contact-settings.update');

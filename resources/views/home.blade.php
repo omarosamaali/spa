@@ -80,28 +80,6 @@
     <div class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none" style="background:linear-gradient(to top,rgba(26,26,26,1) 0%,transparent 100%);height:100px;"></div>
 </section>
 
-{{-- =================== STATS BAR =================== --}}
-<section style="background:#1a1a1a;padding:2.5rem 0;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;" class="md:grid-cols-4">
-            @foreach([
-                ['val'=> ($stats['clients']>0 ? '+'.$stats['clients'] : '+500'), 'label'=>'جلسة مكتملة',  'icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','c'=>'#e8b4b8'],
-                ['val'=> '4.9',                                                  'label'=>'تقييم العملاء','icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','c'=>'#c9a96e'],
-                ['val'=> '10+',                                                  'label'=>'خبراء متخصصين','icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','c'=>'#e8b4b8'],
-                ['val'=> '100%',                                                 'label'=>'رضا العميلات', 'icon'=>'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>','c'=>'#c9a96e'],
-            ] as $s)
-            <div class="stat-card text-center">
-                <div style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;background:rgba({{ $s['c']==='#e8b4b8'?'232,180,184':'201,169,110' }},0.1);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ $s['c'] }}" stroke-width="2" stroke-linecap="round">{!! $s['icon'] !!}</svg>
-                </div>
-                <div class="text-3xl font-black mb-1" style="color:{{ $s['c'] }};">{{ $s['val'] }}</div>
-                <div class="text-sm" style="color:rgba(255,255,255,0.5);">{{ $s['label'] }}</div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-
 {{-- =================== SERVICES + CATEGORY TABS =================== --}}
 <section class="py-20" style="background:#1a1a1a;" id="services-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -125,34 +103,26 @@
             @endforeach
         </div>
 
-        {{-- Services Grid --}}
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;" class="md:grid-cols-4" id="services-grid">
+        {{-- Services Grid — full-bleed image cards --}}
+        <div class="services-grid-home" id="services-grid">
             @php
             $sImgs = [
-                'laser'   => 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=500&h=350&q=75&auto=format&fit=crop',
-                'skin'    => 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=500&h=350&q=75&auto=format&fit=crop',
-                'massage' => 'https://images.unsplash.com/photo-1563788240-4a32624c5e46?w=500&h=350&q=75&auto=format&fit=crop',
-                'botox'   => 'https://images.unsplash.com/photo-1556760544-74068565f05c?w=500&h=350&q=75&auto=format&fit=crop',
-                'nails'   => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500&h=350&q=75&auto=format&fit=crop',
+                'laser'   => 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&h=800&q=80&auto=format&fit=crop',
+                'skin'    => 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=800&q=80&auto=format&fit=crop',
+                'massage' => 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600&h=800&q=80&auto=format&fit=crop',
+                'botox'   => 'https://images.unsplash.com/photo-1556760544-74068565f05c?w=600&h=800&q=80&auto=format&fit=crop',
+                'nails'   => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=800&q=80&auto=format&fit=crop',
             ];
             @endphp
             @forelse($services as $service)
-            <div class="service-card group" data-category="{{ $service->category ?? 'all' }}">
-                <div class="relative overflow-hidden" style="height:190px;">
-                    @php $img = $service->image ? asset('storage/'.$service->image) : ($sImgs[$service->category??'']??$sImgs['skin']); @endphp
-                    <img src="{{ $img }}" alt="{{ $service->name }}"
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(26,26,26,0.95) 0%,transparent 55%);"></div>
-                    <div class="absolute bottom-3 right-3 left-3">
-                        <div class="font-black text-white text-sm">{{ $service->name }}</div>
-                        @if($service->price)<div class="text-xs mt-0.5" style="color:#e8b4b8;">{{ number_format($service->price) }} د.ع</div>@endif
-                    </div>
-                </div>
-                <div class="p-4">
-                    <p class="text-xs mb-4 leading-relaxed" style="color:rgba(255,255,255,0.5);">{{ $service->description }}</p>
-                    <a href="{{ route('booking',['service_id'=>$service->id]) }}" class="btn-primary text-xs w-full justify-center" style="padding:0.5rem;">احجزي الآن</a>
-                </div>
-            </div>
+            @include('partials.service-card-home', [
+                'img' => $service->image ? asset('storage/'.$service->image) : ($sImgs[$service->category ?? ''] ?? $sImgs['skin']),
+                'name' => $service->name,
+                'desc' => $service->description,
+                'price' => $service->price,
+                'category' => $service->category ?? 'all',
+                'bookingUrl' => route('booking', ['service_id' => $service->id]),
+            ])
             @empty
             @foreach([
                 ['name'=>'جلسات الليزر',      'cat'=>'laser',   'price'=>'150','desc'=>'إزالة الشعر بتقنيات حديثة آمنة وفعالة'],
@@ -164,21 +134,14 @@
                 ['name'=>'إزالة الشعر',       'cat'=>'laser',   'price'=>'130','desc'=>'إزالة الشعر بتقنية الليزر الحديثة'],
                 ['name'=>'علاجات الاسترخاء',  'cat'=>'massage', 'price'=>'110','desc'=>'جلسات استرخاء علاجية متخصصة'],
             ] as $s)
-            <div class="service-card group" data-category="{{ $s['cat'] }}">
-                <div class="relative overflow-hidden" style="height:190px;">
-                    <img src="{{ $sImgs[$s['cat']] }}" alt="{{ $s['name'] }}"
-                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(26,26,26,0.95) 0%,transparent 55%);"></div>
-                    <div class="absolute bottom-3 right-3 left-3">
-                        <div class="font-black text-white text-sm">{{ $s['name'] }}</div>
-                        <div class="text-xs mt-0.5" style="color:#e8b4b8;">{{ $s['price'] }} د.ع</div>
-                    </div>
-                </div>
-                <div class="p-4">
-                    <p class="text-xs mb-4 leading-relaxed" style="color:rgba(255,255,255,0.5);">{{ $s['desc'] }}</p>
-                    <a href="{{ route('booking') }}" class="btn-primary text-xs w-full justify-center" style="padding:0.5rem;">احجزي الآن</a>
-                </div>
-            </div>
+            @include('partials.service-card-home', [
+                'img' => $sImgs[$s['cat']],
+                'name' => $s['name'],
+                'desc' => $s['desc'],
+                'price' => $s['price'],
+                'category' => $s['cat'],
+                'bookingUrl' => route('booking'),
+            ])
             @endforeach
             @endforelse
         </div>
@@ -235,40 +198,6 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 احجزي الآن
             </a>
-        </div>
-    </div>
-</section>
-
-{{-- =================== WHY US - STATS 2x2 =================== --}}
-<section class="py-20" style="background:#1e1e1e;">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div class="text-center mb-14">
-            <div class="badge-spa mb-4">لماذا نحن؟</div>
-            <h2 class="text-3xl md:text-4xl font-black text-white mb-3">تجربة تستحقينها</h2>
-            <div class="section-divider mt-4"></div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;">
-            @foreach([
-                ['val'=>($stats['clients']>0?'+'.$stats['clients']:'+500'),'label'=>'جلسة مكتملة',   'sub'=>'عميلة وثقت بنا','icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','c'=>'#e8b4b8'],
-                ['val'=>'4.9',                                              'label'=>'تقييم العملاء','sub'=>'من أصل 5 نجوم','icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','c'=>'#c9a96e'],
-                ['val'=>'10+',                                              'label'=>'خبراء متخصصين','sub'=>'فريق احترافي مدرّب','icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','c'=>'#c9a96e'],
-                ['val'=>'100%',                                             'label'=>'رضا العملاء',  'sub'=>'ضماننا الدائم لكِ','icon'=>'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>','c'=>'#e8b4b8'],
-            ] as $st)
-            <div class="rounded-2xl p-7 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1"
-                 style="background:#2a2a2a;border:1px solid rgba(255,255,255,0.06);">
-                <div class="w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center"
-                     style="background:rgba({{ $st['c']==='#e8b4b8'?'232,180,184':'201,169,110' }},0.1);">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{ $st['c'] }}" stroke-width="1.8" stroke-linecap="round">{!! $st['icon'] !!}</svg>
-                </div>
-                <div>
-                    <div class="text-3xl font-black leading-none" style="color:{{ $st['c'] }};">{{ $st['val'] }}</div>
-                    <div class="font-bold text-white text-sm mt-1">{{ $st['label'] }}</div>
-                    <div class="text-xs mt-0.5" style="color:rgba(255,255,255,0.4);">{{ $st['sub'] }}</div>
-                </div>
-            </div>
-            @endforeach
         </div>
     </div>
 </section>
@@ -451,6 +380,40 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                 ارسلي رسالة
             </a>
+        </div>
+    </div>
+</section>
+
+{{-- =================== WHY US - STATS 2x2 (آخر قسم) =================== --}}
+<section class="py-20" style="background:#1e1e1e;">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-14">
+            <div class="badge-spa mb-4">لماذا نحن؟</div>
+            <h2 class="text-3xl md:text-4xl font-black text-white mb-3">تجربة تستحقينها</h2>
+            <div class="section-divider mt-4"></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;">
+            @foreach([
+                ['val'=>($stats['clients']>0?'+'.$stats['clients']:'+500'),'label'=>'جلسة مكتملة',   'sub'=>'عميلة وثقت بنا','icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','c'=>'#e8b4b8'],
+                ['val'=>'4.9',                                              'label'=>'تقييم العملاء','sub'=>'من أصل 5 نجوم','icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','c'=>'#c9a96e'],
+                ['val'=>'10+',                                              'label'=>'خبراء متخصصين','sub'=>'فريق احترافي مدرّب','icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','c'=>'#c9a96e'],
+                ['val'=>'100%',                                             'label'=>'رضا العملاء',  'sub'=>'ضماننا الدائم لكِ','icon'=>'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>','c'=>'#e8b4b8'],
+            ] as $st)
+            <div class="rounded-2xl p-7 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1"
+                 style="background:#2a2a2a;border:1px solid rgba(255,255,255,0.06);">
+                <div class="w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center"
+                     style="background:rgba({{ $st['c']==='#e8b4b8'?'232,180,184':'201,169,110' }},0.1);">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{ $st['c'] }}" stroke-width="1.8" stroke-linecap="round">{!! $st['icon'] !!}</svg>
+                </div>
+                <div>
+                    <div class="text-3xl font-black leading-none" style="color:{{ $st['c'] }};">{{ $st['val'] }}</div>
+                    <div class="font-bold text-white text-sm mt-1">{{ $st['label'] }}</div>
+                    <div class="text-xs mt-0.5" style="color:rgba(255,255,255,0.4);">{{ $st['sub'] }}</div>
+                </div>
+            </div>
+            @endforeach
         </div>
     </div>
 </section>

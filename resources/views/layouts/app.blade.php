@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.site-theme-vars')
+    @include('partials.site-favicon')
     @stack('head')
 </head>
 <body>
@@ -18,27 +20,7 @@
     <nav class="navbar gradient-hero py-4" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between gap-2 min-w-0">
-                {{-- Logo --}}
-                <a href="{{ route('home') }}" class="flex items-center gap-2 text-white no-underline min-w-0 flex-shrink">
-                    <div class="text-right min-w-0">
-                        <div class="navbar-brand-text text-xl font-black tracking-wider" style="letter-spacing:3px">NAY SPA</div>
-                        <div class="navbar-tagline text-xs opacity-70" style="color:#e8b4b8">جمالك يستحق العناية</div>
-                    </div>
-                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <ellipse cx="20" cy="14" rx="5" ry="10" fill="url(#lpetal1)" opacity="0.9"/>
-                        <ellipse cx="20" cy="14" rx="5" ry="10" fill="url(#lpetal2)" opacity="0.75" transform="rotate(60 20 20)"/>
-                        <ellipse cx="20" cy="14" rx="5" ry="10" fill="url(#lpetal1)" opacity="0.65" transform="rotate(120 20 20)"/>
-                        <ellipse cx="20" cy="14" rx="5" ry="10" fill="url(#lpetal2)" opacity="0.6" transform="rotate(180 20 20)"/>
-                        <ellipse cx="20" cy="14" rx="5" ry="10" fill="url(#lpetal1)" opacity="0.55" transform="rotate(240 20 20)"/>
-                        <ellipse cx="20" cy="14" rx="5" ry="10" fill="url(#lpetal2)" opacity="0.5" transform="rotate(300 20 20)"/>
-                        <circle cx="20" cy="20" r="6" fill="url(#lcenter)"/>
-                        <defs>
-                            <linearGradient id="lpetal1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5dfe1"/><stop offset="100%" stop-color="#c9888e" stop-opacity="0.5"/></linearGradient>
-                            <linearGradient id="lpetal2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c9a96e"/><stop offset="100%" stop-color="#e8b4b8" stop-opacity="0.4"/></linearGradient>
-                            <radialGradient id="lcenter" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#e8b4b8"/><stop offset="100%" stop-color="#c9888e"/></radialGradient>
-                        </defs>
-                    </svg>
-                </a>
+                @include('partials.site-logo', ['size' => 32])
 
                 {{-- Desktop Nav --}}
                 <div class="hidden md:flex items-center gap-8">

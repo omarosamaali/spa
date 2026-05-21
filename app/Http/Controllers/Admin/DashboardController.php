@@ -270,6 +270,73 @@ class DashboardController extends Controller
         return $url;
     }
 
+    // =================== BRANDING (COLORS / LOGO / FAVICON) ===================
+
+    public function brandingSettings()
+    {
+        $theme = SiteSetting::theme();
+
+        $settings = [];
+        foreach (SiteSetting::themeKeys() as $key) {
+            $settings[$key] = SiteSetting::get($key, SiteSetting::defaults()[$key] ?? '');
+        }
+
+        return view('admin.branding-settings', compact('theme', 'settings'));
+    }
+
+    public function updateBrandingSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'theme_primary'       => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
+            'theme_primary_dark'  => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
+            'theme_primary_light' => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
+            'theme_gold'          => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
+            'theme_dark'          => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
+            'theme_dark_2'        => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
+            'site_name'           => 'required|string|max:80',
+            'site_tagline'        => 'nullable|string|max:120',
+            'logo_file'           => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'favicon_file'        => 'nullable|file|mimes:jpeg,png,jpg,webp,ico,svg|max:512',
+        ], [
+            'theme_primary.regex' => 'لون غير صالح (مثال: #e8b4b8)',
+        ]);
+
+        foreach (['theme_primary', 'theme_primary_dark', 'theme_primary_light', 'theme_gold', 'theme_dark', 'theme_dark_2'] as $colorKey) {
+            SiteSetting::set($colorKey, SiteSetting::normalizeHexColor($validated[$colorKey]));
+        }
+
+        SiteSetting::set('site_name', $validated['site_name']);
+        SiteSetting::set('site_tagline', $validated['site_tagline'] ?? '');
+
+        $logoPath = SiteSetting::get('logo_path');
+        if ($request->boolean('remove_logo') && $logoPath) {
+            Storage::disk('public')->delete($logoPath);
+            SiteSetting::set('logo_path', '');
+        }
+        if ($request->hasFile('logo_file')) {
+            if ($logoPath) {
+                Storage::disk('public')->delete($logoPath);
+            }
+            SiteSetting::set('logo_path', $request->file('logo_file')->store('branding', 'public'));
+        }
+
+        $faviconPath = SiteSetting::get('favicon_path');
+        if ($request->boolean('remove_favicon') && $faviconPath) {
+            Storage::disk('public')->delete($faviconPath);
+            SiteSetting::set('favicon_path', '');
+        }
+        if ($request->hasFile('favicon_file')) {
+            if ($faviconPath) {
+                Storage::disk('public')->delete($faviconPath);
+            }
+            SiteSetting::set('favicon_path', $request->file('favicon_file')->store('branding', 'public'));
+        }
+
+        SiteSetting::clearThemeCache();
+
+        return redirect()->route('admin.branding-settings')->with('success', 'تم تحديث ألوان الموقع والشعار بنجاح');
+    }
+
     // =================== HERO SLIDER ===================
 
     public function heroSlides()

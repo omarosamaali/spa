@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class SiteSetting extends Model
 {
@@ -29,7 +30,97 @@ class SiteSetting extends Model
             'social_facebook'        => '',
             'social_tiktok'          => '',
             'social_snapchat'        => '',
+            'theme_primary'          => '#e8b4b8',
+            'theme_primary_dark'     => '#c9888e',
+            'theme_primary_light'    => '#f5dfe1',
+            'theme_gold'             => '#c9a96e',
+            'theme_dark'             => '#1a1a1a',
+            'theme_dark_2'           => '#2a2a2a',
+            'site_name'              => 'NAY SPA',
+            'site_tagline'           => 'جمالك يستحق العناية',
+            'logo_path'              => '',
+            'favicon_path'           => '',
         ];
+    }
+
+    public static function themeKeys(): array
+    {
+        return [
+            'theme_primary', 'theme_primary_dark', 'theme_primary_light',
+            'theme_gold', 'theme_dark', 'theme_dark_2',
+            'site_name', 'site_tagline', 'logo_path', 'favicon_path',
+        ];
+    }
+
+    public static function normalizeHexColor(string $color): string
+    {
+        $color = trim($color);
+        if (! str_starts_with($color, '#')) {
+            $color = '#' . $color;
+        }
+
+        return strtolower($color);
+    }
+
+    public static function assetUrl(?string $path): ?string
+    {
+        if (! $path || ! Storage::disk('public')->exists($path)) {
+            return null;
+        }
+
+        return asset('storage/' . $path);
+    }
+
+    public static function theme(): array
+    {
+        $defaults = static::defaults();
+
+        if (! static::tableReady()) {
+            return static::buildThemePayload($defaults);
+        }
+
+        return Cache::remember('site_setting_theme', 3600, function () use ($defaults) {
+            $values = $defaults;
+            foreach (static::themeKeys() as $key) {
+                $stored = static::where('key', $key)->value('value');
+                if ($stored !== null && $stored !== '') {
+                    $values[$key] = $stored;
+                }
+            }
+
+            return static::buildThemePayload($values);
+        });
+    }
+
+    public static function buildThemePayload(array $values): array
+    {
+        $primary = static::normalizeHexColor($values['theme_primary'] ?? '#e8b4b8');
+        $primaryDark = static::normalizeHexColor($values['theme_primary_dark'] ?? '#c9888e');
+        $logoPath = $values['logo_path'] ?? '';
+        $faviconPath = $values['favicon_path'] ?? '';
+
+        return [
+            'primary'          => $primary,
+            'primary_dark'     => $primaryDark,
+            'primary_light'    => static::normalizeHexColor($values['theme_primary_light'] ?? '#f5dfe1'),
+            'gold'             => static::normalizeHexColor($values['theme_gold'] ?? '#c9a96e'),
+            'dark'             => static::normalizeHexColor($values['theme_dark'] ?? '#1a1a1a'),
+            'dark_2'           => static::normalizeHexColor($values['theme_dark_2'] ?? '#2a2a2a'),
+            'site_name'        => $values['site_name'] ?? 'NAY SPA',
+            'site_tagline'     => $values['site_tagline'] ?? 'جمالك يستحق العناية',
+            'logo_url'         => static::assetUrl($logoPath),
+            'favicon_url'      => static::assetUrl($faviconPath),
+            'has_logo'         => (bool) static::assetUrl($logoPath),
+            'has_favicon'      => (bool) static::assetUrl($faviconPath),
+        ];
+    }
+
+    public static function clearThemeCache(): void
+    {
+        Cache::forget('site_setting_theme');
+        foreach (static::themeKeys() as $key) {
+            Cache::forget("site_setting_{$key}");
+        }
     }
 
     public static function socialPlatforms(): array
@@ -87,6 +178,9 @@ class SiteSetting extends Model
         }
         if (str_starts_with($key, 'contact_') || str_starts_with($key, 'whatsapp_') || str_starts_with($key, 'social_')) {
             static::clearContactCache();
+        }
+        if (in_array($key, static::themeKeys(), true)) {
+            static::clearThemeCache();
         }
     }
 

@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.site-theme-vars')
+    @include('partials.site-favicon')
 </head>
 <body class="admin-panel" style="background:#f5f0f0; color:#1a1a1a; margin:0">
 
@@ -18,25 +20,12 @@
 <div class="flex min-h-screen">
 
     {{-- Sidebar --}}
-    <aside class="w-64 flex-shrink-0 flex flex-col" style="background:#1a1a1a; min-height:100vh; position:sticky; top:0; height:100vh">
+    <aside class="w-64 flex-shrink-0 flex flex-col admin-sidebar" style="min-height:100vh; position:sticky; top:0; height:100vh">
 
         {{-- Logo --}}
         <div class="p-6" style="border-bottom:1px solid rgba(255,255,255,0.08)">
-            <a href="{{ route('home') }}" class="flex items-center gap-3 text-white no-underline">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#e8b4b8,#c9888e)">
-                    <svg width="20" height="20" viewBox="0 0 120 120" fill="none">
-                        <ellipse cx="60" cy="45" rx="14" ry="28" fill="rgba(255,255,255,0.9)"/>
-                        <ellipse cx="60" cy="45" rx="14" ry="28" fill="rgba(255,255,255,0.7)" transform="rotate(90 60 60)"/>
-                        <ellipse cx="60" cy="45" rx="14" ry="28" fill="rgba(255,255,255,0.5)" transform="rotate(45 60 60)"/>
-                        <ellipse cx="60" cy="45" rx="14" ry="28" fill="rgba(255,255,255,0.5)" transform="rotate(135 60 60)"/>
-                        <circle cx="60" cy="60" r="14" fill="white"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="font-black text-sm tracking-widest">NAY SPA</div>
-                    <div class="text-xs" style="color:rgba(255,255,255,0.4)">لوحة التحكم</div>
-                </div>
-            </a>
+            @include('partials.site-logo', ['size' => 36, 'textClass' => 'text-sm'])
+            <div class="text-xs mt-2 pr-1" style="color:rgba(255,255,255,0.4)">لوحة التحكم</div>
         </div>
 
         {{-- Navigation --}}
@@ -49,6 +38,8 @@
                  'svg'=>'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'],
                 ['route'=>'admin.services', 'label'=>'الخدمات',
                  'svg'=>'<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>'],
+                ['route'=>'admin.branding-settings', 'label'=>'الألوان والشعار',
+                 'svg'=>'<circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'],
                 ['route'=>'admin.contact-settings', 'label'=>'إعدادات التواصل',
                  'svg'=>'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.8 19.79 19.79 0 01.22 2.18 2 2 0 012.22 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/>'],
                 ['route'=>'admin.hero-slides', 'label'=>'سلايدر الرئيسية',
@@ -62,7 +53,7 @@
             @php $isActive = request()->routeIs($item['route']) || request()->routeIs($item['route'] . '.*'); @endphp
             <a href="{{ route($item['route']) }}"
                class="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all"
-               style="color:{{ $isActive ? '#e8b4b8' : 'rgba(255,255,255,0.6)' }};
+               style="color:{{ $isActive ? 'var(--spa-primary)' : 'rgba(255,255,255,0.6)' }};
                       background:{{ $isActive ? 'rgba(232,180,184,0.12)' : 'transparent' }}">
                 <div class="flex items-center gap-3">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -73,7 +64,7 @@
                 {{-- Unread badge for contacts --}}
                 @if($item['route'] === 'admin.contacts' && $unreadContactsCount > 0)
                 <span class="text-xs font-black px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
-                      style="background:#e8b4b8; color:#1a1a1a">
+                      style="background:var(--spa-primary); color:var(--spa-dark)">
                     {{ $unreadContactsCount > 99 ? '99+' : $unreadContactsCount }}
                 </span>
                 @endif
@@ -86,7 +77,7 @@
             @auth
             <div class="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl" style="background:rgba(255,255,255,0.05)">
                 <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white"
-                     style="background:linear-gradient(135deg,#e8b4b8,#c9888e)">
+                     style="background:linear-gradient(135deg,var(--spa-primary),var(--spa-primary-dark))">
                     {{ mb_substr(Auth::user()->name, 0, 1) }}
                 </div>
                 <div class="flex-1 min-w-0">
