@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\ContactMessage;
 use App\Models\Service;
 use App\Models\HeroSlide;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -182,6 +183,93 @@ class DashboardController extends Controller
         return back()->with('success', 'تم حذف الرسالة');
     }
 
+    // =================== CONTACT / WHATSAPP SETTINGS ===================
+
+    public function contactSettings()
+    {
+        $c = SiteSetting::contactInfo();
+
+        $settings = [
+            'phone'            => SiteSetting::get('contact_phone', $c['phone']),
+            'phone_raw'        => SiteSetting::get('contact_phone_raw', $c['phone_raw']),
+            'whatsapp_phone'   => SiteSetting::get('contact_whatsapp_phone', $c['whatsapp_phone']),
+            'whatsapp_raw'     => SiteSetting::get('contact_whatsapp_raw', $c['whatsapp_raw']),
+            'email'            => SiteSetting::get('contact_email', $c['email']),
+            'address'          => SiteSetting::get('contact_address', $c['address']),
+            'hours_weekdays'   => SiteSetting::get('contact_hours_weekdays', $c['hours_weekdays']),
+            'hours_friday'     => SiteSetting::get('contact_hours_friday', $c['hours_friday']),
+            'whatsapp_text'    => SiteSetting::get('whatsapp_default_text', $c['whatsapp_text']),
+            'social_instagram' => SiteSetting::get('social_instagram', ''),
+            'social_facebook'  => SiteSetting::get('social_facebook', ''),
+            'social_tiktok'    => SiteSetting::get('social_tiktok', ''),
+            'social_snapchat'  => SiteSetting::get('social_snapchat', ''),
+        ];
+
+        return view('admin.contact-settings', compact('settings', 'c'));
+    }
+
+    public function updateContactSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'contact_phone'            => 'required|string|max:50',
+            'contact_phone_raw'        => 'nullable|string|max:20',
+            'contact_whatsapp_phone'   => 'nullable|string|max:50',
+            'contact_whatsapp_raw'     => 'nullable|string|max:20',
+            'contact_email'            => 'nullable|email|max:255',
+            'contact_address'          => 'required|string|max:500',
+            'contact_hours_weekdays'   => 'required|string|max:100',
+            'contact_hours_friday'     => 'required|string|max:100',
+            'whatsapp_default_text'    => 'nullable|string|max:500',
+            'social_instagram'         => 'nullable|string|max:500',
+            'social_facebook'          => 'nullable|string|max:500',
+            'social_tiktok'            => 'nullable|string|max:500',
+            'social_snapchat'          => 'nullable|string|max:500',
+        ], [
+            'contact_phone.required' => 'رقم الهاتف مطلوب',
+            'contact_email.email'    => 'البريد الإلكتروني غير صالح',
+        ]);
+
+        $phoneRaw = $validated['contact_phone_raw']
+            ? SiteSetting::normalizePhone($validated['contact_phone_raw'])
+            : SiteSetting::normalizePhone($validated['contact_phone']);
+
+        $waPhone = $validated['contact_whatsapp_phone'] ?: $validated['contact_phone'];
+        $waRaw = $validated['contact_whatsapp_raw']
+            ? SiteSetting::normalizePhone($validated['contact_whatsapp_raw'])
+            : $phoneRaw;
+
+        SiteSetting::set('contact_phone', $validated['contact_phone']);
+        SiteSetting::set('contact_phone_raw', $phoneRaw);
+        SiteSetting::set('contact_whatsapp_phone', $waPhone);
+        SiteSetting::set('contact_whatsapp_raw', $waRaw);
+        SiteSetting::set('contact_email', $validated['contact_email'] ?? '');
+        SiteSetting::set('contact_address', $validated['contact_address']);
+        SiteSetting::set('contact_hours_weekdays', $validated['contact_hours_weekdays']);
+        SiteSetting::set('contact_hours_friday', $validated['contact_hours_friday']);
+        SiteSetting::set('whatsapp_default_text', $validated['whatsapp_default_text'] ?? '');
+
+        foreach (['instagram', 'facebook', 'tiktok', 'snapchat'] as $platform) {
+            SiteSetting::set('social_' . $platform, $this->normalizeSocialUrl($validated['social_' . $platform] ?? ''));
+        }
+
+        SiteSetting::clearContactCache();
+
+        return redirect()->route('admin.contact-settings')->with('success', 'تم تحديث بيانات التواصل والسوشيال بنجاح');
+    }
+
+    private function normalizeSocialUrl(?string $url): string
+    {
+        $url = trim($url ?? '');
+        if ($url === '') {
+            return '';
+        }
+        if (! preg_match('#^https?://#i', $url)) {
+            $url = 'https://' . $url;
+        }
+
+        return $url;
+    }
+
     // =================== HERO SLIDER ===================
 
     public function heroSlides()
@@ -201,7 +289,14 @@ class DashboardController extends Controller
                 continue;
             }
 
-            $slide->type = in_array($data['type'] ?? '', ['image', 'video']) ? $data['type'] : 'image';
+            $newType = in_array($data['type'] ?? '', ['image', 'video']) ? $data['type'] : 'image';
+            $oldType = $slide->type;
+
+            if ($oldType !== $newType) {
+                $this->cleanupHeroSlideMediaOnTypeChange($slide, $newType);
+            }
+
+            $slide->type = $newType;
             $slide->badge = $data['badge'] ?? $slide->badge;
             $slide->title = $data['title'] ?? $slide->title;
             $slide->title_highlight = $data['title_highlight'] ?? $slide->title_highlight;
@@ -212,16 +307,16 @@ class DashboardController extends Controller
             $slide->btn_secondary_url = $data['btn_secondary_url'] ?? $slide->btn_secondary_url;
             $slide->is_active = isset($data['is_active']);
 
-            if (! empty($data['media_url'])) {
-                $slide->media_url = $data['media_url'];
+            if (array_key_exists('media_url', $data)) {
+                $slide->media_url = $data['media_url'] ?: null;
             }
 
-            if (! empty($data['media_url_alt'])) {
-                $slide->media_url_alt = $data['media_url_alt'];
-            }
-
-            if (! empty($data['poster_url'])) {
-                $slide->poster_url = $data['poster_url'];
+            if ($slide->type === 'video') {
+                $slide->media_url_alt = ! empty($data['media_url_alt']) ? $data['media_url_alt'] : null;
+                $slide->poster_url = ! empty($data['poster_url']) ? $data['poster_url'] : null;
+            } else {
+                $slide->media_url_alt = null;
+                $slide->poster_url = null;
             }
 
             if (! empty($data['remove_media']) && $slide->media_path) {
@@ -243,17 +338,44 @@ class DashboardController extends Controller
                 $slide->media_path = $mediaFile->store($folder, 'public');
             }
 
-            $posterFile = $request->file("slides.{$id}.poster_file");
-            if ($posterFile) {
-                if ($slide->poster_path) {
-                    Storage::disk('public')->delete($slide->poster_path);
+            if ($slide->type === 'video') {
+                $posterFile = $request->file("slides.{$id}.poster_file");
+                if ($posterFile) {
+                    if ($slide->poster_path) {
+                        Storage::disk('public')->delete($slide->poster_path);
+                    }
+                    $slide->poster_path = $posterFile->store('hero/posters', 'public');
                 }
-                $slide->poster_path = $posterFile->store('hero/posters', 'public');
+            } elseif ($slide->poster_path) {
+                Storage::disk('public')->delete($slide->poster_path);
+                $slide->poster_path = null;
             }
 
             $slide->save();
         }
 
         return redirect()->route('admin.hero-slides')->with('success', 'تم تحديث سلايدر الصفحة الرئيسية بنجاح');
+    }
+
+    private function cleanupHeroSlideMediaOnTypeChange(HeroSlide $slide, string $newType): void
+    {
+        $slide->media_url = null;
+        $slide->media_url_alt = null;
+        $slide->poster_url = null;
+
+        if ($slide->poster_path) {
+            Storage::disk('public')->delete($slide->poster_path);
+            $slide->poster_path = null;
+        }
+
+        if ($newType === 'image') {
+            if ($slide->media_path && str_starts_with($slide->media_path, 'hero/videos')) {
+                Storage::disk('public')->delete($slide->media_path);
+                $slide->media_path = null;
+            }
+        } elseif ($slide->media_path && str_starts_with($slide->media_path, 'hero/images')) {
+            Storage::disk('public')->delete($slide->media_path);
+            $slide->media_path = null;
+        }
     }
 }

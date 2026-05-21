@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body style="background:#f5f0f0; margin:0">
+<body class="admin-panel" style="background:#f5f0f0; color:#1a1a1a; margin:0">
 
 @php
     $unreadContactsCount = \App\Models\ContactMessage::where('is_read', false)->count();
@@ -49,6 +49,8 @@
                  'svg'=>'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'],
                 ['route'=>'admin.services', 'label'=>'الخدمات',
                  'svg'=>'<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>'],
+                ['route'=>'admin.contact-settings', 'label'=>'إعدادات التواصل',
+                 'svg'=>'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.8 19.79 19.79 0 01.22 2.18 2 2 0 012.22 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/>'],
                 ['route'=>'admin.hero-slides', 'label'=>'سلايدر الرئيسية',
                  'svg'=>'<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>'],
                 ['route'=>'admin.contacts', 'label'=>'الرسائل',

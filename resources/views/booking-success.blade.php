@@ -44,7 +44,7 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="https://wa.me/9647701234567?text=مرحبا، حجزت موعد برقم%20%23{{ str_pad($appointment->id, 4, '0', STR_PAD_LEFT) }}"
+            <a href="{{ $siteContact['whatsapp_url_plain'] }}?text={{ rawurlencode('مرحبا، حجزت موعد برقم #' . str_pad($appointment->id, 4, '0', STR_PAD_LEFT)) }}"
                class="btn-whatsapp justify-center">
                 💬 تواصلي معنا
             </a>

@@ -62,8 +62,8 @@
                         <div class="text-xs" style="color:#aaa">{{ $a->client_email }}</div>
                         @endif
                     </td>
-                    <td class="p-4">
-                        <div class="font-bold">{{ $a->service->name ?? '-' }}</div>
+                    <td class="p-4" style="color:#1a1a1a">
+                        <div class="font-bold" style="color:#1a1a1a">{{ $a->service->name ?? '-' }}</div>
                         @if($a->staff)
                         <div class="text-xs" style="color:#888">{{ $a->staff->name }}</div>
                         @endif
@@ -82,7 +82,7 @@
                         <form method="POST" action="{{ route('admin.appointments.status', $a) }}">
                             @csrf @method('PATCH')
                             <select name="status" onchange="this.form.submit()"
-                                    class="text-xs rounded-lg px-2 py-1 border" style="border-color:#e8e0dd; background:white">
+                                    class="admin-select text-xs rounded-lg px-2 py-1.5 border font-bold cursor-pointer">
                                 <option value="pending"   {{ $a->status === 'pending' ? 'selected' : '' }}>انتظار</option>
                                 <option value="confirmed" {{ $a->status === 'confirmed' ? 'selected' : '' }}>تأكيد</option>
                                 <option value="completed" {{ $a->status === 'completed' ? 'selected' : '' }}>مكتمل</option>

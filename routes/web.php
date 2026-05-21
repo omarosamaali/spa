@@ -48,6 +48,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/services/{service}', [DashboardController::class, 'destroyService'])->name('services.destroy');
     Route::patch('/services/{service}/toggle', [DashboardController::class, 'toggleService'])->name('services.toggle');
 
+    // Contact & WhatsApp settings
+    Route::get('/contact-settings', [DashboardController::class, 'contactSettings'])->name('contact-settings');
+    Route::put('/contact-settings', [DashboardController::class, 'updateContactSettings'])->name('contact-settings.update');
+
     // Hero slider (images + videos)
     Route::get('/hero-slides', [DashboardController::class, 'heroSlides'])->name('hero-slides');
     Route::put('/hero-slides', [DashboardController::class, 'updateHeroSlides'])->name('hero-slides.update');

@@ -8,16 +8,18 @@
     <p class="text-sm" style="color:#888">عدّل صور وفيديوهات ونصوص كل شرائح الهيرو ({{ $slides->count() }} شرائح)</p>
 </div>
 
-<form action="{{ route('admin.hero-slides.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+<form action="{{ route('admin.hero-slides.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" id="heroSlidesForm">
     @csrf
     @method('PUT')
 
     @foreach($slides as $slide)
-    <div class="bg-white rounded-2xl p-6 shadow-sm" style="border-right:4px solid {{ $slide->is_active ? '#e8b4b8' : '#e5e7eb' }}">
+    <div class="hero-slide-card bg-white rounded-2xl p-6 shadow-sm"
+         data-slide-id="{{ $slide->id }}"
+         style="border-right:4px solid {{ $slide->is_active ? '#e8b4b8' : '#e5e7eb' }}">
         <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
             <h2 class="text-lg font-black" style="color:#1a1a1a">
                 شريحة {{ $slide->sort_order }}
-                <span class="text-sm font-bold mr-2 px-2 py-0.5 rounded-full"
+                <span class="slide-type-badge text-sm font-bold mr-2 px-2 py-0.5 rounded-full"
                       style="background:{{ $slide->type === 'video' ? '#dbeafe' : '#fce7f3' }}; color:{{ $slide->type === 'video' ? '#2563eb' : '#c9888e' }}">
                     {{ $slide->type === 'video' ? 'فيديو' : 'صورة' }}
                 </span>
@@ -33,65 +35,91 @@
             <div class="space-y-4">
                 <div>
                     <label class="form-label">نوع الشريحة</label>
-                    <select name="slides[{{ $slide->id }}][type]" class="form-input">
+                    <select name="slides[{{ $slide->id }}][type]" class="form-input slide-type-select admin-select">
                         <option value="image" {{ $slide->type === 'image' ? 'selected' : '' }}>صورة</option>
                         <option value="video" {{ $slide->type === 'video' ? 'selected' : '' }}>فيديو</option>
                     </select>
                 </div>
 
-                <div>
-                    <label class="form-label">{{ $slide->type === 'video' ? 'رابط الفيديو (MP4)' : 'رابط الصورة' }}</label>
-                    <input type="url" name="slides[{{ $slide->id }}][media_url]" value="{{ $slide->media_url }}"
-                           class="form-input" dir="ltr" placeholder="https://...">
+                {{-- Image fields --}}
+                <div class="slide-media-image space-y-4" data-slide-media="image">
+                    <div>
+                        <label class="form-label">رابط الصورة</label>
+                        <input type="url" name="slides[{{ $slide->id }}][media_url]"
+                               value="{{ $slide->type === 'image' ? $slide->media_url : '' }}"
+                               class="form-input slide-media-url-input" dir="ltr" placeholder="https://..."
+                               data-initial="{{ $slide->type === 'image' ? $slide->media_url : '' }}">
+                    </div>
+                    <div>
+                        <label class="form-label">أو ارفع صورة من الجهاز</label>
+                        <input type="file" name="slides[{{ $slide->id }}][media_file]"
+                               accept="image/jpeg,image/png,image/webp"
+                               class="form-input slide-media-file-input" style="padding:0.5rem">
+                        <p class="text-xs mt-1" style="color:#888">JPG / PNG / WebP — حتى 2MB</p>
+                    </div>
                 </div>
 
-                @if($slide->type === 'video')
-                <div>
-                    <label class="form-label">رابط فيديو احتياطي (اختياري)</label>
-                    <input type="url" name="slides[{{ $slide->id }}][media_url_alt]" value="{{ $slide->media_url_alt }}"
-                           class="form-input" dir="ltr">
+                {{-- Video fields --}}
+                <div class="slide-media-video space-y-4" data-slide-media="video">
+                    <div>
+                        <label class="form-label">رابط الفيديو (MP4)</label>
+                        <input type="url" name="slides[{{ $slide->id }}][media_url]"
+                               value="{{ $slide->type === 'video' ? $slide->media_url : '' }}"
+                               class="form-input slide-media-url-input" dir="ltr" placeholder="https://...mp4"
+                               data-initial="{{ $slide->type === 'video' ? $slide->media_url : '' }}">
+                    </div>
+                    <div>
+                        <label class="form-label">رابط فيديو احتياطي (اختياري)</label>
+                        <input type="url" name="slides[{{ $slide->id }}][media_url_alt]"
+                               value="{{ $slide->type === 'video' ? $slide->media_url_alt : '' }}"
+                               class="form-input" dir="ltr" placeholder="https://...mp4">
+                    </div>
+                    <div>
+                        <label class="form-label">صورة الغلاف (Poster)</label>
+                        <input type="url" name="slides[{{ $slide->id }}][poster_url]"
+                               value="{{ $slide->type === 'video' ? $slide->poster_url : '' }}"
+                               class="form-input slide-poster-url-input" dir="ltr" placeholder="https://...jpg">
+                    </div>
+                    <div>
+                        <label class="form-label">أو ارفع فيديو من الجهاز</label>
+                        <input type="file" name="slides[{{ $slide->id }}][media_file]"
+                               accept="video/mp4,video/webm"
+                               class="form-input slide-media-file-input" style="padding:0.5rem">
+                        <p class="text-xs mt-1" style="color:#888">MP4 / WebM — حتى 50MB</p>
+                    </div>
+                    <div>
+                        <label class="form-label">رفع صورة غلاف (اختياري)</label>
+                        <input type="file" name="slides[{{ $slide->id }}][poster_file]" accept="image/*"
+                               class="form-input" style="padding:0.5rem">
+                    </div>
                 </div>
-                <div>
-                    <label class="form-label">صورة الغلاف (Poster)</label>
-                    <input type="url" name="slides[{{ $slide->id }}][poster_url]" value="{{ $slide->poster_url }}"
-                           class="form-input" dir="ltr">
-                </div>
-                @endif
-
-                <div>
-                    <label class="form-label">أو ارفع ملف من الجهاز</label>
-                    <input type="file" name="slides[{{ $slide->id }}][media_file]"
-                           accept="{{ $slide->type === 'video' ? 'video/mp4,video/webm' : 'image/jpeg,image/png,image/webp' }}"
-                           class="form-input" style="padding:0.5rem">
-                    <p class="text-xs mt-1" style="color:#888">{{ $slide->type === 'video' ? 'MP4/WebM حتى 50MB' : 'JPG/PNG/WebP حتى 2MB' }}</p>
-                </div>
-
-                @if($slide->type === 'video')
-                <div>
-                    <label class="form-label">رفع صورة غلاف (اختياري)</label>
-                    <input type="file" name="slides[{{ $slide->id }}][poster_file]" accept="image/*"
-                           class="form-input" style="padding:0.5rem">
-                </div>
-                @endif
 
                 @if($slide->media_path)
-                <label class="flex items-center gap-2 text-sm" style="color:#dc2626">
+                <label class="flex items-center gap-2 text-sm slide-remove-media" style="color:#dc2626">
                     <input type="checkbox" name="slides[{{ $slide->id }}][remove_media]" value="1">
-                    حذف الملف المرفوع
+                    حذف الملف المرفوع ({{ basename($slide->media_path) }})
+                </label>
+                @endif
+
+                @if($slide->poster_path)
+                <label class="flex items-center gap-2 text-sm slide-remove-poster slide-media-video" style="color:#dc2626">
+                    <input type="checkbox" name="slides[{{ $slide->id }}][remove_poster]" value="1">
+                    حذف صورة الغلاف المرفوعة
                 </label>
                 @endif
             </div>
 
             {{-- Preview + Text --}}
             <div class="space-y-4">
-                <div class="rounded-xl overflow-hidden" style="background:#1a1a1a; aspect-ratio:16/9">
-                    @if($slide->isVideo())
-                    <video controls muted class="w-full h-full object-cover" poster="{{ $slide->posterSrc() }}">
-                        <source src="{{ $slide->mediaSrc() }}" type="video/mp4">
+                <div class="rounded-xl overflow-hidden slide-preview-wrap" style="background:#1a1a1a; aspect-ratio:16/9">
+                    <img src="{{ $slide->type === 'image' ? $slide->mediaSrc() : ($slide->posterSrc() ?: '') }}"
+                         alt="" class="slide-preview-img w-full h-full object-cover"
+                         style="{{ $slide->type === 'video' ? 'display:none' : '' }}">
+                    <video controls muted class="slide-preview-video w-full h-full object-cover"
+                           poster="{{ $slide->posterSrc() }}"
+                           style="{{ $slide->type === 'image' ? 'display:none' : '' }}">
+                        <source src="{{ $slide->type === 'video' ? $slide->mediaSrc() : '' }}" type="video/mp4">
                     </video>
-                    @else
-                    <img src="{{ $slide->mediaSrc() }}" alt="" class="w-full h-full object-cover">
-                    @endif
                 </div>
 
                 <div>
@@ -148,3 +176,87 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const badgeStyles = {
+        image: { bg: '#fce7f3', color: '#c9888e', label: 'صورة' },
+        video: { bg: '#dbeafe', color: '#2563eb', label: 'فيديو' },
+    };
+
+    function setGroupEnabled(group, enabled) {
+        group.querySelectorAll('input, select, textarea').forEach(function (el) {
+            el.disabled = !enabled;
+        });
+    }
+
+    function applySlideType(card) {
+        const select = card.querySelector('.slide-type-select');
+        const type = select.value;
+        const isVideo = type === 'video';
+        const imageGroup = card.querySelector('.slide-media-image');
+        const videoGroup = card.querySelector('.slide-media-video');
+
+        imageGroup.style.display = isVideo ? 'none' : '';
+        videoGroup.style.display = isVideo ? '' : 'none';
+        setGroupEnabled(imageGroup, !isVideo);
+        setGroupEnabled(videoGroup, isVideo);
+
+        card.querySelectorAll('.slide-remove-poster').forEach(function (el) {
+            el.style.display = isVideo ? '' : 'none';
+            el.querySelectorAll('input').forEach(function (inp) {
+                inp.disabled = !isVideo;
+            });
+        });
+
+        const badge = card.querySelector('.slide-type-badge');
+        const s = badgeStyles[type];
+        badge.textContent = s.label;
+        badge.style.background = s.bg;
+        badge.style.color = s.color;
+
+        updatePreview(card);
+    }
+
+    function updatePreview(card) {
+        const isVideo = card.querySelector('.slide-type-select').value === 'video';
+        const activeGroup = card.querySelector(isVideo ? '.slide-media-video' : '.slide-media-image');
+        const urlInput = activeGroup.querySelector('.slide-media-url-input');
+        const posterInput = card.querySelector('.slide-poster-url-input');
+        const img = card.querySelector('.slide-preview-img');
+        const video = card.querySelector('.slide-preview-video');
+        const src = (urlInput && urlInput.value.trim()) || (urlInput && urlInput.dataset.initial) || '';
+
+        if (isVideo) {
+            img.style.display = 'none';
+            video.style.display = '';
+            const source = video.querySelector('source');
+            if (source && src) source.src = src;
+            video.load();
+            const poster = posterInput && posterInput.value.trim();
+            if (poster) video.poster = poster;
+        } else {
+            video.style.display = 'none';
+            img.style.display = '';
+            if (src) img.src = src;
+        }
+    }
+
+    document.querySelectorAll('.hero-slide-card').forEach(function (card) {
+        const typeSelect = card.querySelector('.slide-type-select');
+        typeSelect.addEventListener('change', function () {
+            applySlideType(card);
+        });
+
+        card.querySelectorAll('.slide-media-url-input, .slide-poster-url-input').forEach(function (input) {
+            input.addEventListener('input', function () {
+                updatePreview(card);
+            });
+        });
+
+        applySlideType(card);
+    });
+})();
+</script>
+@endpush

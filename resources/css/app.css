@@ -327,6 +327,27 @@ main {
     font-size: 0.9rem;
 }
 
+/* Admin panel – override dark-site body text on light UI */
+.admin-panel {
+    color: #1a1a1a;
+}
+
+.admin-panel select,
+.admin-panel .admin-select {
+    color: #1a1a1a !important;
+    background-color: #fff !important;
+    border: 1px solid #e8e0dd !important;
+}
+
+.admin-panel select option {
+    color: #1a1a1a !important;
+    background-color: #fff !important;
+}
+
+.admin-panel table td {
+    color: #1a1a1a;
+}
+
 /* Stars */
 .stars {
     color: #f59e0b;

@@ -420,12 +420,15 @@
         </div>
 
         <div style="display:grid;grid-template-columns:repeat(1,1fr);gap:1rem;" class="md:grid-cols-2">
-            @foreach([
-                ['icon'=>'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.82 19.79 19.79 0 01.21 1.22 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.86-.86a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/>','label'=>'اتصال / واتساب','val'=>'+964 456 123 770','c'=>'#e8b4b8'],
-                ['icon'=>'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>','label'=>'راسلينا','val'=>'info@nayspa.iq','c'=>'#c9a96e'],
-                ['icon'=>'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>','label'=>'موقعنا','val'=>'بغداد - المنصور - شارع 14 رمضان','c'=>'#e8b4b8'],
-                ['icon'=>'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>','label'=>'ساعات العمل','val'=>'السبت - الخميس: 10ص - 10م | الجمعة: 2م - 10م','c'=>'#c9a96e'],
-            ] as $ci)
+            @php
+                $homeContactItems = [
+                    ['icon'=>'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.82 19.79 19.79 0 01.21 1.22 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.86-.86a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/>','label'=>'اتصال / واتساب','val'=>$siteContact['phone'],'href'=>$siteContact['tel_url'],'c'=>'#e8b4b8'],
+                    ['icon'=>'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>','label'=>'راسلينا','val'=>$siteContact['email'],'href'=>$siteContact['mailto_url'],'c'=>'#c9a96e'],
+                    ['icon'=>'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>','label'=>'موقعنا','val'=>$siteContact['address'],'href'=>null,'c'=>'#e8b4b8'],
+                    ['icon'=>'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>','label'=>'ساعات العمل','val'=>'السبت — الخميس: '.$siteContact['hours_weekdays'].' | الجمعة: '.$siteContact['hours_friday'],'href'=>null,'c'=>'#c9a96e'],
+                ];
+            @endphp
+            @foreach($homeContactItems as $ci)
             <div class="flex items-center gap-4 p-5 rounded-2xl" style="background:#2a2a2a;border:1px solid rgba(255,255,255,0.05);">
                 <div class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center"
                      style="background:rgba({{ $ci['c']==='#e8b4b8'?'232,180,184':'201,169,110' }},0.1);">
@@ -433,7 +436,11 @@
                 </div>
                 <div>
                     <div class="text-xs font-bold mb-0.5" style="color:{{ $ci['c'] }};">{{ $ci['label'] }}</div>
+                    @if(!empty($ci['href']))
+                    <a href="{{ $ci['href'] }}" class="text-sm text-white font-medium no-underline hover:opacity-80 block" @if(str_contains($ci['href'], 'tel:')) dir="ltr" @endif>{{ $ci['val'] }}</a>
+                    @else
                     <div class="text-sm text-white font-medium">{{ $ci['val'] }}</div>
+                    @endif
                 </div>
             </div>
             @endforeach

@@ -56,7 +56,7 @@
                 <div>
                     <label class="booking-label">رقم الهاتف <span style="color:#e8b4b8">*</span></label>
                     <input type="tel" name="client_phone" value="{{ old('client_phone') }}"
-                           class="booking-input" placeholder="+964 770 123 4567" required>
+                           class="booking-input" placeholder="{{ $siteContact['phone'] }}" required>
                 </div>
 
                 {{-- Email --}}
