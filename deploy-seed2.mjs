@@ -42,6 +42,7 @@ async function main() {
 
   console.log('\n--- Seed site settings (if needed) ---');
   await run(conn, `cd ${APP} && php artisan db:seed --class=SiteSettingsSeeder --force 2>&1`);
+  await run(conn, `cd ${APP} && php artisan db:seed --class=HeroSlidesSeeder --force 2>&1`);
 
   console.log('\n--- Clear & Cache ---');
   await run(conn, `cd ${APP} && php artisan optimize 2>&1`);

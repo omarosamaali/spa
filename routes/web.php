@@ -48,9 +48,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/services/{service}', [DashboardController::class, 'destroyService'])->name('services.destroy');
     Route::patch('/services/{service}/toggle', [DashboardController::class, 'toggleService'])->name('services.toggle');
 
-    // Hero video settings
-    Route::get('/hero-video', [DashboardController::class, 'heroVideo'])->name('hero-video');
-    Route::put('/hero-video', [DashboardController::class, 'updateHeroVideo'])->name('hero-video.update');
+    // Hero slider (images + videos)
+    Route::get('/hero-slides', [DashboardController::class, 'heroSlides'])->name('hero-slides');
+    Route::put('/hero-slides', [DashboardController::class, 'updateHeroSlides'])->name('hero-slides.update');
+    Route::redirect('/hero-video', '/admin/hero-slides');
 
     // Contact Messages
     Route::get('/contacts', [DashboardController::class, 'contacts'])->name('contacts');

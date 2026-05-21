@@ -27,5 +27,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(SpaSeeder::class);
         $this->call(SiteSettingsSeeder::class);
+        $this->call(HeroSlidesSeeder::class);
     }
 }

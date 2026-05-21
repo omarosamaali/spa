@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\ContactMessage;
 use App\Models\Service;
-use App\Models\SiteSetting;
+use App\Models\HeroSlide;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -182,69 +182,78 @@ class DashboardController extends Controller
         return back()->with('success', 'تم حذف الرسالة');
     }
 
-    // =================== HERO VIDEO ===================
+    // =================== HERO SLIDER ===================
 
-    public function heroVideo()
+    public function heroSlides()
     {
-        $hero = SiteSetting::heroVideo();
+        $slides = HeroSlide::orderBy('sort_order')->get();
 
-        $settings = [
-            'url'      => SiteSetting::get('hero_video_url', $hero['url']),
-            'url_alt'  => SiteSetting::get('hero_video_url_alt', $hero['src_alt']),
-            'poster'   => SiteSetting::get('hero_video_poster', $hero['poster']),
-            'path'     => SiteSetting::get('hero_video_path'),
-        ];
-
-        return view('admin.hero-video', compact('hero', 'settings'));
+        return view('admin.hero-slides', compact('slides'));
     }
 
-    public function updateHeroVideo(Request $request)
+    public function updateHeroSlides(Request $request)
     {
-        $validated = $request->validate([
-            'hero_video_url'      => 'nullable|url|max:2000',
-            'hero_video_url_alt'  => 'nullable|url|max:2000',
-            'hero_video_poster'   => 'nullable|url|max:2000',
-            'hero_video_file'     => 'nullable|file|mimes:mp4,webm|max:51200',
-            'remove_uploaded'     => 'nullable|boolean',
-        ], [
-            'hero_video_url.url'     => 'رابط الفيديو غير صالح',
-            'hero_video_url_alt.url' => 'رابط الفيديو الاحتياطي غير صالح',
-            'hero_video_poster.url'  => 'رابط صورة الغلاف غير صالح',
-            'hero_video_file.mimes'  => 'يجب أن يكون الفيديو بصيغة MP4 أو WebM',
-            'hero_video_file.max'    => 'حجم الفيديو يجب ألا يتجاوز 50 ميغابايت',
-        ]);
+        $slidesData = $request->input('slides', []);
 
-        if ($request->boolean('remove_uploaded')) {
-            $oldPath = SiteSetting::get('hero_video_path');
-            if ($oldPath) {
-                Storage::disk('public')->delete($oldPath);
+        foreach ($slidesData as $id => $data) {
+            $slide = HeroSlide::find($id);
+            if (! $slide) {
+                continue;
             }
-            SiteSetting::set('hero_video_path', null);
-        }
 
-        if ($request->hasFile('hero_video_file')) {
-            $oldPath = SiteSetting::get('hero_video_path');
-            if ($oldPath) {
-                Storage::disk('public')->delete($oldPath);
+            $slide->type = in_array($data['type'] ?? '', ['image', 'video']) ? $data['type'] : 'image';
+            $slide->badge = $data['badge'] ?? $slide->badge;
+            $slide->title = $data['title'] ?? $slide->title;
+            $slide->title_highlight = $data['title_highlight'] ?? $slide->title_highlight;
+            $slide->subtitle = $data['subtitle'] ?? $slide->subtitle;
+            $slide->btn_primary_text = $data['btn_primary_text'] ?? $slide->btn_primary_text;
+            $slide->btn_primary_url = $data['btn_primary_url'] ?? $slide->btn_primary_url;
+            $slide->btn_secondary_text = $data['btn_secondary_text'] ?? $slide->btn_secondary_text;
+            $slide->btn_secondary_url = $data['btn_secondary_url'] ?? $slide->btn_secondary_url;
+            $slide->is_active = isset($data['is_active']);
+
+            if (! empty($data['media_url'])) {
+                $slide->media_url = $data['media_url'];
             }
-            $path = $request->file('hero_video_file')->store('hero', 'public');
-            SiteSetting::set('hero_video_path', $path);
+
+            if (! empty($data['media_url_alt'])) {
+                $slide->media_url_alt = $data['media_url_alt'];
+            }
+
+            if (! empty($data['poster_url'])) {
+                $slide->poster_url = $data['poster_url'];
+            }
+
+            if (! empty($data['remove_media']) && $slide->media_path) {
+                Storage::disk('public')->delete($slide->media_path);
+                $slide->media_path = null;
+            }
+
+            if (! empty($data['remove_poster']) && $slide->poster_path) {
+                Storage::disk('public')->delete($slide->poster_path);
+                $slide->poster_path = null;
+            }
+
+            $mediaFile = $request->file("slides.{$id}.media_file");
+            if ($mediaFile) {
+                if ($slide->media_path) {
+                    Storage::disk('public')->delete($slide->media_path);
+                }
+                $folder = $slide->type === 'video' ? 'hero/videos' : 'hero/images';
+                $slide->media_path = $mediaFile->store($folder, 'public');
+            }
+
+            $posterFile = $request->file("slides.{$id}.poster_file");
+            if ($posterFile) {
+                if ($slide->poster_path) {
+                    Storage::disk('public')->delete($slide->poster_path);
+                }
+                $slide->poster_path = $posterFile->store('hero/posters', 'public');
+            }
+
+            $slide->save();
         }
 
-        if ($request->filled('hero_video_url')) {
-            SiteSetting::set('hero_video_url', $validated['hero_video_url']);
-        }
-
-        if ($request->has('hero_video_url_alt')) {
-            SiteSetting::set('hero_video_url_alt', $validated['hero_video_url_alt'] ?? '');
-        }
-
-        if ($request->has('hero_video_poster')) {
-            SiteSetting::set('hero_video_poster', $validated['hero_video_poster'] ?? '');
-        }
-
-        SiteSetting::clearHeroVideoCache();
-
-        return redirect()->route('admin.hero-video')->with('success', 'تم تحديث فيديو الصفحة الرئيسية بنجاح');
+        return redirect()->route('admin.hero-slides')->with('success', 'تم تحديث سلايدر الصفحة الرئيسية بنجاح');
     }
 }

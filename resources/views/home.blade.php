@@ -13,133 +13,64 @@
     <div class="swiper hero-swiper w-full max-w-full" style="height:100%;">
         <div class="swiper-wrapper">
 
-            {{-- Slide 1 – VIDEO (Spa Ambiance – first thing visitors see) --}}
+            @foreach($heroSlides as $slide)
+            @php
+                $accent = $slide->sort_order === 3 ? '#c9a96e' : '#e8b4b8';
+                $accentBg = $slide->sort_order === 3 ? 'rgba(201,169,110,0.15)' : 'rgba(232,180,184,0.15)';
+                $accentBorder = $slide->sort_order === 3 ? 'rgba(201,169,110,0.35)' : 'rgba(232,180,184,0.35)';
+                $btnUrl = fn($link) => str_starts_with($link ?? '', 'http') ? $link : url($link ?? '/');
+            @endphp
             <div class="swiper-slide relative">
-                <div class="absolute inset-0 overflow-hidden">
+                <div class="absolute inset-0{{ $slide->isVideo() ? ' overflow-hidden' : '' }}">
+                    @if($slide->isVideo())
                     <video class="hero-slide-video" autoplay muted loop playsinline preload="auto"
-                           poster="{{ $heroVideo['poster'] }}">
-                        <source src="{{ $heroVideo['src'] }}" type="video/mp4">
-                        @if($heroVideo['src_alt'])
-                        <source src="{{ $heroVideo['src_alt'] }}" type="video/mp4">
+                           poster="{{ $slide->posterSrc() }}">
+                        <source src="{{ $slide->mediaSrc() }}" type="video/mp4">
+                        @if($slide->mediaSrcAlt())
+                        <source src="{{ $slide->mediaSrcAlt() }}" type="video/mp4">
                         @endif
                     </video>
+                    @else
+                    <img src="{{ $slide->mediaSrc() }}" alt="{{ $slide->title }}"
+                         class="w-full h-full object-cover">
+                    @endif
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(18,8,14,0.88) 0%,rgba(18,8,14,0.42) 55%,rgba(40,18,28,0.75) 100%);"></div>
                 </div>
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
                     <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-6 w-full max-w-full box-border">
                         <div class="max-w-xl">
-                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
+                            @if($slide->badge)
+                            <div class="badge-spa mb-5 inline-flex" style="background:{{ $accentBg }};color:{{ $accent }};border-color:{{ $accentBorder }};">
+                                @if($slide->isVideo())
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                تجربة NAY SPA الفعلية
-                            </div>
-                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
-                                اكتشفي<br><span style="color:#e8b4b8;">عالم الفخامة</span>
-                            </h1>
-                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.7;">تجربة سبا فاخرة في أجواء هادئة ومريحة</p>
-                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
-                                <a href="{{ route('booking') }}" class="btn-primary">
-                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    احجزي موعدك الآن
-                                </a>
-                                <a href="https://wa.me/9647701234567" class="btn-outline">
-                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.095.541 4.063 1.49 5.776L0 24l6.385-1.474A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.853 0-3.584-.504-5.074-1.38l-.361-.214-3.741.863.933-3.638-.235-.374A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-                                    تواصل معنا
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Slide 2 – Luxury Spa Interior --}}
-            <div class="swiper-slide relative">
-                <div class="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1583416750470-965b2707b355?w=1920&q=80&auto=format&fit=crop"
-                         alt="مركز ناي سبا" class="w-full h-full object-cover">
-                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(20,8,12,0.9) 0%,rgba(20,8,12,0.5) 55%,rgba(50,30,35,0.75) 100%);"></div>
-                </div>
-                <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
-                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-6 w-full max-w-full box-border">
-                        <div class="max-w-xl">
-                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
+                                @else
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                أحدث تقنيات • أفضل تجربة
+                                @endif
+                                {{ $slide->badge }}
                             </div>
+                            @endif
                             <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
-                                جمالك<br>يبدأ <span style="color:#e8b4b8;">هنا</span>
+                                {{ $slide->title }}@if($slide->title_highlight)<br><span style="color:{{ $accent }};">{{ $slide->title_highlight }}</span>@endif
                             </h1>
-                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.7;">منصة حجز ذكية لجميع خدمات التجميل والعناية</p>
+                            @if($slide->subtitle)
+                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.7;">{{ $slide->subtitle }}</p>
+                            @endif
                             <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
-                                <a href="{{ route('booking') }}" class="btn-primary">
+                                @if($slide->btn_primary_text)
+                                <a href="{{ $btnUrl($slide->btn_primary_url) }}" class="btn-primary">
                                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    احجزي الآن
+                                    {{ $slide->btn_primary_text }}
                                 </a>
-                                <a href="{{ route('services') }}" class="btn-outline">جميع الخدمات</a>
+                                @endif
+                                @if($slide->btn_secondary_text)
+                                <a href="{{ $btnUrl($slide->btn_secondary_url) }}" class="btn-outline">{{ $slide->btn_secondary_text }}</a>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {{-- Slide 3 – Spa Candles & Stones (NO body) --}}
-            <div class="swiper-slide relative">
-                <div class="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1508380702597-707c1b00695c?w=1920&q=80&auto=format&fit=crop"
-                         alt="جلسات استرخاء" class="w-full h-full object-cover">
-                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(10,18,28,0.9) 0%,rgba(10,18,28,0.5) 55%,rgba(20,35,50,0.78) 100%);"></div>
-                </div>
-                <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
-                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-6 w-full max-w-full box-border">
-                        <div class="max-w-xl">
-                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(201,169,110,0.15);color:#c9a96e;border-color:rgba(201,169,110,0.35);">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                استرخاء تام • تجديد الحيوية
-                            </div>
-                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
-                                جلسات<br><span style="color:#c9a96e;">تُجدد طاقتك</span>
-                            </h1>
-                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;">جلسات علاجية وترفيهية لتجديد الطاقة والراحة التامة</p>
-                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
-                                <a href="{{ route('booking') }}" class="btn-primary">
-                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    احجزي الآن
-                                </a>
-                                <a href="{{ route('services') }}" class="btn-outline">جميع الخدمات</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Slide 4 – Spa Products --}}
-            <div class="swiper-slide relative">
-                <div class="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1556760544-74068565f05c?w=1920&q=80&auto=format&fit=crop"
-                         alt="منتجات العناية" class="w-full h-full object-cover">
-                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(28,8,18,0.9) 0%,rgba(28,8,18,0.5) 55%,rgba(55,18,35,0.78) 100%);"></div>
-                </div>
-                <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
-                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-6 w-full max-w-full box-border">
-                        <div class="max-w-xl">
-                            <div class="badge-spa mb-5 inline-flex" style="background:rgba(232,180,184,0.15);color:#e8b4b8;border-color:rgba(232,180,184,0.35);">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                منتجات فاخرة • نتائج مذهلة
-                            </div>
-                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
-                                منتجات<br><span style="color:#e8b4b8;">تُعنى بك</span>
-                            </h1>
-                            <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;">أفضل منتجات العناية العالمية لنتائج مضمونة</p>
-                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
-                                <a href="{{ route('booking') }}" class="btn-primary">
-                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    احجزي الآن
-                                </a>
-                                <a href="{{ route('contact') }}" class="btn-outline">تواصلي معنا</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforeach
 
         </div>
         <div class="swiper-button-prev"></div>

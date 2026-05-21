@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Service;
-use App\Models\SiteSetting;
+use App\Models\HeroSlide;
 use App\Models\Staff;
 use App\Models\Testimonial;
 
@@ -22,9 +22,11 @@ class HomeController extends Controller
             'rating'   => 100,
         ];
 
-        $heroVideo = SiteSetting::heroVideo();
+        $heroSlides = \Illuminate\Support\Facades\Schema::hasTable('hero_slides')
+            ? HeroSlide::active()->get()
+            : collect();
 
-        return view('home', compact('services', 'testimonials', 'stats', 'heroVideo'));
+        return view('home', compact('services', 'testimonials', 'stats', 'heroSlides'));
     }
 
     public function services()
