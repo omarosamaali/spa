@@ -9,6 +9,7 @@ const SSH = {
 };
 
 const APP = '/home/u133574193/domains/smartbookiq.com/nayspa';
+const PUB = '/home/u133574193/domains/smartbookiq.com/public_html';
 
 function run(conn, cmd) {
   return new Promise((res, rej) => {
@@ -28,23 +29,26 @@ async function main() {
   console.log('Connected!\n');
 
   console.log('--- Discarding local changes ---');
-  await run(conn, `cd ${APP} && git checkout -- database/factories/UserFactory.php`);
+  await run(conn, `cd ${APP} && git checkout -- database/factories/UserFactory.php 2>/dev/null; true`);
 
   console.log('\n--- Git Pull ---');
   await run(conn, `cd ${APP} && git pull origin main 2>&1`);
 
-  console.log('\n--- Clear cache ---');
-  await run(conn, `cd ${APP} && php artisan config:clear 2>&1`);
+  console.log('\n--- Sync build assets (rm + fresh copy) ---');
+  await run(conn, `rm -rf ${PUB}/build && cp -r ${APP}/public/build ${PUB}/build && echo "Build synced OK"`);
 
-  console.log('\n--- Seed ---');
-  await run(conn, `cd ${APP} && php artisan db:seed --force 2>&1`);
+  console.log('\n--- Migrate ---');
+  await run(conn, `cd ${APP} && php artisan migrate --force 2>&1`);
 
-  console.log('\n--- Cache ---');
+  console.log('\n--- Seed site settings (if needed) ---');
+  await run(conn, `cd ${APP} && php artisan db:seed --class=SiteSettingsSeeder --force 2>&1`);
+
+  console.log('\n--- Clear & Cache ---');
   await run(conn, `cd ${APP} && php artisan optimize 2>&1`);
 
   console.log('\n--- Test ---');
   const s = await run(conn, `curl -sk -o /dev/null -w "%{http_code}" https://smartbookiq.com/`);
-  console.log(`\nHome status: ${s}`);
+  console.log(`\nHome status: ${s.trim()}`);
 
   conn.end();
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Service;
+use App\Models\SiteSetting;
 use App\Models\Staff;
 use App\Models\Testimonial;
 
@@ -21,7 +22,9 @@ class HomeController extends Controller
             'rating'   => 100,
         ];
 
-        return view('home', compact('services', 'testimonials', 'stats'));
+        $heroVideo = SiteSetting::heroVideo();
+
+        return view('home', compact('services', 'testimonials', 'stats', 'heroVideo'));
     }
 
     public function services()

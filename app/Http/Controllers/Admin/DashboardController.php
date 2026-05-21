@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\ContactMessage;
 use App\Models\Service;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -179,5 +180,71 @@ class DashboardController extends Controller
     {
         $message->delete();
         return back()->with('success', 'تم حذف الرسالة');
+    }
+
+    // =================== HERO VIDEO ===================
+
+    public function heroVideo()
+    {
+        $hero = SiteSetting::heroVideo();
+
+        $settings = [
+            'url'      => SiteSetting::get('hero_video_url', $hero['url']),
+            'url_alt'  => SiteSetting::get('hero_video_url_alt', $hero['src_alt']),
+            'poster'   => SiteSetting::get('hero_video_poster', $hero['poster']),
+            'path'     => SiteSetting::get('hero_video_path'),
+        ];
+
+        return view('admin.hero-video', compact('hero', 'settings'));
+    }
+
+    public function updateHeroVideo(Request $request)
+    {
+        $validated = $request->validate([
+            'hero_video_url'      => 'nullable|url|max:2000',
+            'hero_video_url_alt'  => 'nullable|url|max:2000',
+            'hero_video_poster'   => 'nullable|url|max:2000',
+            'hero_video_file'     => 'nullable|file|mimes:mp4,webm|max:51200',
+            'remove_uploaded'     => 'nullable|boolean',
+        ], [
+            'hero_video_url.url'     => 'رابط الفيديو غير صالح',
+            'hero_video_url_alt.url' => 'رابط الفيديو الاحتياطي غير صالح',
+            'hero_video_poster.url'  => 'رابط صورة الغلاف غير صالح',
+            'hero_video_file.mimes'  => 'يجب أن يكون الفيديو بصيغة MP4 أو WebM',
+            'hero_video_file.max'    => 'حجم الفيديو يجب ألا يتجاوز 50 ميغابايت',
+        ]);
+
+        if ($request->boolean('remove_uploaded')) {
+            $oldPath = SiteSetting::get('hero_video_path');
+            if ($oldPath) {
+                Storage::disk('public')->delete($oldPath);
+            }
+            SiteSetting::set('hero_video_path', null);
+        }
+
+        if ($request->hasFile('hero_video_file')) {
+            $oldPath = SiteSetting::get('hero_video_path');
+            if ($oldPath) {
+                Storage::disk('public')->delete($oldPath);
+            }
+            $path = $request->file('hero_video_file')->store('hero', 'public');
+            SiteSetting::set('hero_video_path', $path);
+        }
+
+        if ($request->filled('hero_video_url')) {
+            SiteSetting::set('hero_video_url', $validated['hero_video_url']);
+        }
+
+        if ($request->has('hero_video_url_alt')) {
+            SiteSetting::set('hero_video_url_alt', $validated['hero_video_url_alt'] ?? '');
+        }
+
+        if ($request->has('hero_video_poster')) {
+            SiteSetting::set('hero_video_poster', $validated['hero_video_poster'] ?? '');
+        }
+
+        SiteSetting::clearHeroVideoCache();
+
+        return redirect()->route('admin.hero-video')->with('success', 'تم تحديث فيديو الصفحة الرئيسية بنجاح');
     }
 }

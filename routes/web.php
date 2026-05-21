@@ -48,6 +48,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/services/{service}', [DashboardController::class, 'destroyService'])->name('services.destroy');
     Route::patch('/services/{service}/toggle', [DashboardController::class, 'toggleService'])->name('services.toggle');
 
+    // Hero video settings
+    Route::get('/hero-video', [DashboardController::class, 'heroVideo'])->name('hero-video');
+    Route::put('/hero-video', [DashboardController::class, 'updateHeroVideo'])->name('hero-video.update');
+
     // Contact Messages
     Route::get('/contacts', [DashboardController::class, 'contacts'])->name('contacts');
     Route::patch('/contacts/{message}/read', [DashboardController::class, 'markRead'])->name('contacts.read');

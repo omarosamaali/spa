@@ -16,10 +16,12 @@
             {{-- Slide 1 – VIDEO (Spa Ambiance – first thing visitors see) --}}
             <div class="swiper-slide relative">
                 <div class="absolute inset-0 overflow-hidden">
-                    <video class="hero-slide-video" autoplay loop playsinline preload="auto"
-                           poster="https://images.unsplash.com/photo-1583416750470-965b2707b355?w=1920&q=60&auto=format&fit=crop">
-                        <source src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4" type="video/mp4">
-                        <source src="https://videos.pexels.com/video-files/3214436/3214436-hd_1920_1080_25fps.mp4" type="video/mp4">
+                    <video class="hero-slide-video" autoplay muted loop playsinline preload="auto"
+                           poster="{{ $heroVideo['poster'] }}">
+                        <source src="{{ $heroVideo['src'] }}" type="video/mp4">
+                        @if($heroVideo['src_alt'])
+                        <source src="{{ $heroVideo['src_alt'] }}" type="video/mp4">
+                        @endif
                     </video>
                     <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(18,8,14,0.88) 0%,rgba(18,8,14,0.42) 55%,rgba(40,18,28,0.75) 100%);"></div>
                 </div>
