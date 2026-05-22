@@ -9,18 +9,28 @@
 @section('content')
 
 {{-- =================== HERO SLIDER =================== --}}
+@php
+    $heroLayout  = $siteTheme['hero_layout']  ?? 'classic';
+    $heroGrad    = $siteTheme['hero_gradient'] ?? 'linear-gradient(135deg,rgba(18,8,14,0.88) 0%,rgba(18,8,14,0.42) 55%,rgba(40,18,28,0.75) 100%)';
+    $spaPrimary  = $siteTheme['primary']       ?? '#e8b4b8';
+    $spaGold     = $siteTheme['gold']          ?? '#c9a96e';
+    $spaDark     = $siteTheme['dark']          ?? '#1a1a1a';
+    $heroBottomFade = 'linear-gradient(to top,' . $spaDark . ' 0%,transparent 100%)';
+@endphp
 <section class="relative overflow-hidden w-full max-w-full" style="height:100vh; min-height:600px; max-height:100dvh;">
     <div class="swiper hero-swiper w-full max-w-full" style="height:100%;">
         <div class="swiper-wrapper">
 
             @foreach($heroSlides as $slide)
             @php
-                $accent = $slide->sort_order === 3 ? '#c9a96e' : '#e8b4b8';
-                $accentBg = $slide->sort_order === 3 ? 'rgba(201,169,110,0.15)' : 'rgba(232,180,184,0.15)';
-                $accentBorder = $slide->sort_order === 3 ? 'rgba(201,169,110,0.35)' : 'rgba(232,180,184,0.35)';
                 $btnUrl = fn($link) => str_starts_with($link ?? '', 'http') ? $link : url($link ?? '/');
+                $accentHex = $spaPrimary;
+                $accentBg  = 'rgba(' . implode(',', sscanf(ltrim($accentHex,'#'), "%02x%02x%02x")) . ',0.15)';
+                $accentBdr = 'rgba(' . implode(',', sscanf(ltrim($accentHex,'#'), "%02x%02x%02x")) . ',0.35)';
             @endphp
             <div class="swiper-slide relative">
+
+                {{-- ── MEDIA BACKGROUND ── --}}
                 <div class="absolute inset-0{{ $slide->isVideo() ? ' overflow-hidden' : '' }}">
                     @if($slide->isVideo())
                     <video class="hero-slide-video" autoplay muted loop playsinline preload="auto"
@@ -34,13 +44,19 @@
                     <img src="{{ $slide->mediaSrc() }}" alt="{{ $slide->title }}"
                          class="w-full h-full object-cover">
                     @endif
-                    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(18,8,14,0.88) 0%,rgba(18,8,14,0.42) 55%,rgba(40,18,28,0.75) 100%);"></div>
+                    <div class="absolute inset-0" style="background:{{ $heroGrad }};"></div>
                 </div>
+
+                {{-- ══════════════════════════════════════════
+                     LAYOUT 1 · CLASSIC  (LUXÉA)
+                     Left-aligned, badge + bold title + buttons
+                ═══════════════════════════════════════════ --}}
+                @if($heroLayout === 'classic')
                 <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
-                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-6 w-full max-w-full box-border">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-8 w-full box-border">
                         <div class="max-w-xl">
                             @if($slide->badge)
-                            <div class="badge-spa mb-5 inline-flex" style="background:{{ $accentBg }};color:{{ $accent }};border-color:{{ $accentBorder }};">
+                            <div class="badge-spa mb-5 inline-flex" style="background:{{ $accentBg }};color:{{ $accentHex }};border-color:{{ $accentBdr }};">
                                 @if($slide->isVideo())
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                                 @else
@@ -50,7 +66,7 @@
                             </div>
                             @endif
                             <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
-                                {{ $slide->title }}@if($slide->title_highlight)<br><span style="color:{{ $accent }};">{{ $slide->title_highlight }}</span>@endif
+                                {{ $slide->title }}@if($slide->title_highlight)<br><span style="color:{{ $accentHex }};">{{ $slide->title_highlight }}</span>@endif
                             </h1>
                             @if($slide->subtitle)
                             <p class="mb-3" style="color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.7;">{{ $slide->subtitle }}</p>
@@ -69,7 +85,239 @@
                         </div>
                     </div>
                 </div>
-            </div>
+
+                {{-- ══════════════════════════════════════════
+                     LAYOUT 2 · CENTERED  (AURORA)
+                     Centered, decorative divider, diamonds accent
+                ═══════════════════════════════════════════ --}}
+                @elseif($heroLayout === 'centered')
+                <div class="relative z-10 h-full flex items-center justify-center text-center" style="padding-top:80px;">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-8 w-full box-border">
+                        <div class="max-w-2xl mx-auto">
+                            {{-- Decorative top bar --}}
+                            <div class="flex items-center justify-center gap-3 mb-6">
+                                <div class="h-px w-16 opacity-60" style="background:{{ $accentHex }};"></div>
+                                <span class="text-xs tracking-[0.3em] uppercase opacity-80" style="color:{{ $accentHex }};">LUXURY SPA</span>
+                                <div class="h-px w-16 opacity-60" style="background:{{ $accentHex }};"></div>
+                            </div>
+                            @if($slide->badge)
+                            <div class="badge-spa mb-4 inline-flex mx-auto" style="background:{{ $accentBg }};color:{{ $accentHex }};border-color:{{ $accentBdr }};">
+                                {{ $slide->badge }}
+                            </div>
+                            @endif
+                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.6rem,5.5vw,4.5rem);line-height:1.05;">
+                                {{ $slide->title }}@if($slide->title_highlight)<br><span style="color:{{ $accentHex }};">{{ $slide->title_highlight }}</span>@endif
+                            </h1>
+                            {{-- Diamond divider --}}
+                            <div class="flex items-center justify-center gap-2 my-4">
+                                <div class="w-1.5 h-1.5 rotate-45" style="background:{{ $accentHex }};opacity:0.4;"></div>
+                                <div class="w-2 h-2 rotate-45" style="background:{{ $accentHex }};"></div>
+                                <div class="w-1.5 h-1.5 rotate-45" style="background:{{ $accentHex }};opacity:0.4;"></div>
+                            </div>
+                            @if($slide->subtitle)
+                            <p class="mb-3 max-w-lg mx-auto" style="color:rgba(255,255,255,0.72);font-size:1rem;line-height:1.8;">{{ $slide->subtitle }}</p>
+                            @endif
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8 justify-center">
+                                @if($slide->btn_primary_text)
+                                <a href="{{ $btnUrl($slide->btn_primary_url) }}" class="btn-primary">{{ $slide->btn_primary_text }}</a>
+                                @endif
+                                @if($slide->btn_secondary_text)
+                                <a href="{{ $btnUrl($slide->btn_secondary_url) }}" class="btn-outline">{{ $slide->btn_secondary_text }}</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ══════════════════════════════════════════
+                     LAYOUT 3 · MINIMAL  (NIRVANA / SOLÉA / AZURÉ)
+                     Ultra-clean, large thin title, minimal overlay
+                ═══════════════════════════════════════════ --}}
+                @elseif($heroLayout === 'minimal')
+                <div class="relative z-10 h-full flex items-center justify-center text-center" style="padding-top:80px;">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-8 w-full box-border">
+                        <div class="max-w-3xl mx-auto">
+                            <p class="text-xs tracking-[0.5em] uppercase mb-4 opacity-70" style="color:{{ $accentHex }};">— NAY SPA —</p>
+                            <h1 class="text-white mb-2" style="font-size:clamp(3rem,7vw,5.5rem);line-height:1.0;font-weight:300;letter-spacing:0.08em;font-family:'Cormorant Garamond',serif;">
+                                {{ $slide->title }}
+                            </h1>
+                            @if($slide->title_highlight)
+                            <h1 class="mb-0" style="font-size:clamp(3rem,7vw,5.5rem);line-height:1.0;font-weight:700;letter-spacing:0.04em;font-family:'Cormorant Garamond',serif;color:{{ $accentHex }};">
+                                {{ $slide->title_highlight }}
+                            </h1>
+                            @endif
+                            {{-- Thin rule --}}
+                            <div class="my-5 mx-auto" style="width:80px;height:1px;background:{{ $accentHex }};opacity:0.6;"></div>
+                            @if($slide->subtitle)
+                            <p class="mb-3 max-w-md mx-auto" style="color:rgba(255,255,255,0.68);font-size:0.95rem;line-height:1.9;letter-spacing:0.02em;">{{ $slide->subtitle }}</p>
+                            @endif
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8 justify-center">
+                                @if($slide->btn_primary_text)
+                                <a href="{{ $btnUrl($slide->btn_primary_url) }}" class="btn-primary">{{ $slide->btn_primary_text }}</a>
+                                @endif
+                                @if($slide->btn_secondary_text)
+                                <a href="{{ $btnUrl($slide->btn_secondary_url) }}" class="btn-outline">{{ $slide->btn_secondary_text }}</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ══════════════════════════════════════════
+                     LAYOUT 4 · NATURE  (VERA / PURELI)
+                     Large organic circle, centered bottom text
+                ═══════════════════════════════════════════ --}}
+                @elseif($heroLayout === 'nature')
+                {{-- Decorative circle --}}
+                <div class="absolute z-[5] pointer-events-none" style="top:50%;left:50%;transform:translate(-50%,-52%);width:min(70vw,600px);height:min(70vw,600px);border-radius:50%;border:1px solid {{ $accentHex }}22;"></div>
+                <div class="absolute z-[5] pointer-events-none" style="top:50%;left:50%;transform:translate(-50%,-52%);width:min(58vw,500px);height:min(58vw,500px);border-radius:50%;border:1px solid {{ $accentHex }}15;"></div>
+                <div class="relative z-10 h-full flex items-end justify-center pb-28 text-center" style="padding-top:80px;">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-8 w-full box-border">
+                        <div class="max-w-2xl mx-auto">
+                            @if($slide->badge)
+                            <div class="badge-spa mb-4 inline-flex mx-auto" style="background:{{ $accentBg }};color:{{ $accentHex }};border-color:{{ $accentBdr }};">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17 8C8 10 5.9 16.17 3.82 19a10 10 0 1 0 13.18-13Z"/><path d="M15 7.5v.01"/></svg>
+                                {{ $slide->badge }}
+                            </div>
+                            @endif
+                            <h1 class="font-black text-white mb-3" style="font-size:clamp(2.6rem,5.5vw,4.2rem);line-height:1.1;">
+                                {{ $slide->title }}@if($slide->title_highlight)<br><span style="color:{{ $accentHex }};">{{ $slide->title_highlight }}</span>@endif
+                            </h1>
+                            @if($slide->subtitle)
+                            <p class="mb-3" style="color:rgba(255,255,255,0.7);font-size:0.95rem;line-height:1.8;">{{ $slide->subtitle }}</p>
+                            @endif
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-6 justify-center">
+                                @if($slide->btn_primary_text)
+                                <a href="{{ $btnUrl($slide->btn_primary_url) }}" class="btn-primary">{{ $slide->btn_primary_text }}</a>
+                                @endif
+                                @if($slide->btn_secondary_text)
+                                <a href="{{ $btnUrl($slide->btn_secondary_url) }}" class="btn-outline">{{ $slide->btn_secondary_text }}</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ══════════════════════════════════════════
+                     LAYOUT 5 · EDITORIAL  (ELIRA / MAISON D'OR)
+                     Left title + vertical side accent text
+                ═══════════════════════════════════════════ --}}
+                @elseif($heroLayout === 'editorial')
+                {{-- Vertical accent bar --}}
+                <div class="absolute left-8 top-1/2 z-[5] hidden lg:flex flex-col items-center gap-3 pointer-events-none" style="transform:translateY(-50%);">
+                    <div class="w-px h-20 opacity-40" style="background:{{ $accentHex }};"></div>
+                    <span class="text-[10px] tracking-[0.4em] opacity-60 uppercase" style="writing-mode:vertical-rl;color:{{ $accentHex }};">BEAUTY · LUXURY · CARE</span>
+                    <div class="w-px h-20 opacity-40" style="background:{{ $accentHex }};"></div>
+                </div>
+                <div class="relative z-10 h-full flex items-center" style="padding-top:80px; padding-right:10%;">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-8 lg:pr-12 w-full box-border">
+                        <div class="max-w-2xl mr-auto">
+                            {{-- Number / order --}}
+                            <div class="flex items-center gap-3 mb-5">
+                                <span class="text-[0.7rem] tracking-[0.35em] uppercase opacity-50" style="color:{{ $accentHex }};">{{ date('Y') }}</span>
+                                <div class="h-px flex-1 max-w-[60px] opacity-30" style="background:{{ $accentHex }};"></div>
+                            </div>
+                            @if($slide->badge)
+                            <div class="badge-spa mb-4 inline-flex" style="background:{{ $accentBg }};color:{{ $accentHex }};border-color:{{ $accentBdr }};">{{ $slide->badge }}</div>
+                            @endif
+                            {{-- Large outline + solid split title --}}
+                            @if($slide->title_highlight)
+                            <h1 class="mb-0 text-white" style="font-size:clamp(3rem,6.5vw,5rem);line-height:0.95;font-weight:900;letter-spacing:-0.01em;">
+                                {{ $slide->title }}
+                            </h1>
+                            <h1 class="mb-4" style="font-size:clamp(3rem,6.5vw,5rem);line-height:0.95;font-weight:900;letter-spacing:-0.01em;-webkit-text-stroke:1.5px {{ $accentHex }};color:transparent;">
+                                {{ $slide->title_highlight }}
+                            </h1>
+                            @else
+                            <h1 class="font-black text-white mb-4" style="font-size:clamp(3rem,6.5vw,5rem);line-height:1.0;">
+                                {{ $slide->title }}
+                            </h1>
+                            @endif
+                            {{-- Accent rule --}}
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="h-0.5 w-10" style="background:{{ $accentHex }};"></div>
+                                <div class="h-0.5 w-3 opacity-40" style="background:{{ $accentHex }};"></div>
+                            </div>
+                            @if($slide->subtitle)
+                            <p class="mb-3 max-w-sm" style="color:rgba(255,255,255,0.68);font-size:0.92rem;line-height:1.85;letter-spacing:0.01em;">{{ $slide->subtitle }}</p>
+                            @endif
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
+                                @if($slide->btn_primary_text)
+                                <a href="{{ $btnUrl($slide->btn_primary_url) }}" class="btn-primary">{{ $slide->btn_primary_text }}</a>
+                                @endif
+                                @if($slide->btn_secondary_text)
+                                <a href="{{ $btnUrl($slide->btn_secondary_url) }}" class="btn-outline">{{ $slide->btn_secondary_text }}</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ══════════════════════════════════════════
+                     LAYOUT 6 · BOLD  (BELLA ROSE)
+                     Very large pink title + strong CTA
+                ═══════════════════════════════════════════ --}}
+                @elseif($heroLayout === 'bold')
+                {{-- Floating glow orbs --}}
+                <div class="absolute z-[4] pointer-events-none" style="top:20%;right:10%;width:300px;height:300px;border-radius:50%;background:{{ $accentHex }};opacity:0.06;filter:blur(80px);"></div>
+                <div class="absolute z-[4] pointer-events-none" style="bottom:20%;left:5%;width:200px;height:200px;border-radius:50%;background:{{ $spaGold }};opacity:0.05;filter:blur(60px);"></div>
+                <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-8 w-full box-border">
+                        <div class="max-w-3xl">
+                            @if($slide->badge)
+                            <div class="badge-spa mb-5 inline-flex" style="background:{{ $accentBg }};color:{{ $accentHex }};border-color:{{ $accentBdr }};">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                {{ $slide->badge }}
+                            </div>
+                            @endif
+                            <h1 class="font-black text-white mb-2" style="font-size:clamp(3.5rem,8vw,6.5rem);line-height:0.92;letter-spacing:-0.02em;">
+                                {{ $slide->title }}
+                            </h1>
+                            @if($slide->title_highlight)
+                            <h1 class="font-black mb-4" style="font-size:clamp(3.5rem,8vw,6.5rem);line-height:0.92;letter-spacing:-0.02em;color:{{ $accentHex }};">
+                                {{ $slide->title_highlight }}
+                            </h1>
+                            @endif
+                            {{-- Horizontal divider with dot --}}
+                            <div class="flex items-center gap-3 my-5">
+                                <div class="h-px w-8" style="background:{{ $accentHex }};opacity:0.5;"></div>
+                                <div class="w-2 h-2 rounded-full" style="background:{{ $accentHex }};"></div>
+                                <div class="h-px flex-1 max-w-[120px]" style="background:{{ $accentHex }};opacity:0.2;"></div>
+                            </div>
+                            @if($slide->subtitle)
+                            <p class="mb-3 max-w-md" style="color:rgba(255,255,255,0.7);font-size:1rem;line-height:1.75;">{{ $slide->subtitle }}</p>
+                            @endif
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
+                                @if($slide->btn_primary_text)
+                                <a href="{{ $btnUrl($slide->btn_primary_url) }}" class="btn-primary" style="font-size:1.05rem;padding:14px 32px;">{{ $slide->btn_primary_text }}</a>
+                                @endif
+                                @if($slide->btn_secondary_text)
+                                <a href="{{ $btnUrl($slide->btn_secondary_url) }}" class="btn-outline">{{ $slide->btn_secondary_text }}</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @else
+                {{-- Fallback = classic --}}
+                <div class="relative z-10 h-full flex items-center" style="padding-top:80px;">
+                    <div class="hero-slide-inner max-w-7xl mx-auto px-4 sm:px-8 w-full box-border">
+                        <div class="max-w-xl">
+                            <h1 class="font-black text-white mb-4" style="font-size:clamp(2.8rem,6vw,4.2rem);line-height:1.1;">
+                                {{ $slide->title }}@if($slide->title_highlight)<br><span style="color:{{ $accentHex }};">{{ $slide->title_highlight }}</span>@endif
+                            </h1>
+                            <div class="hero-cta-wrap flex flex-col sm:flex-row gap-3 mt-8">
+                                @if($slide->btn_primary_text)
+                                <a href="{{ $btnUrl($slide->btn_primary_url) }}" class="btn-primary">{{ $slide->btn_primary_text }}</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+            </div>{{-- end swiper-slide --}}
             @endforeach
 
         </div>
@@ -77,7 +325,7 @@
         <div class="swiper-button-next"></div>
         <div class="swiper-pagination" style="bottom:28px;"></div>
     </div>
-    <div class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none" style="background:linear-gradient(to top,rgba(26,26,26,1) 0%,transparent 100%);height:100px;"></div>
+    <div class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none" style="background:{{ $heroBottomFade }};height:100px;"></div>
 </section>
 
 {{-- =================== SERVICES + CATEGORY TABS =================== --}}
