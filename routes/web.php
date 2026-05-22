@@ -23,6 +23,10 @@ Route::post('/booking', [BookingController::class, 'store'])->name('booking.stor
 Route::get('/booking/success/{appointment}', [BookingController::class, 'success'])->name('booking.success');
 Route::get('/booking/available-times', [BookingController::class, 'availableTimes'])->name('booking.times');
 
+// Themes Showcase
+Route::get('/themes', [HomeController::class, 'themesShowcase'])->name('themes');
+Route::get('/themes/preview/{themeId}', [HomeController::class, 'themePreview'])->name('themes.preview');
+
 // =================== ADMIN AUTH (no middleware) ===================
 
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
@@ -60,6 +64,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/hero-slides', [DashboardController::class, 'heroSlides'])->name('hero-slides');
     Route::put('/hero-slides', [DashboardController::class, 'updateHeroSlides'])->name('hero-slides.update');
     Route::redirect('/hero-video', '/admin/hero-slides');
+
+    // Theme Selector
+    Route::get('/theme-selector', [DashboardController::class, 'themeSelector'])->name('theme-selector');
+    Route::post('/theme-selector', [DashboardController::class, 'setActiveTheme'])->name('theme-selector.set');
 
     // Contact Messages
     Route::get('/contacts', [DashboardController::class, 'contacts'])->name('contacts');

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+// SiteTheme is in same namespace - no explicit use needed
 
 class SiteSetting extends Model
 {
@@ -40,6 +41,7 @@ class SiteSetting extends Model
             'site_tagline'           => 'جمالك يستحق العناية',
             'logo_path'              => '',
             'favicon_path'           => '',
+            'active_theme'           => 'luxea',
         ];
     }
 
@@ -49,6 +51,7 @@ class SiteSetting extends Model
             'theme_primary', 'theme_primary_dark', 'theme_primary_light',
             'theme_gold', 'theme_dark', 'theme_dark_2',
             'site_name', 'site_tagline', 'logo_path', 'favicon_path',
+            'active_theme',
         ];
     }
 
@@ -73,41 +76,75 @@ class SiteSetting extends Model
 
     public static function theme(): array
     {
-        $defaults = static::defaults();
-
         if (! static::tableReady()) {
-            return static::buildThemePayload($defaults);
+            return SiteTheme::buildPayload(SiteTheme::getById('luxea'));
         }
 
-        return Cache::remember('site_setting_theme', 3600, function () use ($defaults) {
-            $values = $defaults;
+        return Cache::remember('site_setting_theme', 3600, function () {
+            $activeId = static::where('key', 'active_theme')->value('value') ?: 'luxea';
+            $preset   = SiteTheme::getById($activeId);
+
+            $overrides = [];
             foreach (static::themeKeys() as $key) {
                 $stored = static::where('key', $key)->value('value');
                 if ($stored !== null && $stored !== '') {
-                    $values[$key] = $stored;
+                    $overrides[$key] = $stored;
                 }
             }
 
-            return static::buildThemePayload($values);
+            $merged = SiteTheme::mergeWithCustom($preset, $overrides);
+
+            return SiteTheme::buildPayload($merged);
         });
     }
 
+    /**
+     * Build a one-off theme payload for a given theme ID without touching the DB.
+     * Used by the preview route.
+     */
+    public static function themeForPreview(string $themeId): array
+    {
+        $preset = SiteTheme::getById($themeId);
+
+        // Still merge logo/favicon from DB so previews show the real logo
+        $overrides = [];
+        foreach (['logo_path', 'favicon_path', 'site_name'] as $key) {
+            $stored = static::get($key);
+            if ($stored) $overrides[$key] = $stored;
+        }
+
+        $merged = SiteTheme::mergeWithCustom($preset, $overrides);
+
+        return SiteTheme::buildPayload($merged);
+    }
+
+    /**
+     * @deprecated Use SiteTheme::buildPayload() instead.
+     */
     public static function buildThemePayload(array $values): array
     {
-        $primary = static::normalizeHexColor($values['theme_primary'] ?? '#e8b4b8');
+        $primary     = static::normalizeHexColor($values['theme_primary'] ?? '#e8b4b8');
         $primaryDark = static::normalizeHexColor($values['theme_primary_dark'] ?? '#c9888e');
-        $logoPath = $values['logo_path'] ?? '';
+        $logoPath    = $values['logo_path'] ?? '';
         $faviconPath = $values['favicon_path'] ?? '';
 
         return [
+            'id'               => $values['active_theme'] ?? 'luxea',
+            'name'             => $values['site_name'] ?? 'NAY SPA',
+            'tagline'          => $values['site_tagline'] ?? 'جمالك يستحق العناية',
+            'dark_mode'        => true,
             'primary'          => $primary,
             'primary_dark'     => $primaryDark,
             'primary_light'    => static::normalizeHexColor($values['theme_primary_light'] ?? '#f5dfe1'),
             'gold'             => static::normalizeHexColor($values['theme_gold'] ?? '#c9a96e'),
             'dark'             => static::normalizeHexColor($values['theme_dark'] ?? '#1a1a1a'),
             'dark_2'           => static::normalizeHexColor($values['theme_dark_2'] ?? '#2a2a2a'),
+            'dark_3'           => static::normalizeHexColor($values['theme_dark'] ?? '#1a1a1a'),
+            'text_body'        => '#e8e0dd',
+            'hero_gradient'    => '',
+            'nav_gradient'     => '',
+            'preview_colors'   => [$primary, $primaryDark],
             'site_name'        => $values['site_name'] ?? 'NAY SPA',
-            'site_tagline'     => $values['site_tagline'] ?? 'جمالك يستحق العناية',
             'logo_url'         => static::assetUrl($logoPath),
             'favicon_url'      => static::assetUrl($faviconPath),
             'has_logo'         => (bool) static::assetUrl($logoPath),

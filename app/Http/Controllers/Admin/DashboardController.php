@@ -8,6 +8,7 @@ use App\Models\ContactMessage;
 use App\Models\Service;
 use App\Models\HeroSlide;
 use App\Models\SiteSetting;
+use App\Models\SiteTheme;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -423,6 +424,32 @@ class DashboardController extends Controller
 
         return redirect()->route('admin.hero-slides')->with('success', 'تم تحديث سلايدر الصفحة الرئيسية بنجاح');
     }
+
+    // =================== THEME SELECTOR ===================
+
+    public function themeSelector()
+    {
+        $themes    = SiteTheme::presets();
+        $activeId  = SiteSetting::get('active_theme') ?: 'luxea';
+
+        return view('admin.theme-selector', compact('themes', 'activeId'));
+    }
+
+    public function setActiveTheme(Request $request)
+    {
+        $themeId = $request->input('theme_id');
+
+        if (! SiteTheme::exists($themeId)) {
+            return back()->with('error', 'الثيم غير موجود');
+        }
+
+        SiteSetting::set('active_theme', $themeId);
+        SiteSetting::clearThemeCache();
+
+        return back()->with('success', 'تم تفعيل الثيم بنجاح');
+    }
+
+    // =================== PRIVATE HELPERS ===================
 
     private function cleanupHeroSlideMediaOnTypeChange(HeroSlide $slide, string $newType): void
     {
