@@ -328,8 +328,39 @@
     <div class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none" style="background:{{ $heroBottomFade }};height:100px;"></div>
 </section>
 
+{{-- Per-theme dynamic styles (override hardcoded colors via CSS vars) --}}
+<style>
+    .booking-step-line { background: linear-gradient(to bottom, color-mix(in srgb, var(--spa-primary) 55%, transparent), color-mix(in srgb, var(--spa-primary) 8%, transparent)); }
+    .step-icon-box { background: color-mix(in srgb, var(--spa-primary) 10%, transparent); border: 1px solid color-mix(in srgb, var(--spa-primary) 25%, transparent); }
+    .step-icon-box svg { stroke: var(--spa-primary); }
+    .step-num { color: color-mix(in srgb, var(--spa-primary) 18%, transparent); }
+    .cta-card { background: linear-gradient(135deg, var(--spa-primary-dark) 0%, var(--spa-primary) 50%, var(--spa-primary-dark) 100%); }
+    .testimonial-avatar { background: linear-gradient(135deg, var(--spa-primary), var(--spa-primary-dark)); border: 2px solid color-mix(in srgb, var(--spa-primary) 40%, transparent); }
+    .testimonial-quote { color: color-mix(in srgb, var(--spa-primary) 30%, transparent); }
+    .stat-primary { stroke: var(--spa-primary); }
+    .stat-gold    { stroke: var(--spa-gold); }
+    .stat-val-primary { color: var(--spa-primary); }
+    .stat-val-gold    { color: var(--spa-gold); }
+    .stat-icon-primary { background: color-mix(in srgb, var(--spa-primary) 12%, transparent); }
+    .stat-icon-gold    { background: color-mix(in srgb, var(--spa-gold) 12%, transparent); }
+    .contact-primary { color: var(--spa-primary); }
+    .contact-gold    { color: var(--spa-gold); }
+    .contact-icon-primary { background: color-mix(in srgb, var(--spa-primary) 12%, transparent); }
+    .contact-icon-gold    { background: color-mix(in srgb, var(--spa-gold) 12%, transparent); }
+    .contact-card-bg { background: var(--spa-dark-2); border: 1px solid rgba(255,255,255,0.05); }
+    .cat-tab-active { background: linear-gradient(135deg, var(--spa-primary), var(--spa-primary-dark)); color: white; }
+    /* Small shape tweaks per layout */
+    body[data-layout="minimal"]  .rounded-2xl { border-radius: 8px; }
+    body[data-layout="minimal"]  .rounded-xl  { border-radius: 6px; }
+    body[data-layout="minimal"]  .rounded-full.cat-tab { border-radius: 6px; }
+    body[data-layout="editorial"] .stat-card  { border-right: 3px solid var(--spa-primary); }
+    body[data-layout="bold"]     .testimonial-card { border: 1px solid color-mix(in srgb, var(--spa-primary) 20%, transparent); }
+    body[data-layout="nature"]   .rounded-2xl { border-radius: 20px; }
+    body[data-layout="nature"]   .step-icon-box { border-radius: 50%; }
+</style>
+
 {{-- =================== SERVICES + CATEGORY TABS =================== --}}
-<section class="py-20" style="background:#1a1a1a;" id="services-section">
+<section class="py-20" style="background:var(--spa-dark);" id="services-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-10">
@@ -344,8 +375,8 @@
             @php $cats = ['all'=>'الكل','laser'=>'الليزر','skin'=>'البشرة','massage'=>'المساج','botox'=>'البوتوكس','nails'=>'الأظافر']; @endphp
             @foreach($cats as $key => $label)
             <button onclick="filterServices('{{ $key }}')" data-cat="{{ $key }}"
-                    class="cat-tab px-5 py-2 rounded-full text-sm font-bold transition-all duration-200"
-                    style="{{ $key==='all' ? 'background:linear-gradient(135deg,#e8b4b8,#c9888e);color:white;' : 'background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.1);' }}">
+                    class="cat-tab px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 {{ $key==='all' ? 'cat-tab-active' : '' }}"
+                    style="{{ $key!=='all' ? 'background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.1);' : '' }}">
                 {{ $label }}
             </button>
             @endforeach
@@ -395,7 +426,7 @@
         </div>
 
         <div class="text-center mt-10">
-            <a href="{{ route('services') }}" class="btn-outline" style="color:#e8b4b8;border-color:rgba(232,180,184,0.4);">
+            <a href="{{ route('services') }}" class="btn-outline" style="color:var(--spa-primary);border-color:color-mix(in srgb,var(--spa-primary) 40%,transparent);">
                 عرض جميع الخدمات
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             </a>
@@ -404,17 +435,17 @@
 </section>
 
 {{-- =================== BOOKING STEPS VERTICAL TIMELINE =================== --}}
-<section class="py-20" style="background:#131313;">
+<section class="py-20" style="background:var(--spa-dark-3);">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-14">
-            <div class="badge-spa mb-4" style="background:rgba(232,180,184,0.12);color:#e8b4b8;border-color:rgba(232,180,184,0.3);">خطوات الحجز</div>
+            <div class="badge-spa mb-4">خطوات الحجز</div>
             <h2 class="text-3xl md:text-4xl font-black text-white mb-3">احجزي في 4 خطوات سهلة</h2>
             <div class="section-divider mt-4"></div>
         </div>
 
         <div class="relative">
-            <div class="absolute hidden md:block" style="right:2.5rem;top:24px;bottom:24px;width:2px;background:linear-gradient(to bottom,rgba(232,180,184,0.6),rgba(232,180,184,0.1));border-radius:2px;"></div>
+            <div class="absolute hidden md:block booking-step-line" style="right:2.5rem;top:24px;bottom:24px;width:2px;border-radius:2px;"></div>
 
             @foreach([
                 ['num'=>'01','title'=>'اختاري الخدمة','desc'=>'تصفحي خدماتنا واختاري ما يناسبك','svg'=>'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'],
@@ -424,8 +455,8 @@
             ] as $step)
             <div class="flex items-start gap-6 mb-10 last:mb-0 relative">
                 <div class="relative flex-shrink-0 z-10">
-                    <div class="w-20 h-20 rounded-2xl flex items-center justify-center" style="background:rgba(232,180,184,0.08);border:1px solid rgba(232,180,184,0.25);">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e8b4b8" stroke-width="1.8" stroke-linecap="round">
+                    <div class="w-20 h-20 rounded-2xl flex items-center justify-center step-icon-box">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--spa-primary)" stroke-width="1.8" stroke-linecap="round">
                             {!! $step['svg'] !!}
                         </svg>
                     </div>
@@ -433,7 +464,7 @@
                 <div class="flex-1 pt-3">
                     <div class="flex items-center gap-4 mb-2">
                         <h3 class="text-lg font-black text-white">{{ $step['title'] }}</h3>
-                        <span class="text-3xl font-black" style="color:rgba(232,180,184,0.15);line-height:1;">{{ $step['num'] }}</span>
+                        <span class="text-3xl font-black step-num" style="line-height:1;">{{ $step['num'] }}</span>
                     </div>
                     <p class="text-sm" style="color:rgba(255,255,255,0.5);">{{ $step['desc'] }}</p>
                 </div>
@@ -450,12 +481,11 @@
     </div>
 </section>
 
-{{-- =================== CTA - ROSE CARD (no women image) =================== --}}
-<section class="py-16" style="background:#1a1a1a;">
+{{-- =================== CTA - ROSE CARD =================== --}}
+<section class="py-16" style="background:var(--spa-dark);">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="rounded-3xl overflow-hidden relative" style="background:linear-gradient(135deg,#c9888e 0%,#e8b4b8 50%,#d4a0a5 100%);">
+        <div class="rounded-3xl overflow-hidden relative cta-card">
             <div class="absolute inset-0" style="background:radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.12) 0%, transparent 60%);"></div>
-            {{-- Decorative spa image instead of woman --}}
             <div class="absolute inset-0 overflow-hidden">
                 <img src="https://images.unsplash.com/photo-1556760544-74068565f05c?w=800&h=400&q=60&auto=format&fit=crop"
                      alt="" class="absolute left-0 top-0 h-full w-1/2 object-cover opacity-20" style="object-position:center;">
@@ -473,7 +503,7 @@
                     </div>
                 </div>
                 <a href="{{ route('booking') }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-black text-base transition-all hover:scale-105"
-                   style="background:#1a1a1a;color:white;box-shadow:0 8px 25px rgba(0,0,0,0.3);">
+                   style="background:var(--spa-dark);color:white;box-shadow:0 8px 25px rgba(0,0,0,0.3);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                     احجزي الآن
                 </a>
@@ -483,7 +513,7 @@
 </section>
 
 {{-- =================== GALLERY (SPA INTERIORS ONLY) =================== --}}
-<section class="py-20" style="background:#131313;">
+<section class="py-20" style="background:var(--spa-dark-3);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-12">
@@ -509,7 +539,7 @@
         </div>
 
         <div class="text-center mt-10">
-            <a href="{{ route('about') }}" class="btn-outline" style="color:#e8b4b8;border-color:rgba(232,180,184,0.4);">
+            <a href="{{ route('about') }}" class="btn-outline" style="color:var(--spa-primary);border-color:color-mix(in srgb,var(--spa-primary) 40%,transparent);">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 مشاهدة المزيد
             </a>
@@ -518,7 +548,7 @@
 </section>
 
 {{-- =================== TESTIMONIALS SLIDER =================== --}}
-<section class="py-20" style="background:#1a1a1a;">
+<section class="py-20" style="background:var(--spa-dark);">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-12">
@@ -532,13 +562,12 @@
                 @forelse($testimonials as $t)
                 <div class="swiper-slide">
                     <div class="testimonial-card text-center mx-auto" style="max-width:640px;">
-                        <div class="mb-5 flex justify-center" style="color:rgba(232,180,184,0.3);">
+                        <div class="mb-5 flex justify-center testimonial-quote">
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1zm12 0c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
                         </div>
                         <p class="text-base leading-relaxed mb-8" style="color:rgba(255,255,255,0.75);">{{ $t->content }}</p>
                         <div class="flex items-center justify-center gap-4">
-                            <div class="w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0"
-                                 style="background:linear-gradient(135deg,#e8b4b8,#c9888e);border:2px solid rgba(232,180,184,0.4);">
+                            <div class="testimonial-avatar w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0">
                                 {{ mb_substr($t->client_name, 0, 1) }}
                             </div>
                             <div class="text-right">
@@ -559,13 +588,12 @@
                 ] as $t)
                 <div class="swiper-slide">
                     <div class="testimonial-card text-center mx-auto" style="max-width:640px;">
-                        <div class="mb-5 flex justify-center" style="color:rgba(232,180,184,0.3);">
+                        <div class="mb-5 flex justify-center testimonial-quote">
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1zm12 0c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
                         </div>
                         <p class="text-base leading-relaxed mb-8" style="color:rgba(255,255,255,0.75);">{{ $t['text'] }}</p>
                         <div class="flex items-center justify-center gap-4">
-                            <div class="w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0"
-                                 style="background:linear-gradient(135deg,#e8b4b8,#c9888e);border:2px solid rgba(232,180,184,0.4);">
+                            <div class="testimonial-avatar w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0">
                                 {{ mb_substr($t['name'], 0, 1) }}
                             </div>
                             <div class="text-right">
@@ -587,7 +615,7 @@
 </section>
 
 {{-- =================== CONTACT INFO SECTION =================== --}}
-<section class="py-20" style="background:#131313;">
+<section class="py-20" style="background:var(--spa-dark-3);">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-12">
@@ -599,20 +627,19 @@
         <div style="display:grid;grid-template-columns:repeat(1,1fr);gap:1rem;" class="md:grid-cols-2">
             @php
                 $homeContactItems = [
-                    ['icon'=>'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.82 19.79 19.79 0 01.21 1.22 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.86-.86a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/>','label'=>'اتصال / واتساب','val'=>$siteContact['phone'],'href'=>$siteContact['tel_url'],'c'=>'#e8b4b8'],
-                    ['icon'=>'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>','label'=>'راسلينا','val'=>$siteContact['email'],'href'=>$siteContact['mailto_url'],'c'=>'#c9a96e'],
-                    ['icon'=>'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>','label'=>'موقعنا','val'=>$siteContact['address'],'href'=>null,'c'=>'#e8b4b8'],
-                    ['icon'=>'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>','label'=>'ساعات العمل','val'=>'السبت — الخميس: '.$siteContact['hours_weekdays'].' | الجمعة: '.$siteContact['hours_friday'],'href'=>null,'c'=>'#c9a96e'],
+                    ['icon'=>'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.82 19.79 19.79 0 01.21 1.22 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.86-.86a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/>','label'=>'اتصال / واتساب','val'=>$siteContact['phone'],'href'=>$siteContact['tel_url'],'accent'=>'primary'],
+                    ['icon'=>'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>','label'=>'راسلينا','val'=>$siteContact['email'],'href'=>$siteContact['mailto_url'],'accent'=>'gold'],
+                    ['icon'=>'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>','label'=>'موقعنا','val'=>$siteContact['address'],'href'=>null,'accent'=>'primary'],
+                    ['icon'=>'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>','label'=>'ساعات العمل','val'=>'السبت — الخميس: '.$siteContact['hours_weekdays'].' | الجمعة: '.$siteContact['hours_friday'],'href'=>null,'accent'=>'gold'],
                 ];
             @endphp
             @foreach($homeContactItems as $ci)
-            <div class="flex items-center gap-4 p-5 rounded-2xl" style="background:#2a2a2a;border:1px solid rgba(255,255,255,0.05);">
-                <div class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center"
-                     style="background:rgba({{ $ci['c']==='#e8b4b8'?'232,180,184':'201,169,110' }},0.1);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ $ci['c'] }}" stroke-width="1.8" stroke-linecap="round">{!! $ci['icon'] !!}</svg>
+            <div class="flex items-center gap-4 p-5 rounded-2xl contact-card-bg">
+                <div class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center contact-icon-{{ $ci['accent'] }}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--spa-{{ $ci['accent']==='gold'?'gold':'primary' }})" stroke-width="1.8" stroke-linecap="round">{!! $ci['icon'] !!}</svg>
                 </div>
                 <div>
-                    <div class="text-xs font-bold mb-0.5" style="color:{{ $ci['c'] }};">{{ $ci['label'] }}</div>
+                    <div class="text-xs font-bold mb-0.5 contact-{{ $ci['accent'] }}">{{ $ci['label'] }}</div>
                     @if(!empty($ci['href']))
                     <a href="{{ $ci['href'] }}" class="text-sm text-white font-medium no-underline hover:opacity-80 block" @if(str_contains($ci['href'], 'tel:')) dir="ltr" @endif>{{ $ci['val'] }}</a>
                     @else
@@ -633,7 +660,7 @@
 </section>
 
 {{-- =================== WHY US - STATS 2x2 (آخر قسم) =================== --}}
-<section class="py-20" style="background:#1e1e1e;">
+<section class="py-20" style="background:var(--spa-dark-2);">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-14">
@@ -644,19 +671,18 @@
 
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;">
             @foreach([
-                ['val'=>($stats['clients']>0?'+'.$stats['clients']:'+500'),'label'=>'جلسة مكتملة',   'sub'=>'عميلة وثقت بنا','icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','c'=>'#e8b4b8'],
-                ['val'=>'4.9',                                              'label'=>'تقييم العملاء','sub'=>'من أصل 5 نجوم','icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','c'=>'#c9a96e'],
-                ['val'=>'10+',                                              'label'=>'خبراء متخصصين','sub'=>'فريق احترافي مدرّب','icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','c'=>'#c9a96e'],
-                ['val'=>'100%',                                             'label'=>'رضا العملاء',  'sub'=>'ضماننا الدائم لكِ','icon'=>'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>','c'=>'#e8b4b8'],
+                ['val'=>($stats['clients']>0?'+'.$stats['clients']:'+500'),'label'=>'جلسة مكتملة',   'sub'=>'عميلة وثقت بنا','icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','accent'=>'primary'],
+                ['val'=>'4.9',                                              'label'=>'تقييم العملاء','sub'=>'من أصل 5 نجوم','icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','accent'=>'gold'],
+                ['val'=>'10+',                                              'label'=>'خبراء متخصصين','sub'=>'فريق احترافي مدرّب','icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','accent'=>'gold'],
+                ['val'=>'100%',                                             'label'=>'رضا العملاء',  'sub'=>'ضماننا الدائم لكِ','icon'=>'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>','accent'=>'primary'],
             ] as $st)
-            <div class="rounded-2xl p-7 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1"
-                 style="background:#2a2a2a;border:1px solid rgba(255,255,255,0.06);">
-                <div class="w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center"
-                     style="background:rgba({{ $st['c']==='#e8b4b8'?'232,180,184':'201,169,110' }},0.1);">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{ $st['c'] }}" stroke-width="1.8" stroke-linecap="round">{!! $st['icon'] !!}</svg>
+            <div class="stat-card rounded-2xl p-7 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1"
+                 style="background:var(--spa-dark-3);border:1px solid rgba(255,255,255,0.06);">
+                <div class="w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center stat-icon-{{ $st['accent'] }}">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--spa-{{ $st['accent']==='gold'?'gold':'primary' }})" stroke-width="1.8" stroke-linecap="round">{!! $st['icon'] !!}</svg>
                 </div>
                 <div>
-                    <div class="text-3xl font-black leading-none" style="color:{{ $st['c'] }};">{{ $st['val'] }}</div>
+                    <div class="text-3xl font-black leading-none stat-val-{{ $st['accent'] }}">{{ $st['val'] }}</div>
                     <div class="font-bold text-white text-sm mt-1">{{ $st['label'] }}</div>
                     <div class="text-xs mt-0.5" style="color:rgba(255,255,255,0.4);">{{ $st['sub'] }}</div>
                 </div>
@@ -710,16 +736,19 @@
         watchOverflow: true,
     });
 
-    // Category filter
+    // Category filter — uses CSS vars instead of hardcoded colors
     function filterServices(cat) {
         document.querySelectorAll('.service-card').forEach(card => {
             card.style.display = (cat === 'all' || card.dataset.category === cat) ? '' : 'none';
         });
         document.querySelectorAll('.cat-tab').forEach(btn => {
-            const active = btn.dataset.cat === cat;
-            btn.style.cssText = active
-                ? 'background:linear-gradient(135deg,#e8b4b8,#c9888e);color:white;'
-                : 'background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.1);';
+            if (btn.dataset.cat === cat) {
+                btn.classList.add('cat-tab-active');
+                btn.style.cssText = '';
+            } else {
+                btn.classList.remove('cat-tab-active');
+                btn.style.cssText = 'background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.1);';
+            }
         });
     }
 

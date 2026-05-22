@@ -14,7 +14,7 @@
     @include('partials.site-favicon')
     @stack('head')
 </head>
-<body>
+<body data-layout="{{ $siteTheme['hero_layout'] ?? 'classic' }}" data-theme="{{ $siteTheme['id'] ?? 'luxea' }}">
 
     {{-- Navbar --}}
     <nav class="navbar gradient-hero py-4" id="navbar">
