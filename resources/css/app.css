@@ -32,6 +32,36 @@
     background: var(--spa-dark) !important;
 }
 
+.admin-sidebar--fixed {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    max-height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.admin-sidebar__nav {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--spa-primary) 45%, transparent) transparent;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar {
+    width: 5px;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--spa-primary) 50%, transparent);
+    border-radius: 4px;
+}
+
+.admin-sidebar__footer {
+    background: var(--spa-dark);
+}
+
 * {
     font-family: 'Tajawal', sans-serif;
     box-sizing: border-box;

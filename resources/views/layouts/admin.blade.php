@@ -20,16 +20,16 @@
 <div class="flex min-h-screen">
 
     {{-- Sidebar --}}
-    <aside class="w-64 flex-shrink-0 flex flex-col admin-sidebar" style="min-height:100vh; position:sticky; top:0; height:100vh">
+    <aside class="w-64 flex-shrink-0 flex flex-col admin-sidebar admin-sidebar--fixed">
 
         {{-- Logo --}}
-        <div class="p-6" style="border-bottom:1px solid rgba(255,255,255,0.08)">
+        <div class="p-6 flex-shrink-0" style="border-bottom:1px solid rgba(255,255,255,0.08)">
             @include('partials.site-logo', ['size' => 36, 'textClass' => 'text-sm'])
             <div class="text-xs mt-2 pr-1" style="color:rgba(255,255,255,0.4)">لوحة التحكم</div>
         </div>
 
-        {{-- Navigation --}}
-        <nav class="p-4 space-y-1 flex-1">
+        {{-- Navigation — scroll when many items --}}
+        <nav class="admin-sidebar__nav p-4 space-y-1 flex-1 min-h-0">
             @php
             $navItems = [
                 ['route'=>'admin.dashboard', 'label'=>'الرئيسية',
@@ -83,7 +83,7 @@
         </nav>
 
         {{-- Footer: user + logout --}}
-        <div class="p-4" style="border-top:1px solid rgba(255,255,255,0.08)">
+        <div class="p-4 flex-shrink-0 admin-sidebar__footer" style="border-top:1px solid rgba(255,255,255,0.08)">
             @auth
             <div class="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl" style="background:rgba(255,255,255,0.05)">
                 <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white"
