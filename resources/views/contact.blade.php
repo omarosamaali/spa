@@ -95,10 +95,12 @@
                 </div>
 
                 <div>
-                    <label class="booking-label">البريد الإلكتروني</label>
-                    <input type="email" name="email" value="{{ old('email') }}"
+                    <label class="booking-label">البريد الإلكتروني <span style="color:rgba(255,255,255,0.4); font-weight:400;">(اختياري)</span></label>
+                    <input type="text" name="email" value="{{ old('email') }}"
                            class="booking-input @error('email') border-red-500 @enderror"
-                           placeholder="example@email.com" dir="ltr">
+                           placeholder="example@email.com"
+                           inputmode="email" autocomplete="email"
+                           style="direction:ltr; text-align:left; color:#fff;">
                     @error('email')
                     <p class="text-xs mt-1" style="color:#fca5a5">{{ $message }}</p>
                     @enderror

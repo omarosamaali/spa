@@ -61,9 +61,11 @@
 
                 {{-- Email --}}
                 <div>
-                    <label class="booking-label">البريد الإلكتروني (اختياري)</label>
-                    <input type="email" name="client_email" value="{{ old('client_email') }}"
-                           class="booking-input" placeholder="example@email.com">
+                    <label class="booking-label">البريد الإلكتروني <span style="color:rgba(255,255,255,0.4); font-weight:400;">(اختياري)</span></label>
+                    <input type="text" name="client_email" value="{{ old('client_email') }}"
+                           class="booking-input" placeholder="example@email.com"
+                           inputmode="email" autocomplete="email"
+                           style="direction:ltr; text-align:left; color:#fff;">
                 </div>
 
                 {{-- Category (step 1) --}}

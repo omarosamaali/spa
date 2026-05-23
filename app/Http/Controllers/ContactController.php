@@ -14,6 +14,10 @@ class ContactController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'email' => $request->filled('email') ? trim($request->input('email')) : null,
+        ]);
+
         $validated = $request->validate([
             'name'    => 'required|string|max:255',
             'phone'   => 'required|string|max:20',
