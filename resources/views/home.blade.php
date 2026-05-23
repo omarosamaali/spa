@@ -331,6 +331,21 @@
 {{-- Per-theme dynamic styles (override hardcoded colors via CSS vars) --}}
 <style>
     .booking-step-line { background: linear-gradient(to bottom, color-mix(in srgb, var(--spa-primary) 55%, transparent), color-mix(in srgb, var(--spa-primary) 8%, transparent)); }
+    .booking-steps-layout { display: grid; gap: 2.5rem; align-items: center; }
+    @media (min-width: 1024px) {
+        .booking-steps-layout { grid-template-columns: 1fr 1fr; gap: 3rem; }
+    }
+    .booking-steps-video {
+        width: 100%;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        background: #111;
+        border: 1px solid color-mix(in srgb, var(--spa-primary) 22%, transparent);
+        box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    }
+    .booking-steps-video--embed { aspect-ratio: 9 / 16; max-height: 520px; margin-inline: auto; max-width: 320px; }
+    .booking-steps-video--embed iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .booking-steps-video--file video { width: 100%; height: auto; display: block; max-height: 520px; object-fit: cover; }
     .step-icon-box { background: color-mix(in srgb, var(--spa-primary) 10%, transparent); border: 1px solid color-mix(in srgb, var(--spa-primary) 25%, transparent); }
     .step-icon-box svg { stroke: var(--spa-primary); }
     .step-num { color: color-mix(in srgb, var(--spa-primary) 18%, transparent); }
@@ -384,42 +399,37 @@
 
         {{-- Services Grid — full-bleed image cards --}}
         <div class="services-grid-home" id="services-grid">
-            @php
-            $sImgs = [
-                'laser'   => 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&h=800&q=80&auto=format&fit=crop',
-                'skin'    => 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=800&q=80&auto=format&fit=crop',
-                'massage' => 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600&h=800&q=80&auto=format&fit=crop',
-                'botox'   => 'https://images.unsplash.com/photo-1556760544-74068565f05c?w=600&h=800&q=80&auto=format&fit=crop',
-                'nails'   => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=800&q=80&auto=format&fit=crop',
-            ];
-            @endphp
             @forelse($services as $service)
             @include('partials.service-card-home', [
-                'img' => $service->image ? asset('storage/'.$service->image) : ($sImgs[$service->category ?? ''] ?? $sImgs['skin']),
+                'img' => $service->displayImageUrl(),
                 'name' => $service->name,
                 'desc' => $service->description,
                 'price' => $service->price,
+                'duration' => $service->duration_minutes,
                 'category' => $service->category ?? 'all',
                 'bookingUrl' => route('booking', ['service_id' => $service->id]),
+                'variant' => 'home',
             ])
             @empty
             @foreach([
-                ['name'=>'جلسات الليزر',      'cat'=>'laser',   'price'=>'150','desc'=>'إزالة الشعر بتقنيات حديثة آمنة وفعالة'],
-                ['name'=>'البشرة والنضارة',   'cat'=>'skin',    'price'=>'120','desc'=>'جلسات تنظيف ونضارة وتثبيت البشرة'],
-                ['name'=>'مساج الجسم',        'cat'=>'massage', 'price'=>'100','desc'=>'استرخاء تام وتجديد الحيوية'],
-                ['name'=>'البوتوكس والفيلر',  'cat'=>'botox',   'price'=>'300','desc'=>'إبراز جمالك بشكل طبيعي وآمن'],
-                ['name'=>'الأظافر',           'cat'=>'nails',   'price'=>'80', 'desc'=>'تصميم الأظافر بأحدث الستايلات'],
-                ['name'=>'تنظيف البشرة',      'cat'=>'skin',    'price'=>'90', 'desc'=>'جلسة تنظيف عميق وإشراق البشرة'],
-                ['name'=>'إزالة الشعر',       'cat'=>'laser',   'price'=>'130','desc'=>'إزالة الشعر بتقنية الليزر الحديثة'],
-                ['name'=>'علاجات الاسترخاء',  'cat'=>'massage', 'price'=>'110','desc'=>'جلسات استرخاء علاجية متخصصة'],
+                ['name'=>'جلسات الليزر',      'cat'=>'laser',   'price'=>'150','desc'=>'إزالة الشعر بتقنيات حديثة آمنة وفعالة','dur'=>60],
+                ['name'=>'البشرة والنضارة',   'cat'=>'skin',    'price'=>'120','desc'=>'جلسات تنظيف ونضارة وتثبيت البشرة','dur'=>60],
+                ['name'=>'مساج الجسم',        'cat'=>'massage', 'price'=>'100','desc'=>'استرخاء تام وتجديد الحيوية','dur'=>60],
+                ['name'=>'البوتوكس والفيلر',  'cat'=>'botox',   'price'=>'300','desc'=>'إبراز جمالك بشكل طبيعي وآمن','dur'=>30],
+                ['name'=>'الأظافر',           'cat'=>'nails',   'price'=>'80', 'desc'=>'تصميم الأظافر بأحدث الستايلات','dur'=>45],
+                ['name'=>'تنظيف البشرة',      'cat'=>'skin',    'price'=>'90', 'desc'=>'جلسة تنظيف عميق وإشراق البشرة','dur'=>45],
+                ['name'=>'إزالة الشعر',       'cat'=>'laser',   'price'=>'130','desc'=>'إزالة الشعر بتقنية الليزر الحديثة','dur'=>45],
+                ['name'=>'علاجات الاسترخاء',  'cat'=>'massage', 'price'=>'110','desc'=>'جلسات استرخاء علاجية متخصصة','dur'=>75],
             ] as $s)
             @include('partials.service-card-home', [
-                'img' => $sImgs[$s['cat']],
+                'img' => \App\Models\Service::categoryStockImage($s['cat']),
                 'name' => $s['name'],
                 'desc' => $s['desc'],
                 'price' => $s['price'],
+                'duration' => $s['dur'],
                 'category' => $s['cat'],
                 'bookingUrl' => route('booking'),
+                'variant' => 'home',
             ])
             @endforeach
             @endforelse
@@ -436,7 +446,7 @@
 
 {{-- =================== BOOKING STEPS VERTICAL TIMELINE =================== --}}
 <section class="py-20" style="background:var(--spa-dark-3);">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-14">
             <div class="badge-spa mb-4">خطوات الحجز</div>
@@ -444,7 +454,8 @@
             <div class="section-divider mt-4"></div>
         </div>
 
-        <div class="relative">
+        <div class="booking-steps-layout">
+        <div class="relative {{ ($siteStepsVideo['has_video'] ?? false) ? '' : 'lg:col-span-2 max-w-2xl mx-auto w-full' }}">
             <div class="absolute hidden md:block booking-step-line" style="right:2.5rem;top:24px;bottom:24px;width:2px;border-radius:2px;"></div>
 
             @foreach([
@@ -470,47 +481,76 @@
                 </div>
             </div>
             @endforeach
+
+            <div class="text-center mt-12">
+                <a href="{{ route('booking') }}" class="btn-primary text-lg px-10 py-4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    احجزي الآن
+                </a>
+            </div>
         </div>
 
-        <div class="text-center mt-12">
-            <a href="{{ route('booking') }}" class="btn-primary text-lg px-10 py-4">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                احجزي الآن
-            </a>
+        {{-- فيديو الخطوات — يسار الشاشة (العمود الثاني في RTL) --}}
+        @if($siteStepsVideo['has_video'] ?? false)
+        <div>
+            @include('partials.steps-video-player', ['stepsVideo' => $siteStepsVideo])
+        </div>
+        @endif
         </div>
     </div>
 </section>
 
-{{-- =================== CTA - ROSE CARD =================== --}}
+{{-- =================== CTA - ROSE CARD (قابلة للتعديل من لوحة التحكم) =================== --}}
+@if($sitePromo['active'] ?? true)
 <section class="py-16" style="background:var(--spa-dark);">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="rounded-3xl overflow-hidden relative cta-card">
             <div class="absolute inset-0" style="background:radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.12) 0%, transparent 60%);"></div>
             <div class="absolute inset-0 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1556760544-74068565f05c?w=800&h=400&q=60&auto=format&fit=crop"
-                     alt="" class="absolute left-0 top-0 h-full w-1/2 object-cover opacity-20" style="object-position:center;">
+                <img src="{{ $sitePromo['image_url'] }}"
+                     alt="{{ $sitePromo['title'] }}"
+                     class="absolute left-0 top-0 h-full w-1/2 object-cover opacity-20" style="object-position:center;">
             </div>
             <div class="relative z-10 p-10 lg:p-14 text-center md:text-right">
-                <div class="text-xs font-bold mb-3 px-3 py-1 rounded-full inline-block" style="background:rgba(255,255,255,0.2);color:white;">عرض خاص لأول مرة</div>
-                <h2 class="text-3xl md:text-4xl font-black text-white mb-3 leading-tight">جاهزة للتجربة؟</h2>
-                <p class="text-lg mb-2 text-white font-bold" style="opacity:0.9;">احجزي موعدك الآن</p>
-                <p class="text-sm mb-3" style="color:rgba(255,255,255,0.8);">واستمتعي بتجربة عناية فاخرة</p>
+                @if($sitePromo['badge'])
+                <div class="text-xs font-bold mb-3 px-3 py-1 rounded-full inline-block" style="background:rgba(255,255,255,0.2);color:white;">{{ $sitePromo['badge'] }}</div>
+                @endif
+                <h2 class="text-3xl md:text-4xl font-black text-white mb-3 leading-tight">{{ $sitePromo['title'] }}</h2>
+                @if($sitePromo['line1'])
+                <p class="text-lg mb-2 text-white font-bold" style="opacity:0.9;">{{ $sitePromo['line1'] }}</p>
+                @endif
+                @if($sitePromo['line2'])
+                <p class="text-sm mb-3" style="color:rgba(255,255,255,0.8);">{{ $sitePromo['line2'] }}</p>
+                @endif
+                @if($sitePromo['discount'])
                 <div class="flex items-center justify-center md:justify-start gap-2 mb-8">
-                    <span class="text-5xl font-black text-white">15%</span>
+                    <span class="text-5xl font-black text-white">{{ $sitePromo['discount'] }}</span>
                     <div>
-                        <div class="font-bold text-white text-sm">خصم خاص</div>
-                        <div class="text-xs" style="color:rgba(255,255,255,0.8);">على جميع الخدمات للحجوزات الأولى</div>
+                        @if($sitePromo['discount_label'])
+                        <div class="font-bold text-white text-sm">{{ $sitePromo['discount_label'] }}</div>
+                        @endif
+                        @if($sitePromo['discount_note'])
+                        <div class="text-xs" style="color:rgba(255,255,255,0.8);">{{ $sitePromo['discount_note'] }}</div>
+                        @endif
                     </div>
                 </div>
-                <a href="{{ route('booking') }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-black text-base transition-all hover:scale-105"
+                @endif
+                @php
+                    $promoBtnUrl = $sitePromo['button_url'];
+                    if ($promoBtnUrl === '/booking' || $promoBtnUrl === 'booking') {
+                        $promoBtnUrl = route('booking');
+                    }
+                @endphp
+                <a href="{{ $promoBtnUrl }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-black text-base transition-all hover:scale-105"
                    style="background:var(--spa-dark);color:white;box-shadow:0 8px 25px rgba(0,0,0,0.3);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    احجزي الآن
+                    {{ $sitePromo['button_text'] }}
                 </a>
             </div>
         </div>
     </div>
 </section>
+@endif
 
 {{-- =================== GALLERY (SPA INTERIORS ONLY) =================== --}}
 <section class="py-20" style="background:var(--spa-dark-3);">

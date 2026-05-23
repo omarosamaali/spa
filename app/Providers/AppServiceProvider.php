@@ -23,5 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         View::share('siteContact', SiteSetting::contactInfo());
         View::share('siteTheme', SiteSetting::theme());
+        View::share('sitePromo', SiteSetting::promoBanner());
+        View::share('siteStepsVideo', SiteSetting::stepsVideo());
     }
 }

@@ -42,7 +42,40 @@ class SiteSetting extends Model
             'logo_path'              => '',
             'favicon_path'           => '',
             'active_theme'           => 'luxea',
+            'promo_active'           => '1',
+            'promo_badge'            => 'عرض خاص لأول مرة',
+            'promo_title'            => 'جاهزة للتجربة؟',
+            'promo_line1'            => 'احجزي موعدك الآن',
+            'promo_line2'            => 'واستمتعي بتجربة عناية فاخرة',
+            'promo_discount'         => '15%',
+            'promo_discount_label'   => 'خصم خاص',
+            'promo_discount_note'    => 'على جميع الخدمات للحجوزات الأولى',
+            'promo_image'            => '',
+            'promo_button_text'      => 'احجزي الآن',
+            'promo_button_url'       => '',
+            'steps_video_url'        => '',
+            'steps_video_path'       => '',
+            'steps_video_poster'     => '',
         ];
+    }
+
+    public static function stepsVideoKeys(): array
+    {
+        return ['steps_video_url', 'steps_video_path', 'steps_video_poster'];
+    }
+
+    public static function promoKeys(): array
+    {
+        return [
+            'promo_active', 'promo_badge', 'promo_title', 'promo_line1', 'promo_line2',
+            'promo_discount', 'promo_discount_label', 'promo_discount_note',
+            'promo_image', 'promo_button_text', 'promo_button_url',
+        ];
+    }
+
+    public static function defaultPromoImage(): string
+    {
+        return 'https://images.unsplash.com/photo-1556760544-74068565f05c?w=800&h=400&q=80&auto=format&fit=crop';
     }
 
     public static function themeKeys(): array
@@ -213,8 +246,14 @@ class SiteSetting extends Model
         if (str_starts_with($key, 'hero_video')) {
             static::clearHeroVideoCache();
         }
+        if (str_starts_with($key, 'steps_video')) {
+            static::clearStepsVideoCache();
+        }
         if (str_starts_with($key, 'contact_') || str_starts_with($key, 'whatsapp_') || str_starts_with($key, 'social_')) {
             static::clearContactCache();
+        }
+        if (str_starts_with($key, 'promo_')) {
+            static::clearPromoCache();
         }
         if (in_array($key, static::themeKeys(), true)) {
             static::clearThemeCache();
@@ -296,6 +335,57 @@ class SiteSetting extends Model
         }
     }
 
+    public static function buildPromoPayload(array $values): array
+    {
+        $defaults = static::defaults();
+        $imagePath = trim($values['promo_image'] ?? '');
+        $buttonUrl = trim($values['promo_button_url'] ?? '');
+
+        return [
+            'active'          => ($values['promo_active'] ?? '1') === '1',
+            'badge'           => $values['promo_badge'] ?? $defaults['promo_badge'],
+            'title'           => $values['promo_title'] ?? $defaults['promo_title'],
+            'line1'           => $values['promo_line1'] ?? $defaults['promo_line1'],
+            'line2'           => $values['promo_line2'] ?? $defaults['promo_line2'],
+            'discount'        => $values['promo_discount'] ?? $defaults['promo_discount'],
+            'discount_label'  => $values['promo_discount_label'] ?? $defaults['promo_discount_label'],
+            'discount_note'   => $values['promo_discount_note'] ?? $defaults['promo_discount_note'],
+            'image_url'       => static::assetUrl($imagePath) ?: static::defaultPromoImage(),
+            'has_image'       => (bool) static::assetUrl($imagePath),
+            'button_text'     => $values['promo_button_text'] ?? $defaults['promo_button_text'],
+            'button_url'      => $buttonUrl !== '' ? $buttonUrl : '/booking',
+        ];
+    }
+
+    public static function promoBanner(): array
+    {
+        $defaults = static::defaults();
+
+        if (! static::tableReady()) {
+            return static::buildPromoPayload($defaults);
+        }
+
+        return Cache::remember('site_setting_promo', 3600, function () use ($defaults) {
+            $values = $defaults;
+            foreach (static::promoKeys() as $key) {
+                $stored = static::where('key', $key)->value('value');
+                if ($stored !== null && $stored !== '') {
+                    $values[$key] = $stored;
+                }
+            }
+
+            return static::buildPromoPayload($values);
+        });
+    }
+
+    public static function clearPromoCache(): void
+    {
+        Cache::forget('site_setting_promo');
+        foreach (static::promoKeys() as $key) {
+            Cache::forget("site_setting_{$key}");
+        }
+    }
+
     public static function heroVideo(): array
     {
         $defaults = static::defaults();
@@ -337,6 +427,106 @@ class SiteSetting extends Model
     {
         Cache::forget('site_setting_hero_video');
         foreach (['hero_video_url', 'hero_video_url_alt', 'hero_video_poster', 'hero_video_path'] as $key) {
+            Cache::forget("site_setting_{$key}");
+        }
+    }
+
+    /**
+     * Resolve YouTube/Vimeo URL to embed src, or null if direct file URL.
+     *
+     * @return array{type: 'embed'|'file', src: string, poster?: string}|null
+     */
+    public static function resolveVideoSource(string $url, ?string $poster = null): ?array
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return null;
+        }
+
+        if (preg_match('~(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([a-zA-Z0-9_-]{11})~', $url, $m)) {
+            return [
+                'type' => 'embed',
+                'src'  => 'https://www.youtube.com/embed/' . $m[1] . '?rel=0&modestbranding=1',
+            ];
+        }
+
+        if (preg_match('~vimeo\.com/(?:video/)?(\d+)~', $url, $m)) {
+            return [
+                'type' => 'embed',
+                'src'  => 'https://player.vimeo.com/video/' . $m[1],
+            ];
+        }
+
+        return [
+            'type'   => 'file',
+            'src'    => $url,
+            'poster' => $poster ?: null,
+        ];
+    }
+
+    public static function buildStepsVideoPayload(array $values): array
+    {
+        $path = trim($values['steps_video_path'] ?? '');
+        $url = trim($values['steps_video_url'] ?? '');
+        $poster = trim($values['steps_video_poster'] ?? '');
+
+        if ($path && Storage::disk('public')->exists($path)) {
+            $fileSrc = asset('storage/' . $path);
+            $source = static::resolveVideoSource($fileSrc, $poster ?: null) ?? [
+                'type' => 'file',
+                'src'  => $fileSrc,
+            ];
+
+            return [
+                'has_video' => true,
+                'source'    => $source,
+                'path'      => $path,
+                'url'       => $url,
+                'poster'    => $poster,
+            ];
+        }
+
+        if ($url !== '') {
+            $source = static::resolveVideoSource($url, $poster ?: null);
+
+            return [
+                'has_video' => $source !== null,
+                'source'    => $source,
+                'path'      => null,
+                'url'       => $url,
+                'poster'    => $poster,
+            ];
+        }
+
+        return [
+            'has_video' => false,
+            'source'    => null,
+            'path'      => null,
+            'url'       => '',
+            'poster'    => $poster,
+        ];
+    }
+
+    public static function stepsVideo(): array
+    {
+        if (! static::tableReady()) {
+            return static::buildStepsVideoPayload(static::defaults());
+        }
+
+        return Cache::remember('site_setting_steps_video', 3600, function () {
+            $values = [];
+            foreach (static::stepsVideoKeys() as $key) {
+                $values[$key] = static::where('key', $key)->value('value') ?? '';
+            }
+
+            return static::buildStepsVideoPayload($values);
+        });
+    }
+
+    public static function clearStepsVideoCache(): void
+    {
+        Cache::forget('site_setting_steps_video');
+        foreach (static::stepsVideoKeys() as $key) {
             Cache::forget("site_setting_{$key}");
         }
     }

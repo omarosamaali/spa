@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\ContactMessage;
+use App\Models\Equipment;
 use App\Models\Service;
 use App\Models\Staff;
 use App\Models\HeroSlide;
@@ -58,8 +59,10 @@ class DashboardController extends Controller
 
     public function services()
     {
-        $services = Service::orderBy('sort_order')->get();
-        return view('admin.services', compact('services'));
+        $services = Service::with('equipment:id,name')->orderBy('sort_order')->get();
+        $equipmentList = Equipment::orderBy('sort_order')->orderBy('name')->get();
+
+        return view('admin.services', compact('services', 'equipmentList'));
     }
 
     public function storeService(Request $request)
@@ -70,6 +73,7 @@ class DashboardController extends Controller
             'price'            => 'nullable|numeric|min:0',
             'duration_minutes' => 'required|integer|min:5|max:480',
             'category'         => 'nullable|string|max:50',
+            'equipment_id'     => 'nullable|exists:equipment,id',
             'icon'             => 'nullable|string|max:10',
             'sort_order'       => 'integer|min:0',
             'image'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
@@ -88,6 +92,7 @@ class DashboardController extends Controller
 
         $validated['is_active']  = $request->boolean('is_active', true);
         $validated['sort_order'] = $validated['sort_order'] ?? Service::max('sort_order') + 1;
+        $validated['equipment_id'] = $validated['equipment_id'] ?? null;
 
         Service::create($validated);
 
@@ -96,7 +101,9 @@ class DashboardController extends Controller
 
     public function editService(Service $service)
     {
-        return view('admin.service-edit', compact('service'));
+        $equipmentList = Equipment::orderBy('sort_order')->orderBy('name')->get();
+
+        return view('admin.service-edit', compact('service', 'equipmentList'));
     }
 
     public function updateService(Request $request, Service $service)
@@ -107,6 +114,7 @@ class DashboardController extends Controller
             'price'            => 'nullable|numeric|min:0',
             'duration_minutes' => 'required|integer|min:5|max:480',
             'category'         => 'nullable|string|max:50',
+            'equipment_id'     => 'nullable|exists:equipment,id',
             'icon'             => 'nullable|string|max:10',
             'sort_order'       => 'integer|min:0',
             'image'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
@@ -123,6 +131,7 @@ class DashboardController extends Controller
         }
 
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['equipment_id'] = $validated['equipment_id'] ?? null;
 
         $service->update($validated);
 
@@ -159,10 +168,12 @@ class DashboardController extends Controller
     public function storeStaff(Request $request)
     {
         $validated = $request->validate([
-            'name'  => 'required|string|max:255',
-            'role'  => 'nullable|string|max:255',
-            'bio'   => 'nullable|string|max:2000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'name'         => 'required|string|max:255',
+            'role'         => 'nullable|string|max:255',
+            'bio'          => 'nullable|string|max:2000',
+            'image'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'service_ids'  => 'nullable|array',
+            'service_ids.*'=> 'exists:services,id',
         ], [
             'name.required' => 'اسم الأخصائية مطلوب',
             'image.image'   => 'يجب أن يكون الملف صورة',
@@ -174,24 +185,31 @@ class DashboardController extends Controller
         }
 
         $validated['is_active'] = $request->boolean('is_active', true);
+        $serviceIds = $request->input('service_ids', []);
 
-        Staff::create($validated);
+        $staff = Staff::create(collect($validated)->except('service_ids')->all());
+        $staff->services()->sync($serviceIds);
 
         return redirect()->route('admin.staff')->with('success', 'تم إضافة الأخصائية بنجاح');
     }
 
     public function editStaff(Staff $staff)
     {
-        return view('admin.staff-edit', compact('staff'));
+        $staff->load('services');
+        $allServices = Service::orderBy('category')->orderBy('sort_order')->get();
+
+        return view('admin.staff-edit', compact('staff', 'allServices'));
     }
 
     public function updateStaff(Request $request, Staff $staff)
     {
         $validated = $request->validate([
-            'name'  => 'required|string|max:255',
-            'role'  => 'nullable|string|max:255',
-            'bio'   => 'nullable|string|max:2000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'name'         => 'required|string|max:255',
+            'role'         => 'nullable|string|max:255',
+            'bio'          => 'nullable|string|max:2000',
+            'image'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'service_ids'  => 'nullable|array',
+            'service_ids.*'=> 'exists:services,id',
         ], [
             'name.required' => 'اسم الأخصائية مطلوب',
         ]);
@@ -204,8 +222,10 @@ class DashboardController extends Controller
         }
 
         $validated['is_active'] = $request->boolean('is_active');
+        $serviceIds = $request->input('service_ids', []);
 
-        $staff->update($validated);
+        $staff->update(collect($validated)->except('service_ids')->all());
+        $staff->services()->sync($serviceIds);
 
         return redirect()->route('admin.staff')->with('success', 'تم تحديث الأخصائية بنجاح');
     }
@@ -227,6 +247,64 @@ class DashboardController extends Controller
         $label = $staff->is_active ? 'تفعيل' : 'إيقاف';
 
         return back()->with('success', "تم {$label} الأخصائية بنجاح");
+    }
+
+    // =================== EQUIPMENT CRUD ===================
+
+    public function equipment()
+    {
+        $equipmentList = Equipment::orderBy('sort_order')->orderBy('name')->get();
+        $categoryLabels = Equipment::categoryLabels();
+
+        return view('admin.equipment', compact('equipmentList', 'categoryLabels'));
+    }
+
+    public function storeEquipment(Request $request)
+    {
+        $validated = $request->validate([
+            'name'       => 'required|string|max:255',
+            'category'   => 'nullable|string|max:50',
+            'notes'      => 'nullable|string|max:1000',
+            'sort_order' => 'integer|min:0',
+        ], ['name.required' => 'اسم الجهاز مطلوب']);
+
+        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['sort_order'] = $validated['sort_order'] ?? Equipment::max('sort_order') + 1;
+
+        Equipment::create($validated);
+
+        return redirect()->route('admin.equipment')->with('success', 'تم إضافة الجهاز بنجاح');
+    }
+
+    public function updateEquipment(Request $request, Equipment $equipment)
+    {
+        $validated = $request->validate([
+            'name'       => 'required|string|max:255',
+            'category'   => 'nullable|string|max:50',
+            'notes'      => 'nullable|string|max:1000',
+            'sort_order' => 'integer|min:0',
+        ]);
+
+        $validated['is_active'] = $request->boolean('is_active');
+
+        $equipment->update($validated);
+
+        return redirect()->route('admin.equipment')->with('success', 'تم تحديث الجهاز بنجاح');
+    }
+
+    public function destroyEquipment(Equipment $equipment)
+    {
+        Service::where('equipment_id', $equipment->id)->update(['equipment_id' => null]);
+        $equipment->delete();
+
+        return redirect()->route('admin.equipment')->with('success', 'تم حذف الجهاز بنجاح');
+    }
+
+    public function toggleEquipment(Equipment $equipment)
+    {
+        $equipment->update(['is_active' => ! $equipment->is_active]);
+
+        return back()->with('success', 'تم تحديث حالة الجهاز');
     }
 
     // =================== CONTACT MESSAGES ===================
@@ -352,6 +430,112 @@ class DashboardController extends Controller
         }
 
         return $url;
+    }
+
+    // =================== PROMO CTA BANNER ===================
+
+    public function promoSettings()
+    {
+        $promo = SiteSetting::promoBanner();
+        $settings = [];
+        foreach (SiteSetting::promoKeys() as $key) {
+            $settings[$key] = SiteSetting::get($key, SiteSetting::defaults()[$key] ?? '');
+        }
+
+        return view('admin.promo-settings', compact('promo', 'settings'));
+    }
+
+    public function updatePromoSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'promo_badge'          => 'nullable|string|max:120',
+            'promo_title'          => 'required|string|max:200',
+            'promo_line1'          => 'nullable|string|max:200',
+            'promo_line2'          => 'nullable|string|max:300',
+            'promo_discount'       => 'nullable|string|max:20',
+            'promo_discount_label' => 'nullable|string|max:100',
+            'promo_discount_note'  => 'nullable|string|max:200',
+            'promo_button_text'    => 'required|string|max:80',
+            'promo_button_url'     => 'nullable|string|max:500',
+            'promo_image'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+        ], [
+            'promo_title.required' => 'عنوان البطاقة مطلوب',
+            'promo_button_text.required' => 'نص الزر مطلوب',
+        ]);
+
+        SiteSetting::set('promo_active', $request->boolean('promo_active') ? '1' : '0');
+        SiteSetting::set('promo_badge', $validated['promo_badge'] ?? '');
+        SiteSetting::set('promo_title', $validated['promo_title']);
+        SiteSetting::set('promo_line1', $validated['promo_line1'] ?? '');
+        SiteSetting::set('promo_line2', $validated['promo_line2'] ?? '');
+        SiteSetting::set('promo_discount', $validated['promo_discount'] ?? '');
+        SiteSetting::set('promo_discount_label', $validated['promo_discount_label'] ?? '');
+        SiteSetting::set('promo_discount_note', $validated['promo_discount_note'] ?? '');
+        SiteSetting::set('promo_button_text', $validated['promo_button_text']);
+        SiteSetting::set('promo_button_url', trim($validated['promo_button_url'] ?? ''));
+
+        $imagePath = SiteSetting::get('promo_image');
+        if ($request->boolean('remove_promo_image') && $imagePath) {
+            Storage::disk('public')->delete($imagePath);
+            SiteSetting::set('promo_image', '');
+            $imagePath = '';
+        }
+        if ($request->hasFile('promo_image')) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            SiteSetting::set('promo_image', $request->file('promo_image')->store('promo', 'public'));
+        }
+
+        SiteSetting::clearPromoCache();
+
+        return redirect()->route('admin.promo-settings')->with('success', 'تم تحديث بطاقة العرض بنجاح');
+    }
+
+    // =================== BOOKING STEPS VIDEO ===================
+
+    public function stepsVideoSettings()
+    {
+        $stepsVideo = SiteSetting::stepsVideo();
+        $settings = [];
+        foreach (SiteSetting::stepsVideoKeys() as $key) {
+            $settings[$key] = SiteSetting::get($key, SiteSetting::defaults()[$key] ?? '');
+        }
+
+        return view('admin.steps-video-settings', compact('stepsVideo', 'settings'));
+    }
+
+    public function updateStepsVideoSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'steps_video_url'    => 'nullable|string|max:1000',
+            'steps_video_poster' => 'nullable|string|max:1000',
+            'steps_video_file'   => 'nullable|file|mimes:mp4,webm,mov|max:51200',
+        ], [
+            'steps_video_file.max' => 'حجم الفيديو كبير جداً (الحد الأقصى 50 ميجابايت)',
+            'steps_video_file.mimes' => 'صيغة الفيديو غير مدعومة (mp4, webm, mov)',
+        ]);
+
+        SiteSetting::set('steps_video_url', trim($validated['steps_video_url'] ?? ''));
+        SiteSetting::set('steps_video_poster', trim($validated['steps_video_poster'] ?? ''));
+
+        $videoPath = SiteSetting::get('steps_video_path');
+        if ($request->boolean('remove_steps_video') && $videoPath) {
+            Storage::disk('public')->delete($videoPath);
+            SiteSetting::set('steps_video_path', '');
+            $videoPath = '';
+        }
+
+        if ($request->hasFile('steps_video_file')) {
+            if ($videoPath) {
+                Storage::disk('public')->delete($videoPath);
+            }
+            SiteSetting::set('steps_video_path', $request->file('steps_video_file')->store('steps-video', 'public'));
+        }
+
+        SiteSetting::clearStepsVideoCache();
+
+        return redirect()->route('admin.steps-video')->with('success', 'تم تحديث فيديو الخطوات بنجاح');
     }
 
     // =================== BRANDING (COLORS / LOGO / FAVICON) ===================
