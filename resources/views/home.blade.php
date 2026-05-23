@@ -372,7 +372,7 @@
 
         {{-- Category Tabs --}}
         <div class="flex flex-wrap justify-center gap-2 mb-10" id="cat-tabs">
-            @php $cats = ['all'=>'الكل','laser'=>'الليزر','skin'=>'البشرة','massage'=>'المساج','botox'=>'البوتوكس','nails'=>'الأظافر']; @endphp
+            @php $cats = array_merge(['all' => 'الكل'], \App\Models\Service::categoryLabels()); @endphp
             @foreach($cats as $key => $label)
             <button onclick="filterServices('{{ $key }}')" data-cat="{{ $key }}"
                     class="cat-tab px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 {{ $key==='all' ? 'cat-tab-active' : '' }}"

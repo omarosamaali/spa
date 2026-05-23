@@ -26,4 +26,30 @@ class Service extends Model
     {
         return $query->where('is_active', true)->orderBy('sort_order');
     }
+
+    /**
+     * Category keys => Arabic labels (booking, admin, homepage tabs).
+     */
+    public static function categoryLabels(): array
+    {
+        return [
+            'laser'   => 'الليزر',
+            'skin'    => 'البشرة',
+            'botox'   => 'البوتوكس والفيلر',
+            'massage' => 'المساج',
+            'nails'   => 'الأظافر',
+            'hair'    => 'الشعر',
+            'makeup'  => 'المكياج',
+            'other'   => 'أخرى',
+        ];
+    }
+
+    public static function categoryLabel(?string $key): string
+    {
+        if (! $key) {
+            return 'أخرى';
+        }
+
+        return static::categoryLabels()[$key] ?? $key;
+    }
 }

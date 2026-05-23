@@ -12,15 +12,32 @@ class SpaSeeder extends Seeder
     public function run(): void
     {
         $services = [
-            ['name' => 'الليزر', 'icon' => '✨', 'description' => 'إزالة الشعر بتقنيات حديثة آمنة وفعالة', 'price' => 150, 'duration_minutes' => 45, 'category' => 'laser', 'sort_order' => 1],
-            ['name' => 'البشرة', 'icon' => '🌸', 'description' => 'جلسات تنظيف ونضارة وتثبيت البشرة', 'price' => 120, 'duration_minutes' => 60, 'category' => 'skin', 'sort_order' => 2],
-            ['name' => 'البوتوكس والفيلر', 'icon' => '💉', 'description' => 'إبراز جمالك بشكل طبيعي وآمن', 'price' => 300, 'duration_minutes' => 30, 'category' => 'botox', 'sort_order' => 3],
-            ['name' => 'المساج', 'icon' => '💆', 'description' => 'استرخاء تام وتجديد الحيوية', 'price' => 100, 'duration_minutes' => 60, 'category' => 'massage', 'sort_order' => 4],
-            ['name' => 'الأظافر', 'icon' => '💅', 'description' => 'تصميم الأظافر بأحدث الستايلات', 'price' => 80, 'duration_minutes' => 45, 'category' => 'nails', 'sort_order' => 5],
+            // ── الليزر (خدمات فرعية) ──
+            ['name' => 'ليزر الوجه', 'icon' => '✨', 'description' => 'إزالة شعر الوجه بتقنية ليزر آمنة', 'price' => 80, 'duration_minutes' => 30, 'category' => 'laser', 'sort_order' => 1],
+            ['name' => 'ليزر الإبط', 'icon' => '✨', 'description' => 'جلسة ليزر منطقة الإبط', 'price' => 60, 'duration_minutes' => 20, 'category' => 'laser', 'sort_order' => 2],
+            ['name' => 'ليزر الساقين', 'icon' => '✨', 'description' => 'إزالة شعر الساقين بالكامل', 'price' => 120, 'duration_minutes' => 45, 'category' => 'laser', 'sort_order' => 3],
+            ['name' => 'ليزر كامل الجسم', 'icon' => '✨', 'description' => 'باقة ليزر شاملة لكامل الجسم', 'price' => 250, 'duration_minutes' => 90, 'category' => 'laser', 'sort_order' => 4],
+
+            // ── البوتوكس والفيلر (خدمات فرعية) ──
+            ['name' => 'فيلر الشفاه', 'icon' => '💉', 'description' => 'تنعيم ونفخ الشفاه بشكل طبيعي', 'price' => 200, 'duration_minutes' => 30, 'category' => 'botox', 'sort_order' => 10],
+            ['name' => 'فيلر الخدود', 'icon' => '💉', 'description' => 'إبراز الخدود وملء التجاعيد', 'price' => 250, 'duration_minutes' => 35, 'category' => 'botox', 'sort_order' => 11],
+            ['name' => 'بوتوكس الجبهة', 'icon' => '💉', 'description' => 'تخفيف خطوط الجبهة والتجاعيد', 'price' => 180, 'duration_minutes' => 20, 'category' => 'botox', 'sort_order' => 12],
+            ['name' => 'بوتوكس حول العين', 'icon' => '💉', 'description' => 'علاج خطوط العين ورمش العين', 'price' => 160, 'duration_minutes' => 20, 'category' => 'botox', 'sort_order' => 13],
+
+            // ── أقسام أخرى ──
+            ['name' => 'تنظيف البشرة العميق', 'icon' => '🌸', 'description' => 'جلسة تنظيف ونضارة وتثبيت البشرة', 'price' => 120, 'duration_minutes' => 60, 'category' => 'skin', 'sort_order' => 20],
+            ['name' => 'تقشير وتفتيح', 'icon' => '🌸', 'description' => 'تقشير لطيف لإشراق البشرة', 'price' => 100, 'duration_minutes' => 45, 'category' => 'skin', 'sort_order' => 21],
+            ['name' => 'مساج استرخاء', 'icon' => '💆', 'description' => 'استرخاء تام وتجديد الحيوية', 'price' => 100, 'duration_minutes' => 60, 'category' => 'massage', 'sort_order' => 30],
+            ['name' => 'مساج الأحجار الساخنة', 'icon' => '💆', 'description' => 'جلسة مساج علاجية بالأحجار', 'price' => 130, 'duration_minutes' => 75, 'category' => 'massage', 'sort_order' => 31],
+            ['name' => 'مانيكير', 'icon' => '💅', 'description' => 'عناية وتجميل الأظافر', 'price' => 50, 'duration_minutes' => 40, 'category' => 'nails', 'sort_order' => 40],
+            ['name' => 'باديكير', 'icon' => '💅', 'description' => 'عناية أظافر القدمين', 'price' => 60, 'duration_minutes' => 45, 'category' => 'nails', 'sort_order' => 41],
         ];
 
         foreach ($services as $service) {
-            Service::firstOrCreate(['name' => $service['name']], $service);
+            Service::updateOrCreate(
+                ['name' => $service['name'], 'category' => $service['category']],
+                $service
+            );
         }
 
         $staffMembers = [

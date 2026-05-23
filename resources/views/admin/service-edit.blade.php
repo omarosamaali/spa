@@ -54,10 +54,11 @@
                     <label class="form-label">التصنيف</label>
                     <select name="category" class="form-input">
                         <option value="">بدون تصنيف</option>
-                        @foreach(['laser'=>'ليزر','skin'=>'بشرة','botox'=>'بوتوكس وفيلر','massage'=>'مساج','nails'=>'أظافر','hair'=>'شعر','makeup'=>'مكياج','other'=>'أخرى'] as $val => $label)
+                        @foreach(\App\Models\Service::categoryLabels() as $val => $label)
                         <option value="{{ $val }}" {{ old('category', $service->category) == $val ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
+                    <p class="text-xs mt-1.5" style="color:#64748b;">كل خدمة فرعية تُضاف كسجل منفصل — مثلاً: ليزر الوجه، ليزر الجسم، كلها بتصنيف «الليزر».</p>
                 </div>
                 <div>
                     <label class="form-label">ترتيب العرض</label>

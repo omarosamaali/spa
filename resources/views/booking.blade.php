@@ -66,16 +66,43 @@
                            class="booking-input" placeholder="example@email.com">
                 </div>
 
-                {{-- Service --}}
+                {{-- Category (step 1) --}}
+                @php
+                    $preselectedCategory = null;
+                    if (old('service_id')) {
+                        $preselectedCategory = optional($services->firstWhere('id', (int) old('service_id')))->category ?: 'other';
+                    } elseif ($selectedService) {
+                        $preselectedCategory = $selectedService->category ?: 'other';
+                    }
+                @endphp
+                <div>
+                    <label class="booking-label">القسم <span style="color:#e8b4b8">*</span></label>
+                    <select class="booking-input" id="categorySelect" required>
+                        <option value="">— اختاري القسم —</option>
+                        @foreach($categoryLabels as $key => $label)
+                            @if(($servicesByCategory[$key] ?? collect())->isNotEmpty())
+                            <option value="{{ $key }}" {{ $preselectedCategory === $key ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                            @endif
+                        @endforeach
+                        @if(($servicesByCategory['other'] ?? collect())->isNotEmpty())
+                        <option value="other" {{ $preselectedCategory === 'other' ? 'selected' : '' }}>أخرى</option>
+                        @endif
+                    </select>
+                </div>
+
+                {{-- Service (step 2) --}}
                 <div>
                     <label class="booking-label">الخدمة المطلوبة <span style="color:#e8b4b8">*</span></label>
-                    <select name="service_id" class="booking-input" required id="serviceSelect">
-                        <option value="">— اختاري الخدمة —</option>
+                    <select name="service_id" class="booking-input" required id="serviceSelect" disabled>
+                        <option value="">— اختاري القسم أولاً —</option>
                         @foreach($services as $service)
                         <option value="{{ $service->id }}"
+                            data-category="{{ $service->category ?: 'other' }}"
                             {{ (old('service_id') == $service->id || ($selectedService && $selectedService->id == $service->id)) ? 'selected' : '' }}>
                             {{ $service->name }}
-                            @if($service->price) - {{ number_format($service->price) }} د.ع @endif
+                            @if($service->price) — {{ number_format($service->price) }} د.ع @endif
                         </option>
                         @endforeach
                     </select>
@@ -152,6 +179,42 @@
 const dateInput = document.getElementById('dateInput');
 const timeSelect = document.getElementById('timeSelect');
 const serviceSelect = document.getElementById('serviceSelect');
+const categorySelect = document.getElementById('categorySelect');
+
+function updateServiceOptions() {
+    const cat = categorySelect.value;
+    const placeholder = serviceSelect.options[0];
+
+    Array.from(serviceSelect.options).forEach((opt, i) => {
+        if (i === 0) return;
+        const match = cat && opt.dataset.category === cat;
+        opt.hidden = !match;
+        opt.disabled = !match;
+    });
+
+    if (!cat) {
+        serviceSelect.disabled = true;
+        placeholder.textContent = '— اختاري القسم أولاً —';
+        serviceSelect.value = '';
+        return;
+    }
+
+    serviceSelect.disabled = false;
+    placeholder.textContent = '— اختاري الخدمة —';
+
+    const current = serviceSelect.selectedOptions[0];
+    if (!current || current.disabled || current.value === '') {
+        const first = Array.from(serviceSelect.options).find(o => o.value && !o.disabled);
+        serviceSelect.value = first ? first.value : '';
+    }
+}
+
+categorySelect.addEventListener('change', () => {
+    updateServiceOptions();
+    loadTimes();
+});
+
+updateServiceOptions();
 
 async function loadTimes() {
     const date = dateInput.value;

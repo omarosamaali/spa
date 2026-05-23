@@ -13,12 +13,20 @@ class BookingController extends Controller
     public function index(Request $request)
     {
         $services = Service::active()->get();
+        $servicesByCategory = $services->groupBy(fn ($s) => $s->category ?: 'other');
+        $categoryLabels = Service::categoryLabels();
         $staff = Staff::where('is_active', true)->get();
         $selectedService = $request->get('service_id')
             ? Service::find($request->get('service_id'))
             : null;
 
-        return view('booking', compact('services', 'staff', 'selectedService'));
+        return view('booking', compact(
+            'services',
+            'servicesByCategory',
+            'categoryLabels',
+            'staff',
+            'selectedService'
+        ));
     }
 
     public function store(Request $request)
