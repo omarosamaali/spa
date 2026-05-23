@@ -56,7 +56,61 @@ class SiteSetting extends Model
             'steps_video_url'        => '',
             'steps_video_path'       => '',
             'steps_video_poster'     => '',
+            'whatsapp_api_enabled'   => '0',
+            'whatsapp_api_token'     => '',
+            'whatsapp_phone_number_id' => '',
+            'whatsapp_api_version'   => 'v21.0',
+            'whatsapp_template_received' => 'booking_received',
+            'whatsapp_template_confirmed' => 'booking_confirmed',
+            'whatsapp_template_lang' => 'ar',
         ];
+    }
+
+    public static function whatsappApiKeys(): array
+    {
+        return [
+            'whatsapp_api_enabled',
+            'whatsapp_api_token',
+            'whatsapp_phone_number_id',
+            'whatsapp_api_version',
+            'whatsapp_template_received',
+            'whatsapp_template_confirmed',
+            'whatsapp_template_lang',
+        ];
+    }
+
+    public static function whatsappApi(): array
+    {
+        $defaults = static::defaults();
+        $values = $defaults;
+
+        if (static::tableReady()) {
+            foreach (static::whatsappApiKeys() as $key) {
+                $stored = static::where('key', $key)->value('value');
+                if ($stored !== null && $stored !== '') {
+                    $values[$key] = $stored;
+                }
+            }
+        }
+
+        $token = trim($values['whatsapp_api_token'] ?? '') ?: trim((string) config('services.whatsapp.token', ''));
+
+        return [
+            'enabled'            => ($values['whatsapp_api_enabled'] ?? '0') === '1',
+            'token'              => $token,
+            'phone_number_id'    => trim($values['whatsapp_phone_number_id'] ?? ''),
+            'api_version'        => trim($values['whatsapp_api_version'] ?? 'v21.0') ?: 'v21.0',
+            'template_received'  => trim($values['whatsapp_template_received'] ?? 'booking_received'),
+            'template_confirmed' => trim($values['whatsapp_template_confirmed'] ?? 'booking_confirmed'),
+            'template_lang'      => trim($values['whatsapp_template_lang'] ?? 'ar') ?: 'ar',
+        ];
+    }
+
+    public static function clearWhatsappApiCache(): void
+    {
+        foreach (static::whatsappApiKeys() as $key) {
+            Cache::forget("site_setting_{$key}");
+        }
     }
 
     public static function stepsVideoKeys(): array
@@ -248,6 +302,9 @@ class SiteSetting extends Model
         }
         if (str_starts_with($key, 'steps_video')) {
             static::clearStepsVideoCache();
+        }
+        if (str_starts_with($key, 'whatsapp_')) {
+            static::clearWhatsappApiCache();
         }
         if (str_starts_with($key, 'contact_') || str_starts_with($key, 'whatsapp_') || str_starts_with($key, 'social_')) {
             static::clearContactCache();

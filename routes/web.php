@@ -76,6 +76,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/contact-settings', [DashboardController::class, 'contactSettings'])->name('contact-settings');
     Route::put('/contact-settings', [DashboardController::class, 'updateContactSettings'])->name('contact-settings.update');
 
+    // WhatsApp automatic booking messages (Meta Cloud API)
+    Route::get('/whatsapp-settings', [DashboardController::class, 'whatsappSettings'])->name('whatsapp-settings');
+    Route::put('/whatsapp-settings', [DashboardController::class, 'updateWhatsappSettings'])->name('whatsapp-settings.update');
+
     // Promo CTA banner (جاهزة للتجربة)
     Route::get('/promo-settings', [DashboardController::class, 'promoSettings'])->name('promo-settings');
     Route::put('/promo-settings', [DashboardController::class, 'updatePromoSettings'])->name('promo-settings.update');

@@ -11,6 +11,7 @@ use App\Models\Staff;
 use App\Models\HeroSlide;
 use App\Models\SiteSetting;
 use App\Models\SiteTheme;
+use App\Services\WhatsAppNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -50,7 +51,12 @@ class DashboardController extends Controller
     public function updateStatus(Request $request, Appointment $appointment)
     {
         $request->validate(['status' => 'required|in:pending,confirmed,cancelled,completed']);
+        $previousStatus = $appointment->status;
         $appointment->update(['status' => $request->status]);
+
+        if ($request->status === 'confirmed' && $previousStatus !== 'confirmed') {
+            app(WhatsAppNotifier::class)->sendBookingConfirmed($appointment->fresh(['service']));
+        }
 
         return back()->with('success', 'تم تحديث حالة الحجز بنجاح');
     }
@@ -426,6 +432,51 @@ class DashboardController extends Controller
         SiteSetting::clearContactCache();
 
         return redirect()->route('admin.contact-settings')->with('success', 'تم تحديث بيانات التواصل والسوشيال بنجاح');
+    }
+
+    // =================== WHATSAPP API (AUTO MESSAGES) ===================
+
+    public function whatsappSettings()
+    {
+        $config = SiteSetting::whatsappApi();
+        $settings = [];
+        foreach (SiteSetting::whatsappApiKeys() as $key) {
+            $settings[$key] = SiteSetting::get($key, SiteSetting::defaults()[$key] ?? '');
+        }
+
+        return view('admin.whatsapp-settings', compact('config', 'settings'));
+    }
+
+    public function updateWhatsappSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'whatsapp_api_token'          => 'nullable|string|max:500',
+            'whatsapp_phone_number_id'  => 'nullable|string|max:80',
+            'whatsapp_api_version'      => 'nullable|string|max:20',
+            'whatsapp_template_received'  => 'nullable|string|max:120',
+            'whatsapp_template_confirmed' => 'nullable|string|max:120',
+            'whatsapp_template_lang'    => 'nullable|string|max:10',
+            'test_phone'                => 'nullable|string|max:20',
+        ]);
+
+        SiteSetting::set('whatsapp_api_enabled', $request->boolean('whatsapp_api_enabled') ? '1' : '0');
+        SiteSetting::set('whatsapp_api_token', trim($validated['whatsapp_api_token'] ?? ''));
+        SiteSetting::set('whatsapp_phone_number_id', trim($validated['whatsapp_phone_number_id'] ?? ''));
+        SiteSetting::set('whatsapp_api_version', trim($validated['whatsapp_api_version'] ?? 'v21.0') ?: 'v21.0');
+        SiteSetting::set('whatsapp_template_received', trim($validated['whatsapp_template_received'] ?? 'booking_received') ?: 'booking_received');
+        SiteSetting::set('whatsapp_template_confirmed', trim($validated['whatsapp_template_confirmed'] ?? 'booking_confirmed') ?: 'booking_confirmed');
+        SiteSetting::set('whatsapp_template_lang', trim($validated['whatsapp_template_lang'] ?? 'ar') ?: 'ar');
+
+        SiteSetting::clearWhatsappApiCache();
+
+        $message = 'تم حفظ إعدادات واتساب';
+
+        if ($request->boolean('send_test') && ! empty($validated['test_phone'])) {
+            $sent = app(WhatsAppNotifier::class)->sendTestMessage($validated['test_phone']);
+            $message .= $sent ? ' — وتم إرسال رسالة تجريبية' : ' — فشل الإرسال التجريبي (راجع السجل أو القوالب في Meta)';
+        }
+
+        return redirect()->route('admin.whatsapp-settings')->with('success', $message);
     }
 
     private function normalizeSocialUrl(?string $url): string

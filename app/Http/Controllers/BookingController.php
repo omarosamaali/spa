@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\Staff;
 use App\Services\BookingAvailability;
 use App\Services\GoHighLevelService;
+use App\Services\WhatsAppNotifier;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
@@ -114,6 +115,13 @@ class BookingController extends Controller
         }
 
         $appointment = Appointment::create($validated);
+        $appointment->load('service');
+
+        try {
+            app(WhatsAppNotifier::class)->sendBookingReceived($appointment);
+        } catch (\Throwable $e) {
+            \Log::warning('WhatsApp booking notify failed: '.$e->getMessage());
+        }
 
         try {
             $ghlService = new GoHighLevelService();

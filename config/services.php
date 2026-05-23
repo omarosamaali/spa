@@ -33,6 +33,10 @@ return [
         'location_id' => env('GHL_LOCATION_ID', ''),
     ],
 
+    'whatsapp' => [
+        'token' => env('WHATSAPP_TOKEN', ''),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
