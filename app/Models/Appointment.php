@@ -8,8 +8,8 @@ class Appointment extends Model
 {
     protected $fillable = [
         'client_name', 'client_phone', 'client_email',
-        'service_id', 'staff_id', 'appointment_date',
-        'appointment_time', 'status', 'notes', 'ghl_contact_id',
+        'service_id', 'duration_minutes', 'staff_id', 'equipment_id',
+        'appointment_date', 'appointment_time', 'status', 'notes', 'ghl_contact_id',
     ];
 
     protected $casts = [
@@ -24,5 +24,10 @@ class Appointment extends Model
     public function staff()
     {
         return $this->belongsTo(Staff::class);
+    }
+
+    public function equipment()
+    {
+        return $this->belongsTo(Equipment::class);
     }
 }

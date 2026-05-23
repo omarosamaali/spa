@@ -48,6 +48,14 @@
     @endforeach
 </div>
 
+<div class="mb-6 p-4 rounded-xl text-sm leading-relaxed" style="background:#fff; border:1px solid #f0dde0; color:#555; box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+    <strong style="color:#1a1a1a">تذكير — حالات الحجز:</strong>
+    الحجز من الموقع يبدأ <strong>انتظار التأكيد</strong> (وليس ملغياً).
+    بعد التواصل عبر واتساب غيّري الحالة إلى <strong>مؤكد</strong> من صفحة
+    <a href="{{ route('admin.appointments') }}" class="font-bold" style="color:#c9888e">الحجوزات</a>.
+    خيار «إلغاء» يتطلب تأكيداً ولا يحدث تلقائياً من الموقع.
+</div>
+
 {{-- Recent bookings + Messages --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

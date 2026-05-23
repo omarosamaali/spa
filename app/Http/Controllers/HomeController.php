@@ -14,7 +14,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $services     = Service::active()->get();
+        $services     = Service::bookable()->get();
         $testimonials = Testimonial::where('is_active', true)->get();
 
         $stats = [
@@ -33,7 +33,8 @@ class HomeController extends Controller
 
     public function services()
     {
-        $services = Service::active()->get();
+        $services = Service::bookable()->get();
+
         return view('services', compact('services'));
     }
 
@@ -70,7 +71,7 @@ class HomeController extends Controller
             abort(404);
         }
 
-        $services     = Service::active()->get();
+        $services     = Service::bookable()->get();
         $testimonials = Testimonial::where('is_active', true)->get();
         $heroSlides   = \Illuminate\Support\Facades\Schema::hasTable('hero_slides')
             ? HeroSlide::active()->get()

@@ -79,6 +79,7 @@
                 @endphp
                 <div>
                     <label class="booking-label">القسم <span style="color:#e8b4b8">*</span></label>
+                    <p class="text-xs mb-2" style="color:rgba(255,255,255,0.4);">اختاري القسم أولاً — بدون سعر</p>
                     <select class="booking-input" id="categorySelect" required>
                         <option value="">— اختاري القسم —</option>
                         @foreach($categoryLabels as $key => $label)
@@ -94,36 +95,24 @@
                     </select>
                 </div>
 
-                {{-- Service (step 2) --}}
+                {{-- Service (step 2) — السعر والمدة على الخدمة الفرعية --}}
                 <div>
-                    <label class="booking-label">الخدمة المطلوبة <span style="color:#e8b4b8">*</span></label>
+                    <label class="booking-label">الخدمة الفرعية <span style="color:#e8b4b8">*</span></label>
+                    <p class="text-xs mb-2" style="color:rgba(255,255,255,0.4);">السعر ومدة الجلسة تظهر مع كل خدمة</p>
                     <select name="service_id" class="booking-input" required id="serviceSelect" disabled>
                         <option value="">— اختاري القسم أولاً —</option>
-                        @foreach($services as $service)
-                        <option value="{{ $service->id }}"
-                            data-category="{{ $service->category ?: 'other' }}"
-                            {{ (old('service_id') == $service->id || ($selectedService && $selectedService->id == $service->id)) ? 'selected' : '' }}>
-                            {{ $service->name }}
-                            @if($service->price) — {{ number_format($service->price) }} د.ع @endif
-                        </option>
-                        @endforeach
                     </select>
+                    <p class="text-xs mt-2 hidden" id="serviceMeta" style="color:rgba(232,180,184,0.85);"></p>
                 </div>
 
-                {{-- Staff --}}
-                @if($staff->count())
-                <div>
-                    <label class="booking-label">اختاري الأخصائية (اختياري)</label>
-                    <select name="staff_id" class="booking-input">
-                        <option value="">— أي أخصائية متاحة —</option>
-                        @foreach($staff as $s)
-                        <option value="{{ $s->id }}" {{ old('staff_id') == $s->id ? 'selected' : '' }}>
-                            {{ $s->name }} @if($s->role) - {{ $s->role }} @endif
-                        </option>
-                        @endforeach
+                {{-- Staff — تظهر بعد اختيار الخدمة --}}
+                <div id="staffField">
+                    <label class="booking-label">الأخصائية <span style="color:#e8b4b8">*</span></label>
+                    <p class="text-xs mb-2" style="color:rgba(255,255,255,0.4);">تُعرض المختصات المؤهلات لهذه الخدمة فقط</p>
+                    <select name="staff_id" class="booking-input" id="staffSelect" disabled>
+                        <option value="">— اختاري الخدمة أولاً —</option>
                     </select>
                 </div>
-                @endif
 
                 {{-- Date --}}
                 <div>
@@ -154,8 +143,8 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8b4b8" stroke-width="2" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div class="text-sm" style="color:rgba(255,255,255,0.6)">
                     <strong class="block mb-1 text-white">تذكيري:</strong>
+                    الأوقات المتاحة تُحسب حسب مدة الخدمة والجهاز والأخصائية المختارة.
                     سيتم التواصل معك عبر واتساب لتأكيد الموعد خلال ٣٠ دقيقة من الحجز.
-                    في حال الرغبة بالإلغاء يرجى الإخطار قبل ٢٤ ساعة.
                 </div>
             </div>
 
@@ -182,82 +171,186 @@ const dateInput = document.getElementById('dateInput');
 const timeSelect = document.getElementById('timeSelect');
 const serviceSelect = document.getElementById('serviceSelect');
 const categorySelect = document.getElementById('categorySelect');
+const staffSelect = document.getElementById('staffSelect');
+const serviceMeta = document.getElementById('serviceMeta');
+const servicesByCategory = @json($servicesForBooking);
+const preselectedServiceId = @json(old('service_id') ?: ($selectedService?->id));
+const preselectedStaffId = @json(old('staff_id'));
+
+function findService(id) {
+    for (const cat of Object.values(servicesByCategory)) {
+        const found = cat.find(s => s.id == id);
+        if (found) return found;
+    }
+    return null;
+}
+
+function updateServiceMeta() {
+    const s = findService(serviceSelect.value);
+    if (!s) {
+        serviceMeta.classList.add('hidden');
+        return;
+    }
+    let text = `⏱ مدة الجلسة: ${s.duration_minutes} دقيقة`;
+    if (s.equipment) text += ` · جهاز: ${s.equipment}`;
+    serviceMeta.textContent = text;
+    serviceMeta.classList.remove('hidden');
+}
 
 function updateServiceOptions() {
     const cat = categorySelect.value;
-    const placeholder = serviceSelect.options[0];
+    const list = servicesByCategory[cat] || [];
 
-    Array.from(serviceSelect.options).forEach((opt, i) => {
-        if (i === 0) return;
-        const match = cat && opt.dataset.category === cat;
-        opt.hidden = !match;
-        opt.disabled = !match;
-    });
+    serviceSelect.innerHTML = '';
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
 
     if (!cat) {
-        serviceSelect.disabled = true;
         placeholder.textContent = '— اختاري القسم أولاً —';
-        serviceSelect.value = '';
+        serviceSelect.appendChild(placeholder);
+        serviceSelect.disabled = true;
+        resetStaffSelect();
         return;
     }
 
-    serviceSelect.disabled = false;
-    placeholder.textContent = '— اختاري الخدمة —';
+    placeholder.textContent = list.length ? '— اختاري الخدمة —' : '— لا توجد خدمات في هذا القسم —';
+    serviceSelect.appendChild(placeholder);
 
-    const current = serviceSelect.selectedOptions[0];
-    if (!current || current.disabled || current.value === '') {
-        const first = Array.from(serviceSelect.options).find(o => o.value && !o.disabled);
-        serviceSelect.value = first ? first.value : '';
+    list.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        let label = s.name;
+        if (s.price) label += ` — ${Number(s.price).toLocaleString('ar-IQ')} د.ع`;
+        label += ` (${s.duration_minutes} د)`;
+        opt.textContent = label;
+        serviceSelect.appendChild(opt);
+    });
+
+    serviceSelect.disabled = list.length === 0;
+
+    if (preselectedServiceId && list.some(s => s.id == preselectedServiceId)) {
+        serviceSelect.value = preselectedServiceId;
+    } else if (list.length === 1) {
+        serviceSelect.value = list[0].id;
+    }
+
+    updateServiceMeta();
+    loadStaffForService();
+}
+
+function resetStaffSelect(msg = '— اختاري الخدمة أولاً —') {
+    staffSelect.innerHTML = `<option value="">${msg}</option>`;
+    staffSelect.disabled = true;
+    staffSelect.value = '';
+}
+
+async function loadStaffForService() {
+    const serviceId = serviceSelect.value;
+    if (!serviceId) {
+        resetStaffSelect();
+        resetTimesSelect();
+        return;
+    }
+
+    staffSelect.innerHTML = '<option>جاري التحميل...</option>';
+    staffSelect.disabled = true;
+
+    try {
+        const res = await fetch(`{{ route('booking.staff') }}?service_id=${serviceId}`);
+        const staff = await res.json();
+
+        staffSelect.innerHTML = '';
+        if (staff.length === 0) {
+            staffSelect.innerHTML = '<option value="">— أي أخصائية متاحة —</option>';
+            staffSelect.disabled = false;
+            staffSelect.removeAttribute('required');
+        } else {
+            const ph = document.createElement('option');
+            ph.value = '';
+            ph.textContent = '— اختاري الأخصائية —';
+            staffSelect.appendChild(ph);
+            staff.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.role ? `${s.name} — ${s.role}` : s.name;
+                staffSelect.appendChild(opt);
+            });
+            staffSelect.disabled = false;
+            staffSelect.setAttribute('required', 'required');
+            if (preselectedStaffId && staff.some(s => s.id == preselectedStaffId)) {
+                staffSelect.value = preselectedStaffId;
+            } else if (staff.length === 1) {
+                staffSelect.value = staff[0].id;
+            }
+        }
+        loadTimes();
+    } catch (e) {
+        resetStaffSelect('تعذر تحميل الأخصائيات');
     }
 }
 
-categorySelect.addEventListener('change', () => {
-    updateServiceOptions();
-    loadTimes();
-});
+function resetTimesSelect(msg = '— اختاري التاريخ والخدمة —') {
+    timeSelect.innerHTML = `<option value="">${msg}</option>`;
+}
 
-updateServiceOptions();
+function formatTimeLabel(t) {
+    const [h, m] = t.split(':');
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'م' : 'ص';
+    const displayH = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+    return `${displayH}:${m} ${ampm}`;
+}
 
 async function loadTimes() {
     const date = dateInput.value;
     const serviceId = serviceSelect.value;
-    if (!date) return;
+    if (!date || !serviceId) {
+        resetTimesSelect();
+        return;
+    }
+
+    const staffId = staffSelect.value;
+    if (staffSelect.hasAttribute('required') && !staffId) {
+        resetTimesSelect('— اختاري الأخصائية أولاً —');
+        return;
+    }
 
     timeSelect.innerHTML = '<option>جاري التحميل...</option>';
 
     try {
-        const url = `{{ route('booking.times') }}?date=${date}&service_id=${serviceId}`;
+        let url = `{{ route('booking.times') }}?date=${date}&service_id=${serviceId}`;
+        if (staffId) url += `&staff_id=${staffId}`;
         const res = await fetch(url);
         const times = await res.json();
 
         timeSelect.innerHTML = '<option value="">— اختاري الوقت —</option>';
         if (times.length === 0) {
-            timeSelect.innerHTML = '<option value="">لا يوجد أوقات متاحة في هذا اليوم</option>';
+            timeSelect.innerHTML = '<option value="">لا يوجد أوقات متاحة — جرّبي تاريخاً أو أخصائية أخرى</option>';
             return;
         }
         times.forEach(t => {
-            const [h, m] = t.split(':');
-            const hour = parseInt(h);
-            const ampm = hour >= 12 ? 'م' : 'ص';
-            const displayH = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-            const label = `${displayH}:${m} ${ampm}`;
-            timeSelect.innerHTML += `<option value="${t}">${label}</option>`;
+            timeSelect.innerHTML += `<option value="${t}">${formatTimeLabel(t)}</option>`;
         });
-    } catch(e) {
-        const slots = ['10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00'];
-        timeSelect.innerHTML = '<option value="">— اختاري الوقت —</option>';
-        slots.forEach(t => {
-            const [h, m] = t.split(':');
-            const hour = parseInt(h);
-            const ampm = hour >= 12 ? 'م' : 'ص';
-            const displayH = hour > 12 ? hour - 12 : hour;
-            timeSelect.innerHTML += `<option value="${t}">${displayH}:${m} ${ampm}</option>`;
-        });
+    } catch (e) {
+        resetTimesSelect('تعذر تحميل الأوقات');
     }
 }
 
+categorySelect.addEventListener('change', () => {
+    updateServiceOptions();
+});
+
+serviceSelect.addEventListener('change', () => {
+    updateServiceMeta();
+    loadStaffForService();
+});
+
+staffSelect.addEventListener('change', loadTimes);
 dateInput.addEventListener('change', loadTimes);
-serviceSelect.addEventListener('change', loadTimes);
-if (dateInput.value) loadTimes();
+
+updateServiceOptions();
+if (preselectedServiceId) {
+    loadStaffForService();
+}
 </script>
 @endpush

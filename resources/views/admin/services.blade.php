@@ -20,10 +20,15 @@
         {{-- Header --}}
         <div class="flex items-start justify-between mb-3">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                     style="background:linear-gradient(135deg,#f5dfe1,#e8b4b8)">
-                    {{ $service->icon ?? '✨' }}
+                @if($service->image)
+                <img src="{{ asset('storage/'.$service->image) }}" alt=""
+                     class="w-12 h-12 rounded-xl object-cover flex-shrink-0">
+                @else
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0"
+                     style="background:linear-gradient(135deg,#f5dfe1,#e8b4b8); color:#888">
+                    بدون صورة
                 </div>
+                @endif
                 <div>
                     <div class="font-black" style="color:#1a1a1a">{{ $service->name }}</div>
                     <div class="text-xs" style="color:#888">{{ $service->duration_minutes }} دقيقة</div>
@@ -140,17 +145,27 @@
                         <option value="{{ $val }}" {{ old('category') == $val ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
-                    <p class="text-xs mt-1.5" style="color:#64748b;">كل خدمة فرعية تُضاف كسجل منفصل — مثلاً: ليزر الوجه، ليزر الجسم، كلها بتصنيف «الليزر».</p>
                 </div>
                 <div>
-                    <label class="form-label">ترتيب العرض</label>
-                    <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}" class="form-input" min="0">
+                    <label class="form-label">الجهاز / الغرفة</label>
+                    <select name="equipment_id" class="form-input">
+                        <option value="">— بدون —</option>
+                        @foreach($equipmentList as $eq)
+                        <option value="{{ $eq->id }}" {{ old('equipment_id') == $eq->id ? 'selected' : '' }}>{{ $eq->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
             <div>
-                <label class="form-label">صورة الخدمة</label>
-                <input type="file" name="image" accept="image/*" class="form-input" style="padding:0.5rem">
+                <label class="form-label">ترتيب العرض</label>
+                <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}" class="form-input min-w-[8rem]" min="0">
+            </div>
+
+            <div>
+                <label class="form-label">صورة الخدمة (تظهر في الموقع بدل الإيموجي)</label>
+                <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="form-input" style="padding:0.5rem">
+                <p class="text-xs mt-1.5" style="color:#64748b;">يفضّل صورة عمودية 600×800 بكسل أو أكبر</p>
             </div>
 
             <div class="flex items-center gap-3 py-3 px-4 rounded-xl" style="background:#f9f5f5">

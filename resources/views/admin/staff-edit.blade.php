@@ -45,6 +45,25 @@
                 <input type="file" name="image" accept="image/*" class="form-input" style="padding:0.5rem">
             </div>
 
+            <div>
+                <label class="form-label">الخدمات التي تقدمها</label>
+                <p class="text-xs mb-3" style="color:#888">بعد اختيار الخدمة في الحجز، تظهر فقط الأخصائيات المرتبطة بها. إن لم تُحدَّد خدمات، تظهر لجميع الخدمات.</p>
+                <div class="max-h-56 overflow-y-auto rounded-xl p-4 space-y-2" style="background:#f9f5f5; border:1px solid #eee">
+                    @php $assigned = old('service_ids', $staff->services->pluck('id')->all()); @endphp
+                    @forelse($allServices as $svc)
+                    <label class="flex items-center gap-2 text-sm cursor-pointer">
+                        <input type="checkbox" name="service_ids[]" value="{{ $svc->id }}"
+                               class="w-4 h-4 rounded" style="accent-color:#c9888e"
+                               {{ in_array($svc->id, $assigned) ? 'checked' : '' }}>
+                        <span>{{ $svc->name }}</span>
+                        <span class="text-xs" style="color:#aaa">({{ \App\Models\Service::categoryLabel($svc->category) }})</span>
+                    </label>
+                    @empty
+                    <p class="text-sm" style="color:#888">لا توجد خدمات بعد — أضيفيها من قسم الخدمات.</p>
+                    @endforelse
+                </div>
+            </div>
+
             <div class="flex items-center gap-3 py-3 px-4 rounded-xl" style="background:#f9f5f5">
                 <input type="checkbox" name="is_active" id="staff_is_active" value="1"
                        class="w-5 h-5 rounded" style="accent-color:#c9888e"

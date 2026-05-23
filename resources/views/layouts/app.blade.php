@@ -27,8 +27,6 @@
                     <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">الرئيسية</a>
                     <a href="{{ route('services') }}" class="nav-link {{ request()->routeIs('services') ? 'active' : '' }}">الخدمات</a>
                     <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}">عن المركز</a>
-                    <a href="#" class="nav-link">الأسعار</a>
-                    <a href="#" class="nav-link">المدونة</a>
                     <a href="{{ route('contact') }}" class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">تواصل معنا</a>
                     <div class="relative group">
                         <button class="nav-link flex items-center gap-1">العربية ▾</button>
@@ -101,7 +99,7 @@
                         <div><a href="{{ route('home') }}" class="hover:text-white transition-colors">الرئيسية</a></div>
                         <div><a href="{{ route('services') }}" class="hover:text-white transition-colors">الخدمات</a></div>
                         <div><a href="{{ route('about') }}" class="hover:text-white transition-colors">عن المركز</a></div>
-                        <div><a href="{{ route('booking') }}" class="hover:text-white transition-colors">الأسعار</a></div>
+                        <div><a href="{{ route('booking') }}" class="hover:text-white transition-colors">احجزي الآن</a></div>
                         <div><a href="{{ route('contact') }}" class="hover:text-white transition-colors">تواصل معنا</a></div>
                     </div>
                 </div>

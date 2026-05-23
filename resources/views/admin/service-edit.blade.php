@@ -61,20 +61,38 @@
                     <p class="text-xs mt-1.5" style="color:#64748b;">كل خدمة فرعية تُضاف كسجل منفصل — مثلاً: ليزر الوجه، ليزر الجسم، كلها بتصنيف «الليزر».</p>
                 </div>
                 <div>
-                    <label class="form-label">ترتيب العرض</label>
-                    <input type="number" name="sort_order" value="{{ old('sort_order', $service->sort_order) }}" class="form-input" min="0">
+                    <label class="form-label">الجهاز / الغرفة</label>
+                    <select name="equipment_id" class="form-input">
+                        <option value="">— بدون جهاز محدد —</option>
+                        @foreach($equipmentList as $eq)
+                        <option value="{{ $eq->id }}" {{ old('equipment_id', $service->equipment_id) == $eq->id ? 'selected' : '' }}>
+                            {{ $eq->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs mt-1.5" style="color:#64748b;">يمنع حجزين على نفس الجهاز في نفس الوقت.</p>
                 </div>
             </div>
 
             <div>
-                <label class="form-label">صورة الخدمة</label>
+                <label class="form-label">ترتيب العرض</label>
+                <input type="number" name="sort_order" value="{{ old('sort_order', $service->sort_order) }}" class="form-input min-w-[8rem]" min="0">
+            </div>
+
+            <div>
+                <label class="form-label">صورة الخدمة (تظهر في قسم خدماتنا)</label>
                 @if($service->image)
-                <div class="mb-3 flex items-center gap-3">
-                    <img src="{{ asset('storage/'.$service->image) }}" alt="" class="w-20 h-20 object-cover rounded-xl">
-                    <span class="text-xs" style="color:#888">الصورة الحالية — رفع صورة جديدة يستبدلها</span>
+                <div class="mb-3">
+                    <img src="{{ asset('storage/'.$service->image) }}" alt="" class="w-full max-w-xs h-40 object-cover rounded-xl">
+                    <span class="text-xs block mt-2" style="color:#888">الصورة الحالية — رفع صورة جديدة يستبدلها</span>
+                </div>
+                @else
+                <div class="mb-3 p-4 rounded-xl text-sm" style="background:#f9f5f5; color:#888">
+                    لا توجد صورة مرفوعة — يُستخدم صورة افتراضية حسب القسم. ارفعي صورة حقيقية للخدمة.
                 </div>
                 @endif
-                <input type="file" name="image" accept="image/*" class="form-input" style="padding:0.5rem">
+                <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="form-input" style="padding:0.5rem">
+                <p class="text-xs mt-1.5" style="color:#64748b;">يفضّل صورة عمودية واضحة للجلسة أو الجهاز</p>
             </div>
 
             <div class="flex items-center gap-3 py-3 px-4 rounded-xl" style="background:#f9f5f5">

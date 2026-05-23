@@ -4,6 +4,28 @@
 
 @section('content')
 
+@php
+$statusConfig = [
+    'pending' => [
+        'bg' => '#fef9c3', 'color' => '#ca8a04', 'label' => '⏳ في الانتظار',
+        'message' => 'تم استلام حجزك بنجاح. سيتم التواصل معك عبر واتساب لتأكيد الموعد خلال ٣٠ دقيقة.',
+    ],
+    'confirmed' => [
+        'bg' => '#d1fae5', 'color' => '#059669', 'label' => '✅ مؤكد',
+        'message' => 'موعدك مؤكد. نراكِ في الموعد المحدد!',
+    ],
+    'cancelled' => [
+        'bg' => '#fee2e2', 'color' => '#dc2626', 'label' => '❌ ملغي',
+        'message' => 'هذا الحجز مُلغى. للاستفسار تواصلي معنا عبر واتساب.',
+    ],
+    'completed' => [
+        'bg' => '#dbeafe', 'color' => '#2563eb', 'label' => '🏁 مكتمل',
+        'message' => 'شكراً لزيارتك! نتمنى أن تكوني قد استمتعتِ بتجربتك.',
+    ],
+];
+$sc = $statusConfig[$appointment->status] ?? $statusConfig['pending'];
+@endphp
+
 <div class="page-header">
     <h1 class="text-4xl font-black text-white">✅ تم الحجز بنجاح</h1>
 </div>
@@ -14,7 +36,7 @@
     <div class="bg-white rounded-3xl p-10 shadow-xl" style="box-shadow:0 20px 60px rgba(232,180,184,0.15)">
         <div class="text-7xl mb-6 animate-float">🌸</div>
         <h2 class="text-2xl font-black mb-3" style="color:#1a1a1a">مرحباً {{ $appointment->client_name }}!</h2>
-        <p class="text-lg mb-8" style="color:#666">تم استلام حجزك بنجاح. سيتم التواصل معك عبر واتساب لتأكيد الموعد.</p>
+        <p class="text-lg mb-8" style="color:#666">{{ $sc['message'] }}</p>
 
         {{-- Booking details --}}
         <div class="rounded-2xl p-6 mb-8 text-right" style="background:#fdf8f5">
@@ -28,6 +50,12 @@
                     <span style="color:#888">الخدمة</span>
                     <span class="font-bold">{{ $appointment->service->name ?? '' }}</span>
                 </div>
+                @if($appointment->staff)
+                <div class="flex justify-between items-center py-2" style="border-bottom:1px solid #f0dde0">
+                    <span style="color:#888">الأخصائية</span>
+                    <span class="font-bold">{{ $appointment->staff->name }}</span>
+                </div>
+                @endif
                 <div class="flex justify-between items-center py-2" style="border-bottom:1px solid #f0dde0">
                     <span style="color:#888">التاريخ</span>
                     <span class="font-bold">{{ $appointment->appointment_date->format('Y/m/d') }}</span>
@@ -38,7 +66,8 @@
                 </div>
                 <div class="flex justify-between items-center py-2">
                     <span style="color:#888">الحالة</span>
-                    <span class="px-3 py-1 rounded-full text-xs font-bold" style="background:#fef9c3; color:#ca8a04">⏳ في الانتظار</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold"
+                          style="background:{{ $sc['bg'] }}; color:{{ $sc['color'] }}">{{ $sc['label'] }}</span>
                 </div>
             </div>
         </div>

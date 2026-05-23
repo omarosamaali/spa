@@ -255,18 +255,24 @@ main {
 /* Homepage services grid */
 .services-grid-home {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
 }
 
 @media (min-width: 640px) {
     .services-grid-home {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 0.875rem;
     }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
+    .services-grid-home {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
     .services-grid-home {
         grid-template-columns: repeat(4, 1fr);
         gap: 1rem;
@@ -276,12 +282,18 @@ main {
 /* Homepage service cards — full-bleed image + glass button */
 .service-card--visual {
     position: relative;
-    aspect-ratio: 4 / 5;
-    min-height: 0;
-    max-height: 200px;
+    aspect-ratio: 16 / 10;
+    min-height: 240px;
+    max-height: none;
     padding: 0;
     display: flex;
     border-radius: 16px;
+}
+
+/* بطاقات الرئيسية — صورة/فيديو أوضح وأكبر على الموبايل */
+.service-card--home {
+    aspect-ratio: 16 / 11;
+    min-height: 260px;
 }
 
 .service-card--visual .service-card__img {
@@ -297,12 +309,21 @@ main {
     inset: 0;
     background: linear-gradient(
         to top,
-        rgba(26, 26, 26, 0.95) 0%,
-        rgba(26, 26, 26, 0.55) 38%,
-        rgba(26, 26, 26, 0.15) 62%,
-        transparent 100%
+        rgba(26, 26, 26, 0.92) 0%,
+        rgba(26, 26, 26, 0.45) 32%,
+        rgba(26, 26, 26, 0.08) 55%,
+        transparent 72%
     );
     transition: opacity 0.3s ease;
+}
+
+.service-card--home .service-card__overlay {
+    background: linear-gradient(
+        to top,
+        rgba(26, 26, 26, 0.93) 0%,
+        rgba(26, 26, 26, 0.4) 28%,
+        transparent 58%
+    );
 }
 
 .service-card--visual:hover .service-card__overlay {
@@ -398,14 +419,15 @@ main {
 }
 
 @media (min-width: 640px) {
-    .service-card--visual {
-        max-height: 220px;
+    .service-card--home {
+        aspect-ratio: 4 / 5;
+        min-height: 220px;
     }
 }
 
 @media (min-width: 1024px) {
-    .service-card--visual {
-        max-height: 240px;
+    .service-card--home {
+        min-height: 240px;
     }
 
     .service-card--visual .service-card__title {
@@ -422,8 +444,92 @@ main {
     }
 }
 
+@media (max-width: 639px) {
+    .service-card--home .service-card__title {
+        font-size: 1rem;
+    }
+
+    .service-card--home .service-card__desc {
+        font-size: 0.75rem;
+        -webkit-line-clamp: 2;
+    }
+
+    .service-card--home .service-card__content {
+        padding: 1rem;
+    }
+
+    .service-card--home .btn-service-ghost {
+        font-size: 0.75rem;
+        padding: 0.45rem 1rem;
+    }
+}
+
 .service-card--visual:hover {
     transform: translateY(-4px);
+}
+
+.service-card__duration {
+    position: absolute;
+    top: 0.65rem;
+    left: 0.65rem;
+    z-index: 3;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(26, 26, 26, 0.82);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Services page — larger photo cards */
+.services-grid-page {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .services-grid-page {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .services-grid-page {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+.service-card--page {
+    max-height: none;
+    aspect-ratio: 3 / 4;
+    min-height: 280px;
+}
+
+@media (min-width: 1024px) {
+    .service-card--page {
+        min-height: 340px;
+    }
+
+    .service-card--page .service-card__title {
+        font-size: 1rem;
+    }
+
+    .service-card--page .service-card__desc {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 3;
+    }
+
+    .service-card--page .btn-service-ghost {
+        font-size: 0.75rem;
+        padding: 0.45rem 1rem;
+    }
+
+    .service-card--page .service-card__price {
+        font-size: 0.9rem;
+    }
 }
 
 .testimonial-card {

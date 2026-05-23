@@ -4,9 +4,24 @@
 
 @section('content')
 
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex items-center justify-between flex-wrap gap-4">
     <h1 class="text-2xl font-black" style="color:#1a1a1a">جميع الحجوزات</h1>
     <a href="{{ route('booking') }}" class="btn-primary">+ حجز جديد</a>
+</div>
+
+@if(session('success'))
+<div class="mb-6 p-4 rounded-xl text-sm font-bold" style="background:#d1fae5; color:#059669">{{ session('success') }}</div>
+@endif
+
+<div class="mb-6 p-4 rounded-xl text-sm leading-relaxed" style="background:#fdf8f5; border:1px solid #f0dde0; color:#555">
+    <strong style="color:#1a1a1a">سير العمل:</strong>
+    كل حجز جديد من الموقع يدخل بحالة <strong>انتظار</strong> — تواصلي مع العميلة عبر واتساب ثم غيّري الحالة إلى <strong>تأكيد</strong>.
+    اختيار <strong>إلغاء</strong> يعني إلغاء الموعد (يُطلب تأكيد قبل الحفظ).
+    @if($appointments->where('status', 'cancelled')->count() > 0)
+    <span class="block mt-2" style="color:#dc2626">
+        يوجد حجوزات ملغية — إن أُلغيت بالخطأ، اختاري «انتظار» أو «تأكيد» من القائمة لاستعادتها.
+    </span>
+    @endif
 </div>
 
 {{-- Filters --}}
@@ -79,9 +94,11 @@
                         </span>
                     </td>
                     <td class="p-4">
-                        <form method="POST" action="{{ route('admin.appointments.status', $a) }}">
+                        <form method="POST" action="{{ route('admin.appointments.status', $a) }}" class="appointment-status-form">
                             @csrf @method('PATCH')
-                            <select name="status" onchange="this.form.submit()"
+                            <select name="status"
+                                    data-current="{{ $a->status }}"
+                                    onchange="handleAppointmentStatusChange(this)"
                                     class="admin-select text-xs rounded-lg px-2 py-1.5 border font-bold cursor-pointer">
                                 <option value="pending"   {{ $a->status === 'pending' ? 'selected' : '' }}>انتظار</option>
                                 <option value="confirmed" {{ $a->status === 'confirmed' ? 'selected' : '' }}>تأكيد</option>
@@ -104,5 +121,40 @@
     </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+function handleAppointmentStatusChange(select) {
+    const previous = select.dataset.current;
+    const next = select.value;
+
+    if (next === previous) {
+        return;
+    }
+
+    if (next === 'cancelled') {
+        const rowId = select.closest('tr')?.querySelector('td')?.textContent?.trim() || '';
+        const ok = confirm(
+            'هل تريد إلغاء الحجز ' + rowId + '؟\n\n' +
+            'الحجز يبقى في السجل لكن يُعلَّم ملغياً. يمكنك استعادته لاحقاً باختيار «انتظار» أو «تأكيد».'
+        );
+        if (!ok) {
+            select.value = previous;
+            return;
+        }
+    }
+
+    if (next === 'completed') {
+        const ok = confirm('هل تريد تعليم هذا الحجز كمكتمل؟');
+        if (!ok) {
+            select.value = previous;
+            return;
+        }
+    }
+
+    select.form.submit();
+}
+</script>
+@endpush
 
 @endsection

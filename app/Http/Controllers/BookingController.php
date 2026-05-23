@@ -5,17 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\Staff;
+use App\Services\BookingAvailability;
 use App\Services\GoHighLevelService;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
+    public function __construct(
+        private BookingAvailability $availability
+    ) {}
+
     public function index(Request $request)
     {
-        $services = Service::active()->get();
+        $services = Service::bookable()->with('equipment:id,name')->get();
         $servicesByCategory = $services->groupBy(fn ($s) => $s->category ?: 'other');
+        $servicesForBooking = $servicesByCategory->map(fn ($group) => $group->map(fn ($s) => [
+            'id'               => $s->id,
+            'name'             => $s->name,
+            'price'            => $s->price ? (float) $s->price : null,
+            'duration_minutes' => (int) $s->duration_minutes,
+            'equipment'        => $s->equipment?->name,
+        ])->values());
         $categoryLabels = Service::categoryLabels();
-        $staff = Staff::where('is_active', true)->get();
         $selectedService = $request->get('service_id')
             ? Service::find($request->get('service_id'))
             : null;
@@ -23,10 +34,24 @@ class BookingController extends Controller
         return view('booking', compact(
             'services',
             'servicesByCategory',
+            'servicesForBooking',
             'categoryLabels',
-            'staff',
             'selectedService'
         ));
+    }
+
+    public function staffForService(Request $request)
+    {
+        $request->validate(['service_id' => 'required|exists:services,id']);
+
+        $service = Service::findOrFail($request->service_id);
+        $staff = $this->availability->eligibleStaffFor($service);
+
+        return response()->json($staff->map(fn ($s) => [
+            'id'   => $s->id,
+            'name' => $s->name,
+            'role' => $s->role,
+        ])->values());
     }
 
     public function store(Request $request)
@@ -49,17 +74,47 @@ class BookingController extends Controller
             'appointment_time.required' => 'يرجى اختيار الوقت',
         ]);
 
+        $service = Service::findOrFail($validated['service_id']);
+        $eligible = $this->availability->eligibleStaffFor($service);
+
+        if ($eligible->isNotEmpty()) {
+            $request->validate([
+                'staff_id' => 'required|exists:staff,id',
+            ], ['staff_id.required' => 'يرجى اختيار الأخصائية المناسبة للخدمة']);
+        }
+
+        if (! empty($validated['staff_id']) && ! $this->availability->staffCanPerform((int) $validated['staff_id'], $service)) {
+            return back()->withErrors(['staff_id' => 'هذه الأخصائية لا تقدم الخدمة المختارة'])->withInput();
+        }
+
+        $slots = $this->availability->availableSlots(
+            $validated['appointment_date'],
+            $service,
+            $validated['staff_id'] ?? null
+        );
+
+        $time = substr($validated['appointment_time'], 0, 5);
+        if (! in_array($time, $slots, true)) {
+            return back()->withErrors(['appointment_time' => 'هذا الوقت لم يعد متاحاً، اختاري وقتاً آخر'])->withInput();
+        }
+
+        $validated['appointment_time'] = $time.':00';
+        $validated['duration_minutes'] = $service->duration_minutes;
+        $validated['equipment_id'] = $service->equipment_id;
+
+        if (empty($validated['client_email'])) {
+            $validated['client_email'] = null;
+        }
+
         $appointment = Appointment::create($validated);
 
-        // Send to GoHighLevel
         try {
             $ghlService = new GoHighLevelService();
             $ghlContactId = $ghlService->createContact($appointment);
             $appointment->update(['ghl_contact_id' => $ghlContactId]);
             $ghlService->createAppointment($appointment);
         } catch (\Exception $e) {
-            // GHL integration is optional - booking still saved locally
-            \Log::warning('GHL sync failed: ' . $e->getMessage());
+            \Log::warning('GHL sync failed: '.$e->getMessage());
         }
 
         return redirect()->route('booking.success', $appointment->id);
@@ -67,36 +122,27 @@ class BookingController extends Controller
 
     public function success(Appointment $appointment)
     {
+        $appointment->load(['service', 'staff']);
+
         return view('booking-success', compact('appointment'));
     }
 
     public function availableTimes(Request $request)
     {
-        $date = $request->get('date');
-        $serviceId = $request->get('service_id');
+        $request->validate([
+            'date'       => 'required|date',
+            'service_id' => 'required|exists:services,id',
+            'staff_id'   => 'nullable|exists:staff,id',
+        ]);
 
-        $bookedTimes = Appointment::where('appointment_date', $date)
-            ->where('service_id', $serviceId)
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->pluck('appointment_time')
-            ->map(fn($t) => substr($t, 0, 5))
-            ->toArray();
+        $service = Service::findOrFail($request->service_id);
 
-        $allTimes = $this->generateTimeSlots();
-        $available = array_filter($allTimes, fn($t) => !in_array($t, $bookedTimes));
-
-        return response()->json(array_values($available));
-    }
-
-    private function generateTimeSlots(): array
-    {
-        $slots = [];
-        for ($h = 10; $h <= 20; $h++) {
-            $slots[] = sprintf('%02d:00', $h);
-            if ($h < 20) {
-                $slots[] = sprintf('%02d:30', $h);
-            }
-        }
-        return $slots;
+        return response()->json(
+            $this->availability->availableSlots(
+                $request->date,
+                $service,
+                $request->staff_id ? (int) $request->staff_id : null
+            )
+        );
     }
 }
