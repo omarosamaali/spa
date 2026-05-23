@@ -9,8 +9,12 @@
     $cardVariant = $variant ?? 'home';
     $fallbackImg = \App\Models\Service::categoryStockImage($cardCat !== 'all' ? $cardCat : null);
 @endphp
-<div class="service-card service-card--visual service-card--{{ $cardVariant }} group" style="width: 100%;" data-category="{{ $cardCat }}">
-    <img src="{{ $cardImg }}" alt="{{ $cardName }}"
+<a href="{{ $cardBookingUrl }}"
+   class="service-card service-card--visual service-card--clickable service-card--{{ $cardVariant }} group no-underline"
+   style="width: 100%;"
+   data-category="{{ $cardCat }}"
+   aria-label="احجزي {{ $cardName }}">
+    <img src="{{ $cardImg }}" alt=""
          class="service-card__img transition-transform duration-500 group-hover:scale-105"
          loading="lazy"
          onerror="this.onerror=null;this.src='{{ $fallbackImg }}';">
@@ -29,7 +33,7 @@
             @else
             <span></span>
             @endif
-            <a href="{{ $cardBookingUrl }}" class="btn-service-ghost">احجزي الآن</a>
+            <span class="btn-service-ghost">احجزي الآن</span>
         </div>
     </div>
-</div>
+</a>
