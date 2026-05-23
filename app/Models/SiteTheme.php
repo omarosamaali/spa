@@ -275,10 +275,13 @@ class SiteTheme
         $logoPath    = $merged['logo_path'] ?? '';
         $faviconPath = $merged['favicon_path'] ?? '';
 
+        $tagline = $merged['tagline'] ?? $merged['site_tagline'] ?? '';
+
         return [
             'id'               => $merged['id'],
             'name'             => $merged['name'],
-            'tagline'          => $merged['tagline'] ?? '',
+            'tagline'          => $tagline,
+            'site_tagline'     => $tagline,
             'dark_mode'        => $merged['dark_mode'] ?? true,
             'hero_layout'      => $merged['hero_layout'] ?? 'classic',
             'primary'          => $merged['primary'],

@@ -32,7 +32,7 @@
                 @endif
                 <div class="text-white">
                     <div class="font-black text-lg" id="previewName">{{ $theme['site_name'] }}</div>
-                    <div class="text-sm" id="previewTagline" style="color:var(--spa-primary)">{{ $theme['site_tagline'] }}</div>
+                    <div class="text-sm" id="previewTagline" style="color:var(--spa-primary)">{{ $theme['site_tagline'] ?? $theme['tagline'] ?? '' }}</div>
                 </div>
             </div>
             <button type="button" class="btn-primary text-sm">زر تجريبي</button>
