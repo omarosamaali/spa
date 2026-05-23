@@ -38,6 +38,8 @@
                  'svg'=>'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'],
                 ['route'=>'admin.services', 'label'=>'الخدمات',
                  'svg'=>'<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>'],
+                ['route'=>'admin.staff', 'label'=>'الأخصائيات',
+                 'svg'=>'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>'],
                 ['route'=>'admin.theme-selector', 'label'=>'اختيار الثيم',
                  'svg'=>'<circle cx="12" cy="8" r="3"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M12 11v4M9 18h6"/>'],
                 ['route'=>'admin.branding-settings', 'label'=>'الألوان والشعار',

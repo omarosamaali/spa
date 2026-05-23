@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\ContactMessage;
 use App\Models\Service;
+use App\Models\Staff;
 use App\Models\HeroSlide;
 use App\Models\SiteSetting;
 use App\Models\SiteTheme;
@@ -144,6 +145,88 @@ class DashboardController extends Controller
         $label = $service->is_active ? 'تفعيل' : 'إيقاف';
 
         return back()->with('success', "تم {$label} الخدمة بنجاح");
+    }
+
+    // =================== STAFF CRUD ===================
+
+    public function staff()
+    {
+        $staffMembers = Staff::orderBy('name')->get();
+
+        return view('admin.staff', compact('staffMembers'));
+    }
+
+    public function storeStaff(Request $request)
+    {
+        $validated = $request->validate([
+            'name'  => 'required|string|max:255',
+            'role'  => 'nullable|string|max:255',
+            'bio'   => 'nullable|string|max:2000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ], [
+            'name.required' => 'اسم الأخصائية مطلوب',
+            'image.image'   => 'يجب أن يكون الملف صورة',
+            'image.max'     => 'حجم الصورة يجب أن لا يتجاوز 2 ميغابايت',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('staff', 'public');
+        }
+
+        $validated['is_active'] = $request->boolean('is_active', true);
+
+        Staff::create($validated);
+
+        return redirect()->route('admin.staff')->with('success', 'تم إضافة الأخصائية بنجاح');
+    }
+
+    public function editStaff(Staff $staff)
+    {
+        return view('admin.staff-edit', compact('staff'));
+    }
+
+    public function updateStaff(Request $request, Staff $staff)
+    {
+        $validated = $request->validate([
+            'name'  => 'required|string|max:255',
+            'role'  => 'nullable|string|max:255',
+            'bio'   => 'nullable|string|max:2000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ], [
+            'name.required' => 'اسم الأخصائية مطلوب',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($staff->image) {
+                Storage::disk('public')->delete($staff->image);
+            }
+            $validated['image'] = $request->file('image')->store('staff', 'public');
+        }
+
+        $validated['is_active'] = $request->boolean('is_active');
+
+        $staff->update($validated);
+
+        return redirect()->route('admin.staff')->with('success', 'تم تحديث الأخصائية بنجاح');
+    }
+
+    public function destroyStaff(Staff $staff)
+    {
+        if ($staff->image) {
+            Storage::disk('public')->delete($staff->image);
+        }
+
+        $staff->delete();
+
+        return redirect()->route('admin.staff')->with('success', 'تم حذف الأخصائية بنجاح');
+    }
+
+    public function toggleStaff(Staff $staff)
+    {
+        $staff->update(['is_active' => ! $staff->is_active]);
+        $label = $staff->is_active ? 'تفعيل' : 'إيقاف';
+
+        return back()->with('success', "تم {$label} الأخصائية بنجاح");
     }
 
     // =================== CONTACT MESSAGES ===================

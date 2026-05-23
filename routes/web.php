@@ -52,6 +52,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/services/{service}', [DashboardController::class, 'destroyService'])->name('services.destroy');
     Route::patch('/services/{service}/toggle', [DashboardController::class, 'toggleService'])->name('services.toggle');
 
+    // Staff CRUD
+    Route::get('/staff', [DashboardController::class, 'staff'])->name('staff');
+    Route::post('/staff', [DashboardController::class, 'storeStaff'])->name('staff.store');
+    Route::get('/staff/{staff}/edit', [DashboardController::class, 'editStaff'])->name('staff.edit');
+    Route::put('/staff/{staff}', [DashboardController::class, 'updateStaff'])->name('staff.update');
+    Route::delete('/staff/{staff}', [DashboardController::class, 'destroyStaff'])->name('staff.destroy');
+    Route::patch('/staff/{staff}/toggle', [DashboardController::class, 'toggleStaff'])->name('staff.toggle');
+
     // Branding (colors, logo, favicon)
     Route::get('/branding-settings', [DashboardController::class, 'brandingSettings'])->name('branding-settings');
     Route::put('/branding-settings', [DashboardController::class, 'updateBrandingSettings'])->name('branding-settings.update');
