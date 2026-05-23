@@ -17,7 +17,7 @@ class BookingController extends Controller
 
     public function index(Request $request)
     {
-        $services = Service::bookable()->with('equipment:id,name')->get();
+        $services = Service::bookable()->with('equipment:id,name,capacity')->get();
         $servicesByCategory = $services->groupBy(fn ($s) => $s->category ?: 'other');
         $servicesForBooking = $servicesByCategory->map(fn ($group) => $group->map(fn ($s) => [
             'id'               => $s->id,
@@ -74,7 +74,7 @@ class BookingController extends Controller
             'appointment_time.required' => 'يرجى اختيار الوقت',
         ]);
 
-        $service = Service::findOrFail($validated['service_id']);
+        $service = Service::with('equipment:id,name,capacity')->findOrFail($validated['service_id']);
         $eligible = $this->availability->eligibleStaffFor($service);
 
         if ($eligible->isNotEmpty()) {
@@ -95,7 +95,14 @@ class BookingController extends Controller
 
         $time = substr($validated['appointment_time'], 0, 5);
         if (! in_array($time, $slots, true)) {
-            return back()->withErrors(['appointment_time' => 'هذا الوقت لم يعد متاحاً، اختاري وقتاً آخر'])->withInput();
+            return back()->withErrors([
+                'appointment_time' => $this->availability->slotRejectionMessage(
+                    $validated['appointment_date'],
+                    $time,
+                    $service,
+                    isset($validated['staff_id']) ? (int) $validated['staff_id'] : null
+                ),
+            ])->withInput();
         }
 
         $validated['appointment_time'] = $time.':00';
@@ -135,7 +142,7 @@ class BookingController extends Controller
             'staff_id'   => 'nullable|exists:staff,id',
         ]);
 
-        $service = Service::findOrFail($request->service_id);
+        $service = Service::with('equipment:id,name,capacity')->findOrFail($request->service_id);
 
         return response()->json(
             $this->availability->availableSlots(

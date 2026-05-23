@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Appointment;
+use App\Models\Equipment;
 use App\Models\Service;
 use App\Models\Staff;
 use Carbon\Carbon;
@@ -22,12 +23,9 @@ class BookingAvailability
         $dayStart = Carbon::parse("{$date} ".sprintf('%02d:00', self::OPEN_HOUR));
         $dayEnd = Carbon::parse("{$date} ".sprintf('%02d:00', self::CLOSE_HOUR));
 
-        $booked = Appointment::where('appointment_date', $date)
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->with(['service:id,duration_minutes,equipment_id', 'staff:id'])
-            ->get();
-
+        $booked = $this->bookedAppointmentsForDate($date);
         $eligibleStaff = $this->eligibleStaffFor($service);
+        $equipment = $this->equipmentForService($service);
         $slots = [];
 
         for ($cursor = $dayStart->copy(); $cursor->lt($dayEnd); $cursor->addMinutes(self::SLOT_STEP_MINUTES)) {
@@ -36,7 +34,7 @@ class BookingAvailability
                 break;
             }
 
-            if ($this->equipmentBlocked($booked, $service->equipment_id, $cursor, $slotEnd)) {
+            if (! $this->equipmentHasCapacity($booked, $equipment, $cursor, $slotEnd)) {
                 continue;
             }
 
@@ -52,6 +50,36 @@ class BookingAvailability
         }
 
         return $slots;
+    }
+
+    public function isSlotAvailable(string $date, string $time, Service $service, ?int $staffId = null): bool
+    {
+        $time = substr($time, 0, 5);
+
+        return in_array($time, $this->availableSlots($date, $service, $staffId), true);
+    }
+
+    public function slotRejectionMessage(string $date, string $time, Service $service, ?int $staffId = null): string
+    {
+        $duration = max(5, (int) $service->duration_minutes);
+        $start = Carbon::parse("{$date} {$time}");
+        $end = $start->copy()->addMinutes($duration);
+        $booked = $this->bookedAppointmentsForDate($date);
+        $equipment = $this->equipmentForService($service);
+
+        if ($equipment && ! $this->equipmentHasCapacity($booked, $equipment, $start, $end)) {
+            $cap = max(1, (int) $equipment->capacity);
+
+            return $cap === 1
+                ? 'الجهاز غير متاح في هذا الوقت — اختاري وقتاً آخر من القائمة'
+                : "الجهاز ممتلئ ({$cap} أماكن محجوزة في هذا الوقت) — اختاري وقتاً آخر";
+        }
+
+        if ($staffId && ! $this->staffFree($booked, $staffId, $start, $end)) {
+            return 'الأخصائية غير متاحة في هذا الوقت — اختاري وقتاً آخر';
+        }
+
+        return 'هذا الوقت لم يعد متاحاً — اختاري وقتاً آخر من القائمة';
     }
 
     public function eligibleStaffFor(Service $service): Collection
@@ -74,6 +102,27 @@ class BookingAvailability
         }
 
         return $service->staff()->count() === 0;
+    }
+
+    private function bookedAppointmentsForDate(string $date): Collection
+    {
+        return Appointment::where('appointment_date', $date)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->with(['service:id,duration_minutes,equipment_id', 'staff:id'])
+            ->get();
+    }
+
+    private function equipmentForService(Service $service): ?Equipment
+    {
+        if (! $service->equipment_id) {
+            return null;
+        }
+
+        if ($service->relationLoaded('equipment') && $service->equipment) {
+            return $service->equipment;
+        }
+
+        return Equipment::find($service->equipment_id);
     }
 
     private function anyStaffFree(Collection $booked, Collection $staff, Carbon $start, Carbon $end): bool
@@ -105,11 +154,22 @@ class BookingAvailability
         return true;
     }
 
-    private function equipmentBlocked(Collection $booked, ?int $equipmentId, Carbon $start, Carbon $end): bool
+    /**
+     * True if adding a booking at [start, end) stays within equipment capacity.
+     */
+    private function equipmentHasCapacity(Collection $booked, ?Equipment $equipment, Carbon $start, Carbon $end): bool
     {
-        if (! $equipmentId) {
-            return false;
+        if (! $equipment) {
+            return true;
         }
+
+        $capacity = max(1, (int) $equipment->capacity);
+        $equipmentId = $equipment->id;
+
+        $events = [
+            [$start->timestamp, 1],
+            [$end->timestamp, -1],
+        ];
 
         foreach ($booked as $appointment) {
             $apptEquipment = $appointment->equipment_id
@@ -119,12 +179,34 @@ class BookingAvailability
                 continue;
             }
 
-            if ($this->intervalsOverlap($start, $end, $this->appointmentStart($appointment), $this->appointmentEnd($appointment))) {
-                return true;
+            $aStart = $this->appointmentStart($appointment);
+            $aEnd = $this->appointmentEnd($appointment);
+
+            if (! $this->intervalsOverlap($start, $end, $aStart, $aEnd)) {
+                continue;
             }
+
+            $events[] = [$aStart->timestamp, 1];
+            $events[] = [$aEnd->timestamp, -1];
         }
 
-        return false;
+        usort($events, function (array $a, array $b) {
+            if ($a[0] === $b[0]) {
+                return $a[1] <=> $b[1];
+            }
+
+            return $a[0] <=> $b[0];
+        });
+
+        $concurrent = 0;
+        $peak = 0;
+
+        foreach ($events as [, $delta]) {
+            $concurrent += $delta;
+            $peak = max($peak, $concurrent);
+        }
+
+        return $peak <= $capacity;
     }
 
     private function appointmentStart(Appointment $appointment): Carbon

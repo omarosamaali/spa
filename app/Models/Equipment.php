@@ -9,7 +9,11 @@ class Equipment extends Model
     protected $table = 'equipment';
 
     protected $fillable = [
-        'name', 'category', 'notes', 'is_active', 'sort_order',
+        'name', 'category', 'capacity', 'notes', 'is_active', 'sort_order',
+    ];
+
+    protected $attributes = [
+        'capacity' => 1,
     ];
 
     protected $casts = [

@@ -264,9 +264,14 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'name'       => 'required|string|max:255',
             'category'   => 'nullable|string|max:50',
+            'capacity'   => 'required|integer|min:1|max:50',
             'notes'      => 'nullable|string|max:1000',
             'sort_order' => 'integer|min:0',
-        ], ['name.required' => 'اسم الجهاز مطلوب']);
+        ], [
+            'name.required' => 'اسم الجهاز مطلوب',
+            'capacity.required' => 'عدد الأماكن مطلوب',
+            'capacity.min' => 'عدد الأماكن يجب أن يكون 1 على الأقل',
+        ]);
 
         $validated['is_active'] = $request->boolean('is_active', true);
         $validated['sort_order'] = $validated['sort_order'] ?? Equipment::max('sort_order') + 1;
@@ -281,8 +286,12 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'name'       => 'required|string|max:255',
             'category'   => 'nullable|string|max:50',
+            'capacity'   => 'required|integer|min:1|max:50',
             'notes'      => 'nullable|string|max:1000',
             'sort_order' => 'integer|min:0',
+        ], [
+            'capacity.required' => 'عدد الأماكن مطلوب',
+            'capacity.min' => 'عدد الأماكن يجب أن يكون 1 على الأقل',
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');

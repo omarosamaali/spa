@@ -6,7 +6,7 @@
 <div class="mb-6 flex items-center justify-between flex-wrap gap-4">
     <div>
         <h1 class="text-2xl font-black" style="color:#1a1a1a">الأجهزة والغرف</h1>
-        <p class="text-sm mt-1" style="color:#888">كل جهاز يُحجز مرة واحدة في الوقت — اربطيه بالخدمات من قسم الخدمات</p>
+        <p class="text-sm mt-1" style="color:#888">حدّدي <strong>عدد الأماكن</strong> لكل جهاز (مثلاً ليزر = 1، غرفة = 2). عند امتلاء الوقت يظهر للعميلة اختيار وقت آخر.</p>
     </div>
     <button onclick="document.getElementById('addEquipmentModal').classList.remove('hidden')" class="btn-primary">
         إضافة جهاز
@@ -27,10 +27,15 @@
         @if($eq->notes)
         <p class="text-sm mb-3" style="color:#666">{{ $eq->notes }}</p>
         @endif
-        <span class="text-xs px-2 py-0.5 rounded-full font-bold"
-              style="background:{{ $eq->is_active ? '#d1fae5' : '#fee2e2' }}; color:{{ $eq->is_active ? '#059669' : '#dc2626' }}">
-            {{ $eq->is_active ? 'نشط' : 'معطّل' }}
-        </span>
+        <div class="flex flex-wrap gap-2 mb-2">
+            <span class="text-xs px-2 py-0.5 rounded-full font-bold"
+                  style="background:{{ $eq->is_active ? '#d1fae5' : '#fee2e2' }}; color:{{ $eq->is_active ? '#059669' : '#dc2626' }}">
+                {{ $eq->is_active ? 'نشط' : 'معطّل' }}
+            </span>
+            <span class="text-xs px-2 py-0.5 rounded-full font-bold" style="background:#fdf0f2; color:#c9888e">
+                {{ (int) ($eq->capacity ?? 1) }} {{ ((int) ($eq->capacity ?? 1)) === 1 ? 'مكان' : 'أماكن' }} في نفس الوقت
+            </span>
+        </div>
 
         <form action="{{ route('admin.equipment.update', $eq) }}" method="POST" class="mt-4 space-y-3 pt-4" style="border-top:1px solid #f5f0f0">
             @csrf
@@ -42,6 +47,10 @@
                 <option value="{{ $val }}" {{ $eq->category == $val ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
+            <div>
+                <label class="text-xs font-bold mb-1 block" style="color:#888">عدد الأماكن في نفس الوقت</label>
+                <input type="number" name="capacity" value="{{ (int) ($eq->capacity ?? 1) }}" class="form-input text-sm" min="1" max="50" required>
+            </div>
             <input type="number" name="sort_order" value="{{ $eq->sort_order }}" class="form-input text-sm" min="0" placeholder="ترتيب">
             <label class="flex items-center gap-2 text-sm">
                 <input type="checkbox" name="is_active" value="1" {{ $eq->is_active ? 'checked' : '' }} style="accent-color:#c9888e">
@@ -88,6 +97,11 @@
                     <option value="{{ $val }}">{{ $label }}</option>
                     @endforeach
                 </select>
+            </div>
+            <div>
+                <label class="form-label">عدد الأماكن في نفس الوقت *</label>
+                <input type="number" name="capacity" class="form-input" value="1" min="1" max="50" required>
+                <p class="text-xs mt-1" style="color:#888">مثال: جهاز ليزر = 1، غرفة علاجات = 2</p>
             </div>
             <div>
                 <label class="form-label">ملاحظات</label>

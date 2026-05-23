@@ -13,11 +13,11 @@ class SpaSeeder extends Seeder
     public function run(): void
     {
         $devices = [
-            ['name' => 'جهاز ليزر ١', 'category' => 'laser', 'sort_order' => 1],
-            ['name' => 'جهاز ليزر ٢', 'category' => 'laser', 'sort_order' => 2],
-            ['name' => 'غرفة العلاجات (بشرة/فيلر)', 'category' => 'skin', 'sort_order' => 10],
-            ['name' => 'غرفة المساج', 'category' => 'massage', 'sort_order' => 20],
-            ['name' => 'طاولة الأظافر', 'category' => 'nails', 'sort_order' => 30],
+            ['name' => 'جهاز ليزر ١', 'category' => 'laser', 'capacity' => 1, 'sort_order' => 1],
+            ['name' => 'جهاز ليزر ٢', 'category' => 'laser', 'capacity' => 1, 'sort_order' => 2],
+            ['name' => 'غرفة العلاجات (بشرة/فيلر)', 'category' => 'skin', 'capacity' => 2, 'sort_order' => 10],
+            ['name' => 'غرفة المساج', 'category' => 'massage', 'capacity' => 1, 'sort_order' => 20],
+            ['name' => 'طاولة الأظافر', 'category' => 'nails', 'capacity' => 2, 'sort_order' => 30],
         ];
 
         foreach ($devices as $device) {
