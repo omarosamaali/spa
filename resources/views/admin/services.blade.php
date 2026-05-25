@@ -134,7 +134,7 @@
             <div class="grid grid-cols-2 gap-5">
                 <div>
                     <label class="form-label">السعر (د.ع) <span class="text-xs font-normal" style="color:#888">(اختياري)</span></label>
-                    <input type="number" name="price" value="{{ old('price') }}" class="form-input @error('price') border-red-400 @enderror" min="0" step="500" placeholder="اتركيه فارغاً إن لم يكن للخدمة سعر">
+                    <input type="number" name="price" value="{{ old('price') }}" class="form-input @error('price') border-red-400 @enderror" min="0" step="1" inputmode="numeric" placeholder="اتركيه فارغاً إن لم يكن للخدمة سعر">
                     @error('price')<p class="text-xs mt-1" style="color:#dc2626">{{ $message }}</p>@enderror
                 </div>
                 <div>

@@ -7,8 +7,7 @@
     <div>
         <h1 class="text-2xl font-black" style="color:#1a1a1a">تصنيفات الخدمات</h1>
         <p class="text-sm mt-1" style="color:#888">
-            أسماء الأقسام (ليزر، بشرة، مساج…) — تظهر في <strong>تعديل الخدمة</strong> وفي فلتر «اختاري ما يناسبك».
-            <a href="{{ route('admin.home-service-filters') }}" class="font-bold" style="color:#c9888e">إعدادات الفلتر</a>
+            أسماء الأقسام وتبويب «الكل» في فلتر الصفحة الرئيسية «اختاري ما يناسبك».
         </p>
     </div>
     <button type="button" onclick="document.getElementById('addCategoryModal').classList.remove('hidden')" class="btn-primary">
@@ -29,6 +28,13 @@
     </ul>
 </div>
 @endif
+
+@include('admin.partials.home-filter-settings', [
+    'filterConfig' => $filterConfig,
+    'filterCategoryLabels' => $filterCategoryLabels,
+])
+
+<h2 class="text-lg font-black mb-4" style="color:#1a1a1a">قائمة التصنيفات</h2>
 
 <div class="space-y-4">
     @forelse($categories as $cat)

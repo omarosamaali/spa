@@ -332,7 +332,7 @@ class DashboardController extends Controller
 
         HomeCategoryFilter::save($showAll, $default, $visible);
 
-        return redirect()->route('admin.home-service-filters')->with('success', 'تم حفظ إعدادات فلتر الخدمات في الرئيسية');
+        return back()->with('success', 'تم حفظ إعدادات فلتر الخدمات في الرئيسية');
     }
 
     // =================== SERVICE CATEGORIES (تصنيفات الخدمات) ===================
@@ -341,8 +341,10 @@ class DashboardController extends Controller
     {
         ServiceCategory::seedDefaultsIfEmpty();
         $categories = ServiceCategory::orderBy('sort_order')->orderBy('id')->get();
+        $filterConfig = HomeCategoryFilter::config();
+        $filterCategoryLabels = Service::categoryLabelsForAdmin();
 
-        return view('admin.service-categories', compact('categories'));
+        return view('admin.service-categories', compact('categories', 'filterConfig', 'filterCategoryLabels'));
     }
 
     public function storeServiceCategory(Request $request)
