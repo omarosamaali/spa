@@ -15,14 +15,9 @@ class HomeController extends Controller
     public function index()
     {
         $services     = Service::bookable()->get();
-        $testimonials = Testimonial::where('is_active', true)->get();
+        $testimonials = Testimonial::where('is_active', true)->orderBy('id')->get();
 
-        $stats = [
-            'clients'  => Appointment::distinct('client_phone')->count('client_phone'),
-            'services' => Service::active()->count(),
-            'years'    => max(1, now()->year - 2019),
-            'rating'   => 100,
-        ];
+        $stats = $this->homeStats();
 
         $heroSlides = \Illuminate\Support\Facades\Schema::hasTable('hero_slides')
             ? HeroSlide::active()->get()
@@ -42,12 +37,7 @@ class HomeController extends Controller
     {
         $staff = Staff::where('is_active', true)->get();
 
-        $stats = [
-            'clients'  => Appointment::distinct('client_phone')->count('client_phone'),
-            'services' => Service::active()->count(),
-            'years'    => max(1, now()->year - 2019),
-            'rating'   => 100,
-        ];
+        $stats = $this->homeStats();
 
         return view('about', compact('staff', 'stats'));
     }
@@ -72,17 +62,12 @@ class HomeController extends Controller
         }
 
         $services     = Service::bookable()->get();
-        $testimonials = Testimonial::where('is_active', true)->get();
+        $testimonials = Testimonial::where('is_active', true)->orderBy('id')->get();
         $heroSlides   = \Illuminate\Support\Facades\Schema::hasTable('hero_slides')
             ? HeroSlide::active()->get()
             : collect();
 
-        $stats = [
-            'clients'  => Appointment::distinct('client_phone')->count('client_phone'),
-            'services' => Service::active()->count(),
-            'years'    => max(1, now()->year - 2019),
-            'rating'   => 100,
-        ];
+        $stats = $this->homeStats();
 
         $previewTheme = SiteSetting::themeForPreview($themeId);
 
@@ -90,5 +75,17 @@ class HomeController extends Controller
         \Illuminate\Support\Facades\View::share('siteTheme', $previewTheme);
 
         return view('home', compact('services', 'testimonials', 'stats', 'heroSlides'));
+    }
+
+    /** @return array{clients: int, services: int, experts: int, years: int, rating: int} */
+    private function homeStats(): array
+    {
+        return [
+            'clients'  => Appointment::distinct('client_phone')->count('client_phone'),
+            'services' => Service::active()->count(),
+            'experts'  => Staff::where('is_active', true)->count(),
+            'years'    => max(1, now()->year - 2019),
+            'rating'   => 100,
+        ];
     }
 }

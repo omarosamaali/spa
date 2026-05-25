@@ -76,13 +76,6 @@ class BookingController extends Controller
         ]);
 
         $service = Service::with('equipment:id,name,capacity')->findOrFail($validated['service_id']);
-        $eligible = $this->availability->eligibleStaffFor($service);
-
-        if ($eligible->isNotEmpty()) {
-            $request->validate([
-                'staff_id' => 'required|exists:staff,id',
-            ], ['staff_id.required' => 'يرجى اختيار الأخصائية المناسبة للخدمة']);
-        }
 
         if (! empty($validated['staff_id']) && ! $this->availability->staffCanPerform((int) $validated['staff_id'], $service)) {
             return back()->withErrors(['staff_id' => 'هذه الأخصائية لا تقدم الخدمة المختارة'])->withInput();

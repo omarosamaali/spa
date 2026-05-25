@@ -6,8 +6,20 @@
 
 <div class="mb-6 flex items-center justify-between flex-wrap gap-4">
     <h1 class="text-2xl font-black" style="color:#1a1a1a">جميع الحجوزات</h1>
-    <a href="{{ route('booking') }}" class="btn-primary">+ حجز جديد</a>
+    <button type="button" onclick="document.getElementById('createAppointmentModal').classList.remove('hidden')" class="btn-primary">
+        + حجز جديد
+    </button>
 </div>
+
+@if($errors->any() && old('client_name'))
+<div class="mb-6 p-4 rounded-xl text-sm" style="background:#fee2e2; color:#dc2626;">
+    <ul class="list-disc pr-5 space-y-1">
+        @foreach($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
 
 @if(session('success'))
 <div class="mb-6 p-4 rounded-xl text-sm font-bold" style="background:#d1fae5; color:#059669">{{ session('success') }}</div>
@@ -17,6 +29,7 @@
     <strong style="color:#1a1a1a">سير العمل:</strong>
     كل حجز جديد من الموقع يدخل بحالة <strong>انتظار</strong> — تواصلي مع العميلة عبر واتساب ثم غيّري الحالة إلى <strong>تأكيد</strong>.
     اختيار <strong>إلغاء</strong> يعني إلغاء الموعد (يُطلب تأكيد قبل الحفظ).
+    <strong>حذف</strong> يزيل السجل نهائياً من النظام (لا يمكن التراجع).
     @if($appointments->where('status', 'cancelled')->count() > 0)
     <span class="block mt-2" style="color:#dc2626">
         يوجد حجوزات ملغية — إن أُلغيت بالخطأ، اختاري «انتظار» أو «تأكيد» من القائمة لاستعادتها.
@@ -26,7 +39,7 @@
 
 {{-- Filters --}}
 <form method="GET" class="bg-white rounded-2xl p-4 mb-6 flex flex-wrap gap-4 items-end shadow-sm">
-    <div>
+    <div class="min-w-[140px]">
         <label class="form-label text-xs">الحالة</label>
         <select name="status" class="form-input text-sm" style="padding:0.5rem 0.875rem">
             <option value="">الكل</option>
@@ -36,7 +49,18 @@
             <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>ملغي</option>
         </select>
     </div>
-    <div>
+    <div class="min-w-[160px]">
+        <label class="form-label text-xs">الخدمة</label>
+        <select name="service_id" class="form-input text-sm" style="padding:0.5rem 0.875rem">
+            <option value="">كل الخدمات</option>
+            @foreach($bookableServices as $svc)
+            <option value="{{ $svc->id }}" {{ (string) request('service_id') === (string) $svc->id ? 'selected' : '' }}>
+                {{ $svc->name }}@if($svc->price) — {{ number_format($svc->price) }} د.ع@endif
+            </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="min-w-[140px]">
         <label class="form-label text-xs">التاريخ</label>
         <input type="date" name="date" value="{{ request('date') }}" class="form-input text-sm" style="padding:0.5rem 0.875rem">
     </div>
@@ -94,18 +118,33 @@
                         </span>
                     </td>
                     <td class="p-4">
-                        <form method="POST" action="{{ route('admin.appointments.status', $a) }}" class="appointment-status-form">
-                            @csrf @method('PATCH')
-                            <select name="status"
-                                    data-current="{{ $a->status }}"
-                                    onchange="handleAppointmentStatusChange(this)"
-                                    class="admin-select text-xs rounded-lg px-2 py-1.5 border font-bold cursor-pointer">
-                                <option value="pending"   {{ $a->status === 'pending' ? 'selected' : '' }}>انتظار</option>
-                                <option value="confirmed" {{ $a->status === 'confirmed' ? 'selected' : '' }}>تأكيد</option>
-                                <option value="completed" {{ $a->status === 'completed' ? 'selected' : '' }}>مكتمل</option>
-                                <option value="cancelled" {{ $a->status === 'cancelled' ? 'selected' : '' }}>إلغاء</option>
-                            </select>
-                        </form>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <form method="POST" action="{{ route('admin.appointments.status', $a) }}" class="appointment-status-form">
+                                @csrf @method('PATCH')
+                                <select name="status"
+                                        data-current="{{ $a->status }}"
+                                        onchange="handleAppointmentStatusChange(this)"
+                                        class="admin-select text-xs rounded-lg px-2 py-1.5 border font-bold cursor-pointer">
+                                    <option value="pending"   {{ $a->status === 'pending' ? 'selected' : '' }}>انتظار</option>
+                                    <option value="confirmed" {{ $a->status === 'confirmed' ? 'selected' : '' }}>تأكيد</option>
+                                    <option value="completed" {{ $a->status === 'completed' ? 'selected' : '' }}>مكتمل</option>
+                                    <option value="cancelled" {{ $a->status === 'cancelled' ? 'selected' : '' }}>إلغاء</option>
+                                </select>
+                            </form>
+                            <form method="POST" action="{{ route('admin.appointments.destroy', $a) }}"
+                                  onsubmit="return confirm('حذف الحجز #{{ str_pad($a->id, 4, '0', STR_PAD_LEFT) }} نهائياً؟\n\nلا يمكن التراجع عن الحذف.')">
+                                @csrf @method('DELETE')
+                                <button type="submit"
+                                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:opacity-80"
+                                        style="background:#fee2e2; color:#dc2626"
+                                        title="حذف السجل">
+                                    <span class="inline-flex items-center gap-1">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+                                        حذف
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -122,8 +161,209 @@
     @endif
 </div>
 
+{{-- Create appointment modal --}}
+<div id="createAppointmentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.55)">
+    <div class="bg-white rounded-2xl p-8 w-full shadow-xl max-h-[92vh] overflow-y-auto" style="max-width:640px">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-black" style="color:#1a1a1a">حجز جديد من اللوحة</h2>
+            <button type="button" onclick="document.getElementById('createAppointmentModal').classList.add('hidden')"
+                    class="w-8 h-8 rounded-xl flex items-center justify-center" style="background:#f5f5f5; color:#888">✕</button>
+        </div>
+
+        <form action="{{ route('admin.appointments.store') }}" method="POST" class="space-y-4" id="adminBookingForm">
+            @csrf
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">اسم العميلة *</label>
+                    <input type="text" name="client_name" value="{{ old('client_name') }}" class="form-input" required>
+                </div>
+                <div>
+                    <label class="form-label">رقم الهاتف *</label>
+                    <input type="tel" name="client_phone" value="{{ old('client_phone') }}" class="form-input" required>
+                </div>
+                <div>
+                    <label class="form-label">البريد (اختياري)</label>
+                    <input type="email" name="client_email" value="{{ old('client_email') }}" class="form-input">
+                </div>
+                <div>
+                    <label class="form-label">الحالة *</label>
+                    <select name="status" class="form-input">
+                        <option value="pending" {{ old('status', 'pending') === 'pending' ? 'selected' : '' }}>انتظار</option>
+                        <option value="confirmed" {{ old('status') === 'confirmed' ? 'selected' : '' }}>مؤكد</option>
+                        <option value="completed" {{ old('status') === 'completed' ? 'selected' : '' }}>مكتمل</option>
+                        <option value="cancelled" {{ old('status') === 'cancelled' ? 'selected' : '' }}>ملغي</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="form-label">الخدمة *</label>
+                    <select name="service_id" id="adminServiceSelect" class="form-input" required>
+                        <option value="">— اختاري الخدمة —</option>
+                        @foreach($bookableServices as $svc)
+                        <option value="{{ $svc->id }}"
+                                data-duration="{{ $svc->duration_minutes }}"
+                                data-price="{{ $svc->price }}"
+                                {{ (string) old('service_id') === (string) $svc->id ? 'selected' : '' }}>
+                            {{ $svc->name }}@if($svc->price) — {{ number_format($svc->price) }} د.ع@endif ({{ $svc->duration_minutes }} د)
+                        </option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs mt-1" id="adminServiceMeta" style="color:#888"></p>
+                </div>
+                <div>
+                    <label class="form-label">الأخصائية (اختياري)</label>
+                    <select name="staff_id" id="adminStaffSelect" class="form-input" disabled>
+                        <option value="">— اختاري الخدمة أولاً —</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">تاريخ الموعد *</label>
+                    <input type="date" name="appointment_date" id="adminDateInput" value="{{ old('appointment_date', date('Y-m-d')) }}"
+                           class="form-input" min="{{ date('Y-m-d') }}" required>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="form-label">وقت الموعد *</label>
+                    <select name="appointment_time" id="adminTimeSelect" class="form-input" required>
+                        <option value="">— اختاري الخدمة والتاريخ —</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="form-label">ملاحظات</label>
+                    <textarea name="notes" rows="2" class="form-input" placeholder="اختياري">{{ old('notes') }}</textarea>
+                </div>
+            </div>
+            <p class="text-xs" style="color:#888">الأوقات المتاحة تُحسب حسب الجهاز والأخصائية — كما في حجز الموقع.</p>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary flex-1 justify-center">حفظ الحجز</button>
+                <button type="button" class="flex-1 py-3 rounded-xl font-bold" style="background:#f5f0f0; color:#666"
+                        onclick="document.getElementById('createAppointmentModal').classList.add('hidden')">إلغاء</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @push('scripts')
 <script>
+const adminServiceSelect = document.getElementById('adminServiceSelect');
+const adminStaffSelect = document.getElementById('adminStaffSelect');
+const adminDateInput = document.getElementById('adminDateInput');
+const adminTimeSelect = document.getElementById('adminTimeSelect');
+const adminServiceMeta = document.getElementById('adminServiceMeta');
+const preselectedAdminServiceId = @json(old('service_id'));
+const preselectedAdminStaffId = @json(old('staff_id'));
+const preselectedAdminTime = @json(old('appointment_time'));
+
+function updateAdminServiceMeta() {
+    const opt = adminServiceSelect.selectedOptions[0];
+    if (!opt || !opt.value) {
+        adminServiceMeta.textContent = '';
+        return;
+    }
+    const dur = opt.dataset.duration;
+    const price = opt.dataset.price;
+    let t = `المدة: ${dur} دقيقة`;
+    if (price) t += ` — السعر: ${Number(price).toLocaleString('ar-IQ')} د.ع`;
+    adminServiceMeta.textContent = t;
+}
+
+async function loadAdminStaff() {
+    const serviceId = adminServiceSelect.value;
+    if (!serviceId) {
+        adminStaffSelect.innerHTML = '<option value="">— اختاري الخدمة أولاً —</option>';
+        adminStaffSelect.disabled = true;
+        return;
+    }
+    adminStaffSelect.innerHTML = '<option>جاري التحميل...</option>';
+    adminStaffSelect.disabled = true;
+    try {
+        const res = await fetch(`{{ route('booking.staff') }}?service_id=${serviceId}`);
+        const staff = await res.json();
+        adminStaffSelect.innerHTML = '';
+        const ph = document.createElement('option');
+        ph.value = '';
+        ph.textContent = '— بدون تفضيل (اختياري) —';
+        adminStaffSelect.appendChild(ph);
+        staff.forEach(s => {
+            const o = document.createElement('option');
+            o.value = s.id;
+            o.textContent = s.role ? `${s.name} — ${s.role}` : s.name;
+            adminStaffSelect.appendChild(o);
+        });
+        adminStaffSelect.disabled = false;
+        if (preselectedAdminStaffId) {
+            adminStaffSelect.value = preselectedAdminStaffId;
+        }
+    } catch (e) {
+        adminStaffSelect.innerHTML = '<option value="">تعذر تحميل الأخصائيات</option>';
+    }
+    loadAdminTimes();
+}
+
+function formatAdminTimeLabel(t) {
+    const [h, m] = t.split(':');
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'م' : 'ص';
+    const displayH = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+    return `${displayH}:${m} ${ampm}`;
+}
+
+async function loadAdminTimes() {
+    const date = adminDateInput.value;
+    const serviceId = adminServiceSelect.value;
+    if (!date || !serviceId) {
+        adminTimeSelect.innerHTML = '<option value="">— اختاري الخدمة والتاريخ —</option>';
+        return;
+    }
+    adminTimeSelect.innerHTML = '<option>جاري التحميل...</option>';
+    try {
+        let url = `{{ route('booking.times') }}?date=${date}&service_id=${serviceId}`;
+        if (adminStaffSelect.value) url += `&staff_id=${adminStaffSelect.value}`;
+        const res = await fetch(url);
+        const times = await res.json();
+        adminTimeSelect.innerHTML = '';
+        if (!times.length) {
+            adminTimeSelect.innerHTML = '<option value="">لا توجد أوقات متاحة</option>';
+            return;
+        }
+        times.forEach(t => {
+            const o = document.createElement('option');
+            o.value = t;
+            o.textContent = formatAdminTimeLabel(t);
+            adminTimeSelect.appendChild(o);
+        });
+        if (preselectedAdminTime) {
+            const t5 = String(preselectedAdminTime).substring(0, 5);
+            if ([...adminTimeSelect.options].some(o => o.value === t5)) {
+                adminTimeSelect.value = t5;
+            }
+        }
+    } catch (e) {
+        adminTimeSelect.innerHTML = '<option value="">تعذر تحميل الأوقات</option>';
+    }
+}
+
+adminServiceSelect?.addEventListener('change', () => {
+    updateAdminServiceMeta();
+    loadAdminStaff();
+});
+adminStaffSelect?.addEventListener('change', loadAdminTimes);
+adminDateInput?.addEventListener('change', loadAdminTimes);
+
+document.getElementById('createAppointmentModal')?.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.add('hidden');
+});
+
+@if($errors->any() && old('client_name'))
+document.getElementById('createAppointmentModal')?.classList.remove('hidden');
+updateAdminServiceMeta();
+loadAdminStaff();
+@endif
+
+if (preselectedAdminServiceId && adminServiceSelect) {
+    adminServiceSelect.value = preselectedAdminServiceId;
+    updateAdminServiceMeta();
+    loadAdminStaff();
+}
+
 function handleAppointmentStatusChange(select) {
     const previous = select.dataset.current;
     const next = select.value;

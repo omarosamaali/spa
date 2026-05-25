@@ -52,20 +52,24 @@
 
     <div class="bg-white rounded-2xl p-6 shadow-sm space-y-5">
         <h2 class="text-lg font-black" style="color:#1a1a1a">أسماء القوالب في Meta</h2>
-        <p class="text-sm" style="color:#888">يجب إنشاء قالبين بالعربية في Meta Business → WhatsApp → Message templates</p>
+        <p class="text-sm" style="color:#888">يجب إنشاء <strong>ثلاثة قوالب</strong> بالعربية في Meta Business → WhatsApp → Message templates (نفس المتغيرات الستة)</p>
 
         <div class="p-4 rounded-xl text-sm font-mono leading-relaxed" style="background:#f9f5f5; color:#444; direction:ltr; text-align:left">
-            <div class="mb-4">
+            <div class="mb-3">
                 <strong>Template 1:</strong> booking_received (عند الحجز)<br>
                 Body: مرحباً {{1}}، {{2}} لخدمة {{3}} بتاريخ {{4}} الساعة {{5}}. رقم الحجز: {{6}}.
             </div>
-            <div>
+            <div class="mb-3">
                 <strong>Template 2:</strong> booking_confirmed (عند التأكيد من لوحة الحجوزات)<br>
+                Body: مرحباً {{1}}، {{2}} لخدمة {{3}} بتاريخ {{4}} الساعة {{5}}. رقم الحجز: {{6}}.
+            </div>
+            <div>
+                <strong>Template 3:</strong> booking_reminder (تذكير قبل الموعد)<br>
                 Body: مرحباً {{1}}، {{2}} لخدمة {{3}} بتاريخ {{4}} الساعة {{5}}. رقم الحجز: {{6}}.
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             <div>
                 <label class="form-label">قالب «استلام الحجز»</label>
                 <input type="text" name="whatsapp_template_received" class="form-input" dir="ltr"
@@ -77,9 +81,28 @@
                        value="{{ old('whatsapp_template_confirmed', $settings['whatsapp_template_confirmed']) }}">
             </div>
             <div>
+                <label class="form-label">قالب «تذكير الموعد»</label>
+                <input type="text" name="whatsapp_template_reminder" class="form-input" dir="ltr"
+                       value="{{ old('whatsapp_template_reminder', $settings['whatsapp_template_reminder'] ?? 'booking_reminder') }}">
+            </div>
+            <div>
                 <label class="form-label">لغة القالب</label>
                 <input type="text" name="whatsapp_template_lang" class="form-input" dir="ltr"
                        value="{{ old('whatsapp_template_lang', $settings['whatsapp_template_lang'] ?: 'ar') }}" placeholder="ar">
+            </div>
+        </div>
+
+        <div class="p-4 rounded-xl space-y-4" style="background:#fdf8f5; border:1px solid #f0dde0">
+            <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" name="whatsapp_reminder_enabled" value="1" class="w-5 h-5 rounded" style="accent-color:#c9888e"
+                       {{ old('whatsapp_reminder_enabled', $settings['whatsapp_reminder_enabled'] ?? '0') === '1' ? 'checked' : '' }}>
+                <span class="font-bold" style="color:#1a1a1a">تفعيل تذكير الموعد (القالب 3)</span>
+            </label>
+            <div class="max-w-xs">
+                <label class="form-label">إرسال التذكير قبل الموعد بـ (ساعة)</label>
+                <input type="number" name="whatsapp_reminder_hours" class="form-input" min="1" max="168"
+                       value="{{ old('whatsapp_reminder_hours', $settings['whatsapp_reminder_hours'] ?? '24') }}">
+                <p class="text-xs mt-1" style="color:#888">مثال: 24 = رسالة قبل يوم من الموعد (يفحص النظام كل 15 دقيقة)</p>
             </div>
         </div>
 
@@ -90,11 +113,19 @@
 
     <div class="bg-white rounded-2xl p-6 shadow-sm space-y-4">
         <h2 class="text-lg font-black" style="color:#1a1a1a">رسالة تجريبية</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
                 <label class="form-label">رقم للاختبار (أرقام فقط مع مفتاح الدولة)</label>
                 <input type="text" name="test_phone" class="form-input" dir="ltr" placeholder="9647xxxxxxxxx"
                        value="{{ old('test_phone') }}">
+            </div>
+            <div>
+                <label class="form-label">قالب الاختبار</label>
+                <select name="test_template" class="form-input">
+                    <option value="received">استلام الحجز</option>
+                    <option value="confirmed">تأكيد الحجز</option>
+                    <option value="reminder">تذكير الموعد</option>
+                </select>
             </div>
             <label class="flex items-center gap-2 text-sm cursor-pointer pb-2">
                 <input type="checkbox" name="send_test" value="1" style="accent-color:#c9888e">
@@ -109,9 +140,13 @@
 <div class="mt-8 p-5 rounded-2xl text-sm" style="background:#fff; border:1px solid #eee">
     <h3 class="font-black mb-3" style="color:#1a1a1a">متى تُرسل الرسالة؟</h3>
     <ul class="space-y-2 list-disc pr-5" style="color:#666">
-        <li><strong>فور الحجز</strong> من الموقع → قالب booking_received</li>
+        <li><strong>فور الحجز</strong> من الموقع أو اللوحة → قالب booking_received</li>
         <li><strong>عند تغيير الحالة إلى «مؤكد»</strong> من لوحة الحجوزات → قالب booking_confirmed</li>
+        <li><strong>قبل الموعد</strong> (حسب عدد الساعات أعلاه) → قالب booking_reminder — للحجوزات «انتظار» أو «مؤكد» فقط</li>
     </ul>
+    <p class="mt-3 text-xs" style="color:#888">
+        على السيرفر: جدولة <code dir="ltr">php artisan schedule:run</code> كل دقيقة (cron) لتشغيل التذكيرات تلقائياً.
+    </p>
 </div>
 
 @endsection

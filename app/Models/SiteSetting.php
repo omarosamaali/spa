@@ -62,6 +62,9 @@ class SiteSetting extends Model
             'whatsapp_api_version'   => 'v21.0',
             'whatsapp_template_received' => 'booking_received',
             'whatsapp_template_confirmed' => 'booking_confirmed',
+            'whatsapp_template_reminder' => 'booking_reminder',
+            'whatsapp_reminder_enabled' => '0',
+            'whatsapp_reminder_hours' => '24',
             'whatsapp_template_lang' => 'ar',
         ];
     }
@@ -75,6 +78,9 @@ class SiteSetting extends Model
             'whatsapp_api_version',
             'whatsapp_template_received',
             'whatsapp_template_confirmed',
+            'whatsapp_template_reminder',
+            'whatsapp_reminder_enabled',
+            'whatsapp_reminder_hours',
             'whatsapp_template_lang',
         ];
     }
@@ -102,6 +108,9 @@ class SiteSetting extends Model
             'api_version'        => trim($values['whatsapp_api_version'] ?? 'v21.0') ?: 'v21.0',
             'template_received'  => trim($values['whatsapp_template_received'] ?? 'booking_received'),
             'template_confirmed' => trim($values['whatsapp_template_confirmed'] ?? 'booking_confirmed'),
+            'template_reminder'  => trim($values['whatsapp_template_reminder'] ?? 'booking_reminder'),
+            'reminder_enabled'   => ($values['whatsapp_reminder_enabled'] ?? '0') === '1',
+            'reminder_hours'     => max(1, min(168, (int) ($values['whatsapp_reminder_hours'] ?? 24))),
             'template_lang'      => trim($values['whatsapp_template_lang'] ?? 'ar') ?: 'ar',
         ];
     }

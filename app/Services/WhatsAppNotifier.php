@@ -27,10 +27,45 @@ class WhatsAppNotifier
         return $this->sendBooking($appointment, 'confirmed');
     }
 
-    public function sendTestMessage(string $phone, string $clientName = 'اختبار'): bool
+    public function sendBookingReminder(Appointment $appointment): bool
+    {
+        if (! $this->isEnabled()) {
+            return false;
+        }
+
+        $config = SiteSetting::whatsappApi();
+        if (! ($config['reminder_enabled'] ?? false)) {
+            return false;
+        }
+
+        $appointment->loadMissing('service:id,name');
+        $template = $config['template_reminder'] ?: 'booking_reminder';
+
+        return $this->sendTemplate(
+            $appointment->client_phone,
+            $template,
+            $config['template_lang'],
+            [
+                $appointment->client_name,
+                'تذكير بموعدك',
+                $appointment->service?->name ?? 'خدمة',
+                $appointment->appointment_date->format('Y/m/d'),
+                substr((string) $appointment->appointment_time, 0, 5),
+                '#'.str_pad((string) $appointment->id, 4, '0', STR_PAD_LEFT),
+            ]
+        );
+    }
+
+    public function sendTestMessage(string $phone, string $clientName = 'اختبار', string $templateType = 'received'): bool
     {
         $config = SiteSetting::whatsappApi();
-        $template = $config['template_received'] ?: 'booking_received';
+
+        $templates = [
+            'received' => [$config['template_received'] ?: 'booking_received', 'تم استلام حجزك'],
+            'confirmed' => [$config['template_confirmed'] ?: 'booking_confirmed', 'تم تأكيد حجزك'],
+            'reminder' => [$config['template_reminder'] ?: 'booking_reminder', 'تذكير بموعدك'],
+        ];
+        [$template, $statusLine] = $templates[$templateType] ?? $templates['received'];
 
         return $this->sendTemplate(
             $phone,
@@ -38,7 +73,7 @@ class WhatsAppNotifier
             $config['template_lang'],
             [
                 $clientName,
-                'تم استلام حجزك',
+                $statusLine,
                 'جلسة تجريبية',
                 now()->format('Y/m/d'),
                 now()->format('H:i'),

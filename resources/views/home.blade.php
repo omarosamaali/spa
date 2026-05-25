@@ -403,6 +403,7 @@
             @include('partials.service-card-home', [
                 'img' => $service->displayImageUrl(),
                 'name' => $service->name,
+                'icon' => $service->icon,
                 'desc' => $service->description,
                 'price' => $service->price,
                 'duration' => $service->duration_minutes,
@@ -607,8 +608,12 @@
                         </div>
                         <p class="text-base leading-relaxed mb-8" style="color:rgba(255,255,255,0.75);">{{ $t->content }}</p>
                         <div class="flex items-center justify-center gap-4">
-                            <div class="testimonial-avatar w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0">
-                                {{ mb_substr($t->client_name, 0, 1) }}
+                            <div class="testimonial-avatar w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl flex-shrink-0 overflow-hidden">
+                                @if($t->client_image)
+                                    <img src="{{ asset('storage/'.$t->client_image) }}" alt="{{ $t->client_name }}" class="w-full h-full object-cover">
+                                @else
+                                    {{ mb_substr($t->client_name, 0, 1) }}
+                                @endif
                             </div>
                             <div class="text-right">
                                 <div class="font-black text-white">{{ $t->client_name }}</div>
@@ -713,7 +718,7 @@
             @foreach([
                 ['val'=>($stats['clients']>0?'+'.$stats['clients']:'+500'),'label'=>'جلسة مكتملة',   'sub'=>'عميلة وثقت بنا','icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','accent'=>'primary'],
                 ['val'=>'4.9',                                              'label'=>'تقييم العملاء','sub'=>'من أصل 5 نجوم','icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','accent'=>'gold'],
-                ['val'=>'10+',                                              'label'=>'خبراء متخصصين','sub'=>'فريق احترافي مدرّب','icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','accent'=>'gold'],
+                ['val'=>($stats['experts']>0?$stats['experts'].'+':'10+'),  'label'=>'خبراء متخصصين','sub'=>'فريق احترافي مدرّب','icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','accent'=>'gold'],
                 ['val'=>'100%',                                             'label'=>'رضا العملاء',  'sub'=>'ضماننا الدائم لكِ','icon'=>'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>','accent'=>'primary'],
             ] as $st)
             <div class="stat-card rounded-2xl p-7 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1"

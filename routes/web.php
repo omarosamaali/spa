@@ -43,7 +43,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Appointments
     Route::get('/appointments', [DashboardController::class, 'appointments'])->name('appointments');
+    Route::post('/appointments', [DashboardController::class, 'storeAppointment'])->name('appointments.store');
     Route::patch('/appointments/{appointment}/status', [DashboardController::class, 'updateStatus'])->name('appointments.status');
+    Route::delete('/appointments/{appointment}', [DashboardController::class, 'destroyAppointment'])->name('appointments.destroy');
 
     // Services CRUD
     Route::get('/services', [DashboardController::class, 'services'])->name('services');
@@ -67,6 +69,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('/equipment/{equipment}', [DashboardController::class, 'updateEquipment'])->name('equipment.update');
     Route::delete('/equipment/{equipment}', [DashboardController::class, 'destroyEquipment'])->name('equipment.destroy');
     Route::patch('/equipment/{equipment}/toggle', [DashboardController::class, 'toggleEquipment'])->name('equipment.toggle');
+
+    // Testimonials (آراء العملاء)
+    Route::get('/testimonials', [DashboardController::class, 'testimonials'])->name('testimonials');
+    Route::post('/testimonials', [DashboardController::class, 'storeTestimonial'])->name('testimonials.store');
+    Route::put('/testimonials/{testimonial}', [DashboardController::class, 'updateTestimonial'])->name('testimonials.update');
+    Route::delete('/testimonials/{testimonial}', [DashboardController::class, 'destroyTestimonial'])->name('testimonials.destroy');
+    Route::patch('/testimonials/{testimonial}/toggle', [DashboardController::class, 'toggleTestimonial'])->name('testimonials.toggle');
 
     // Branding (colors, logo, favicon)
     Route::get('/branding-settings', [DashboardController::class, 'brandingSettings'])->name('branding-settings');

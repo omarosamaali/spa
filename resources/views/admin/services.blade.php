@@ -30,7 +30,12 @@
                 </div>
                 @endif
                 <div>
-                    <div class="font-black" style="color:#1a1a1a">{{ $service->name }}</div>
+                    <div class="font-black flex items-center gap-2" style="color:#1a1a1a">
+                        @if($service->icon)
+                        <span class="text-lg leading-none" aria-hidden="true">{{ $service->icon }}</span>
+                        @endif
+                        <span>{{ $service->name }}</span>
+                    </div>
                     <div class="text-xs" style="color:#888">{{ $service->duration_minutes }} دقيقة</div>
                 </div>
             </div>
@@ -114,8 +119,9 @@
                     @error('name')<p class="text-xs mt-1" style="color:#dc2626">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label class="form-label">الأيقونة (emoji)</label>
-                    <input type="text" name="icon" value="{{ old('icon') }}" class="form-input" placeholder="✨" maxlength="5">
+                    <label class="form-label">الأيقونة (emoji) <span class="text-xs font-normal" style="color:#888">(اختياري)</span></label>
+                    <input type="text" name="icon" value="{{ old('icon') }}" class="form-input" placeholder="✨ 💆 🌸" maxlength="16">
+                    <p class="text-xs mt-1" style="color:#888">تظهر بجانب اسم الخدمة في الصفحة الرئيسية — اتركيه فارغاً إن لم تحتاجيها</p>
                 </div>
             </div>
 
@@ -127,8 +133,9 @@
 
             <div class="grid grid-cols-2 gap-5">
                 <div>
-                    <label class="form-label">السعر (د.ع)</label>
-                    <input type="number" name="price" value="{{ old('price') }}" class="form-input" min="0" step="500" placeholder="0">
+                    <label class="form-label">السعر (د.ع) <span class="text-xs font-normal" style="color:#888">(اختياري)</span></label>
+                    <input type="number" name="price" value="{{ old('price') }}" class="form-input @error('price') border-red-400 @enderror" min="0" step="500" placeholder="اتركيه فارغاً إن لم يكن للخدمة سعر">
+                    @error('price')<p class="text-xs mt-1" style="color:#dc2626">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="form-label">مدة الجلسة (دقيقة) <span style="color:#c9888e">*</span></label>

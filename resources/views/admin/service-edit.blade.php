@@ -16,6 +16,16 @@
     <div class="bg-white rounded-2xl p-8 shadow-sm">
         <h1 class="text-xl font-black mb-6" style="color:#1a1a1a">تعديل الخدمة</h1>
 
+        @if($errors->any())
+        <div class="mb-6 p-4 rounded-xl text-sm" style="background:#fee2e2; color:#dc2626;">
+            <ul class="list-disc pr-5 space-y-1">
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <form action="{{ route('admin.services.update', $service) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
             @method('PUT')
@@ -27,8 +37,9 @@
                     @error('name')<p class="text-xs mt-1" style="color:#dc2626">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label class="form-label">الأيقونة (emoji)</label>
-                    <input type="text" name="icon" value="{{ old('icon', $service->icon) }}" class="form-input" placeholder="✨" maxlength="5">
+                    <label class="form-label">الأيقونة (emoji) <span class="text-xs font-normal" style="color:#888">(اختياري)</span></label>
+                    <input type="text" name="icon" value="{{ old('icon', $service->icon) }}" class="form-input" placeholder="✨ 💆 🌸" maxlength="16">
+                    <p class="text-xs mt-1" style="color:#888">تظهر بجانب اسم الخدمة في الصفحة الرئيسية</p>
                 </div>
             </div>
 
@@ -40,8 +51,9 @@
 
             <div class="grid grid-cols-2 gap-5">
                 <div>
-                    <label class="form-label">السعر (د.ع)</label>
-                    <input type="number" name="price" value="{{ old('price', $service->price) }}" class="form-input" min="0" step="500" placeholder="0">
+                    <label class="form-label">السعر (د.ع) <span class="text-xs font-normal" style="color:#888">(اختياري)</span></label>
+                    <input type="number" name="price" value="{{ old('price', $service->price) }}" class="form-input @error('price') border-red-400 @enderror" min="0" step="500" placeholder="اتركيه فارغاً إن لم يكن للخدمة سعر">
+                    @error('price')<p class="text-xs mt-1" style="color:#dc2626">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="form-label">مدة الجلسة (دقيقة) <span style="color:#c9888e">*</span></label>

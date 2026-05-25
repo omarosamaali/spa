@@ -107,8 +107,8 @@
 
                 {{-- Staff — تظهر بعد اختيار الخدمة --}}
                 <div id="staffField">
-                    <label class="booking-label">الأخصائية <span style="color:#e8b4b8">*</span></label>
-                    <p class="text-xs mb-2" style="color:rgba(255,255,255,0.4);">تُعرض المختصات المؤهلات لهذه الخدمة فقط</p>
+                    <label class="booking-label">الأخصائية <span class="text-xs font-normal" style="color:rgba(255,255,255,0.45);">(اختياري)</span></label>
+                    <p class="text-xs mb-2" style="color:rgba(255,255,255,0.4);">تُعرض المختصات المؤهلات لهذه الخدمة فقط — يمكن ترك الحقل فارغاً</p>
                     <select name="staff_id" class="booking-input" id="staffSelect" disabled>
                         <option value="">— اختاري الخدمة أولاً —</option>
                     </select>
@@ -260,14 +260,14 @@ async function loadStaffForService() {
         const staff = await res.json();
 
         staffSelect.innerHTML = '';
+        staffSelect.removeAttribute('required');
         if (staff.length === 0) {
             staffSelect.innerHTML = '<option value="">— أي أخصائية متاحة —</option>';
             staffSelect.disabled = false;
-            staffSelect.removeAttribute('required');
         } else {
             const ph = document.createElement('option');
             ph.value = '';
-            ph.textContent = '— اختاري الأخصائية —';
+            ph.textContent = '— بدون تفضيل (اختياري) —';
             staffSelect.appendChild(ph);
             staff.forEach(s => {
                 const opt = document.createElement('option');
@@ -276,11 +276,8 @@ async function loadStaffForService() {
                 staffSelect.appendChild(opt);
             });
             staffSelect.disabled = false;
-            staffSelect.setAttribute('required', 'required');
             if (preselectedStaffId && staff.some(s => s.id == preselectedStaffId)) {
                 staffSelect.value = preselectedStaffId;
-            } else if (staff.length === 1) {
-                staffSelect.value = staff[0].id;
             }
         }
         loadTimes();
@@ -310,10 +307,6 @@ async function loadTimes() {
     }
 
     const staffId = staffSelect.value;
-    if (staffSelect.hasAttribute('required') && !staffId) {
-        resetTimesSelect('— اختاري الأخصائية أولاً —');
-        return;
-    }
 
     timeSelect.innerHTML = '<option>جاري التحميل...</option>';
 

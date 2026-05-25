@@ -21,6 +21,7 @@
         @include('partials.service-card-home', [
             'img' => $service->displayImageUrl(),
             'name' => $service->name,
+            'icon' => $service->icon,
             'desc' => $service->description,
             'price' => $service->price,
             'duration' => $service->duration_minutes,

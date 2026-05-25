@@ -8,9 +8,11 @@ use App\Models\ContactMessage;
 use App\Models\Equipment;
 use App\Models\Service;
 use App\Models\Staff;
+use App\Models\Testimonial;
 use App\Models\HeroSlide;
 use App\Models\SiteSetting;
 use App\Models\SiteTheme;
+use App\Services\BookingAvailability;
 use App\Services\WhatsAppNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -40,12 +42,99 @@ class DashboardController extends Controller
     public function appointments(Request $request)
     {
         $appointments = Appointment::with(['service', 'staff'])
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->date, fn($q) => $q->whereDate('appointment_date', $request->date))
+            ->when($request->status, fn ($q) => $q->where('status', $request->status))
+            ->when($request->date, fn ($q) => $q->whereDate('appointment_date', $request->date))
+            ->when($request->service_id, fn ($q) => $q->where('service_id', $request->service_id))
             ->latest()
             ->paginate(20);
 
-        return view('admin.appointments', compact('appointments'));
+        $bookableServices = Service::bookable()->orderBy('sort_order')->orderBy('name')->get();
+
+        return view('admin.appointments', compact('appointments', 'bookableServices'));
+    }
+
+    public function storeAppointment(Request $request)
+    {
+        $validated = $request->validate([
+            'client_name'      => 'required|string|max:255',
+            'client_phone'     => 'required|string|max:20',
+            'client_email'     => 'nullable|email|max:255',
+            'service_id'       => 'required|exists:services,id',
+            'staff_id'         => 'nullable|exists:staff,id',
+            'appointment_date' => 'required|date',
+            'appointment_time' => 'required',
+            'status'           => 'required|in:pending,confirmed,cancelled,completed',
+            'notes'            => 'nullable|string|max:500',
+        ], [
+            'client_name.required'      => 'اسم العميلة مطلوب',
+            'client_phone.required'     => 'رقم الهاتف مطلوب',
+            'service_id.required'       => 'يرجى اختيار الخدمة',
+            'appointment_date.required' => 'يرجى اختيار التاريخ',
+            'appointment_time.required' => 'يرجى اختيار الوقت',
+            'status.required'           => 'يرجى اختيار الحالة',
+        ]);
+
+        $service = Service::bookable()->with('equipment:id,name,capacity')->find($validated['service_id']);
+        if (! $service) {
+            return back()->withErrors(['service_id' => 'الخدمة غير متاحة للحجز'])->withInput();
+        }
+
+        $availability = app(BookingAvailability::class);
+
+        if (! empty($validated['staff_id']) && ! $availability->staffCanPerform((int) $validated['staff_id'], $service)) {
+            return back()->withErrors(['staff_id' => 'هذه الأخصائية لا تقدم الخدمة المختارة'])->withInput();
+        }
+
+        $slots = $availability->availableSlots(
+            $validated['appointment_date'],
+            $service,
+            $validated['staff_id'] ?? null
+        );
+
+        $time = substr($validated['appointment_time'], 0, 5);
+        if (! in_array($time, $slots, true)) {
+            return back()->withErrors([
+                'appointment_time' => $availability->slotRejectionMessage(
+                    $validated['appointment_date'],
+                    $time,
+                    $service,
+                    isset($validated['staff_id']) ? (int) $validated['staff_id'] : null
+                ),
+            ])->withInput();
+        }
+
+        $appointment = Appointment::create([
+            'client_name'       => $validated['client_name'],
+            'client_phone'      => $validated['client_phone'],
+            'client_email'      => $validated['client_email'] ?: null,
+            'service_id'        => $service->id,
+            'staff_id'          => $validated['staff_id'] ?? null,
+            'duration_minutes'  => $service->duration_minutes,
+            'equipment_id'      => $service->equipment_id,
+            'appointment_date'  => $validated['appointment_date'],
+            'appointment_time'  => $time.':00',
+            'status'            => $validated['status'],
+            'notes'             => $validated['notes'] ?? null,
+        ]);
+
+        $appointment->load('service');
+
+        try {
+            $notifier = app(WhatsAppNotifier::class);
+            if ($validated['status'] === 'confirmed') {
+                $notifier->sendBookingConfirmed($appointment);
+            } else {
+                $notifier->sendBookingReceived($appointment);
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('WhatsApp admin booking notify failed: '.$e->getMessage());
+        }
+
+        $label = '#'.str_pad((string) $appointment->id, 4, '0', STR_PAD_LEFT);
+
+        return redirect()
+            ->route('admin.appointments', $request->only(['status', 'date', 'service_id']))
+            ->with('success', "تم إنشاء الحجز {$label} بنجاح");
     }
 
     public function updateStatus(Request $request, Appointment $appointment)
@@ -61,6 +150,14 @@ class DashboardController extends Controller
         return back()->with('success', 'تم تحديث حالة الحجز بنجاح');
     }
 
+    public function destroyAppointment(Appointment $appointment)
+    {
+        $label = '#'.str_pad((string) $appointment->id, 4, '0', STR_PAD_LEFT);
+        $appointment->delete();
+
+        return back()->with('success', "تم حذف الحجز {$label} نهائياً");
+    }
+
     // =================== SERVICES CRUD ===================
 
     public function services()
@@ -73,6 +170,8 @@ class DashboardController extends Controller
 
     public function storeService(Request $request)
     {
+        $this->normalizeServiceRequest($request);
+
         $validated = $request->validate([
             'name'             => 'required|string|max:255',
             'description'      => 'required|string|max:1000',
@@ -80,17 +179,10 @@ class DashboardController extends Controller
             'duration_minutes' => 'required|integer|min:5|max:480',
             'category'         => 'nullable|string|max:50',
             'equipment_id'     => 'nullable|exists:equipment,id',
-            'icon'             => 'nullable|string|max:10',
-            'sort_order'       => 'integer|min:0',
+            'icon'             => 'nullable|string|max:16',
+            'sort_order'       => 'nullable|integer|min:0',
             'image'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-        ], [
-            'name.required'        => 'اسم الخدمة مطلوب',
-            'description.required' => 'الوصف مطلوب',
-            'price.numeric'        => 'السعر يجب أن يكون رقماً',
-            'duration_minutes.required' => 'مدة الجلسة مطلوبة',
-            'image.image'          => 'يجب أن يكون الملف صورة',
-            'image.max'            => 'حجم الصورة يجب أن لا يتجاوز 2 ميغابايت',
-        ]);
+        ], $this->serviceValidationMessages());
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('services', 'public');
@@ -114,6 +206,8 @@ class DashboardController extends Controller
 
     public function updateService(Request $request, Service $service)
     {
+        $this->normalizeServiceRequest($request);
+
         $validated = $request->validate([
             'name'             => 'required|string|max:255',
             'description'      => 'required|string|max:1000',
@@ -121,13 +215,10 @@ class DashboardController extends Controller
             'duration_minutes' => 'required|integer|min:5|max:480',
             'category'         => 'nullable|string|max:50',
             'equipment_id'     => 'nullable|exists:equipment,id',
-            'icon'             => 'nullable|string|max:10',
-            'sort_order'       => 'integer|min:0',
+            'icon'             => 'nullable|string|max:16',
+            'sort_order'       => 'nullable|integer|min:0',
             'image'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-        ], [
-            'name.required'        => 'اسم الخدمة مطلوب',
-            'description.required' => 'الوصف مطلوب',
-        ]);
+        ], $this->serviceValidationMessages());
 
         if ($request->hasFile('image')) {
             if ($service->image) {
@@ -138,6 +229,7 @@ class DashboardController extends Controller
 
         $validated['is_active'] = $request->boolean('is_active');
         $validated['equipment_id'] = $validated['equipment_id'] ?? null;
+        $validated['sort_order'] = $validated['sort_order'] ?? $service->sort_order;
 
         $service->update($validated);
 
@@ -152,6 +244,29 @@ class DashboardController extends Controller
         $service->delete();
 
         return redirect()->route('admin.services')->with('success', 'تم حذف الخدمة بنجاح');
+    }
+
+    /** تحويل الحقول الفارغة إلى null (Laravel 11 لا يفعل ذلك تلقائياً) */
+    private function normalizeServiceRequest(Request $request): void
+    {
+        foreach (['price', 'category', 'equipment_id', 'icon', 'sort_order'] as $field) {
+            if ($request->has($field) && $request->input($field) === '') {
+                $request->merge([$field => null]);
+            }
+        }
+    }
+
+    /** @return array<string, string> */
+    private function serviceValidationMessages(): array
+    {
+        return [
+            'name.required'             => 'اسم الخدمة مطلوب',
+            'description.required'      => 'الوصف مطلوب',
+            'price.numeric'             => 'السعر يجب أن يكون رقماً صحيحاً أو يُترك فارغاً',
+            'duration_minutes.required' => 'مدة الجلسة مطلوبة',
+            'image.image'               => 'يجب أن يكون الملف صورة',
+            'image.max'                 => 'حجم الصورة يجب أن لا يتجاوز 2 ميغابايت',
+        ];
     }
 
     public function toggleService(Service $service)
@@ -322,6 +437,84 @@ class DashboardController extends Controller
         return back()->with('success', 'تم تحديث حالة الجهاز');
     }
 
+    // =================== TESTIMONIALS CRUD ===================
+
+    public function testimonials()
+    {
+        $testimonials = Testimonial::orderBy('id')->get();
+
+        return view('admin.testimonials', compact('testimonials'));
+    }
+
+    public function storeTestimonial(Request $request)
+    {
+        $validated = $this->validateTestimonial($request);
+
+        if ($request->hasFile('client_image')) {
+            $validated['client_image'] = $request->file('client_image')->store('testimonials', 'public');
+        }
+
+        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['rating'] = $validated['rating'] ?? 5;
+
+        Testimonial::create($validated);
+
+        return redirect()->route('admin.testimonials')->with('success', 'تم إضافة الرأي بنجاح');
+    }
+
+    public function updateTestimonial(Request $request, Testimonial $testimonial)
+    {
+        $validated = $this->validateTestimonial($request);
+
+        if ($request->hasFile('client_image')) {
+            if ($testimonial->client_image) {
+                Storage::disk('public')->delete($testimonial->client_image);
+            }
+            $validated['client_image'] = $request->file('client_image')->store('testimonials', 'public');
+        }
+
+        $validated['is_active'] = $request->boolean('is_active');
+        $validated['rating'] = $validated['rating'] ?? 5;
+
+        $testimonial->update($validated);
+
+        return redirect()->route('admin.testimonials')->with('success', 'تم تحديث الرأي بنجاح');
+    }
+
+    public function destroyTestimonial(Testimonial $testimonial)
+    {
+        if ($testimonial->client_image) {
+            Storage::disk('public')->delete($testimonial->client_image);
+        }
+        $testimonial->delete();
+
+        return redirect()->route('admin.testimonials')->with('success', 'تم حذف الرأي بنجاح');
+    }
+
+    public function toggleTestimonial(Testimonial $testimonial)
+    {
+        $testimonial->update(['is_active' => ! $testimonial->is_active]);
+
+        return back()->with('success', 'تم تحديث حالة الرأي');
+    }
+
+    /** @return array<string, mixed> */
+    private function validateTestimonial(Request $request): array
+    {
+        return $request->validate([
+            'client_name'  => 'required|string|max:255',
+            'client_city'  => 'nullable|string|max:255',
+            'content'      => 'required|string|max:2000',
+            'rating'       => 'nullable|integer|min:1|max:5',
+            'client_image' => 'nullable|image|max:2048',
+        ], [
+            'client_name.required' => 'اسم العميلة مطلوب',
+            'content.required'     => 'نص الرأي مطلوب',
+            'rating.min'           => 'التقييم من 1 إلى 5',
+            'rating.max'           => 'التقييم من 1 إلى 5',
+        ]);
+    }
+
     // =================== CONTACT MESSAGES ===================
 
     public function contacts(Request $request)
@@ -455,8 +648,11 @@ class DashboardController extends Controller
             'whatsapp_api_version'      => 'nullable|string|max:20',
             'whatsapp_template_received'  => 'nullable|string|max:120',
             'whatsapp_template_confirmed' => 'nullable|string|max:120',
+            'whatsapp_template_reminder'  => 'nullable|string|max:120',
+            'whatsapp_reminder_hours'     => 'nullable|integer|min:1|max:168',
             'whatsapp_template_lang'    => 'nullable|string|max:10',
             'test_phone'                => 'nullable|string|max:20',
+            'test_template'               => 'nullable|in:received,confirmed,reminder',
         ]);
 
         SiteSetting::set('whatsapp_api_enabled', $request->boolean('whatsapp_api_enabled') ? '1' : '0');
@@ -465,6 +661,9 @@ class DashboardController extends Controller
         SiteSetting::set('whatsapp_api_version', trim($validated['whatsapp_api_version'] ?? 'v21.0') ?: 'v21.0');
         SiteSetting::set('whatsapp_template_received', trim($validated['whatsapp_template_received'] ?? 'booking_received') ?: 'booking_received');
         SiteSetting::set('whatsapp_template_confirmed', trim($validated['whatsapp_template_confirmed'] ?? 'booking_confirmed') ?: 'booking_confirmed');
+        SiteSetting::set('whatsapp_template_reminder', trim($validated['whatsapp_template_reminder'] ?? 'booking_reminder') ?: 'booking_reminder');
+        SiteSetting::set('whatsapp_reminder_enabled', $request->boolean('whatsapp_reminder_enabled') ? '1' : '0');
+        SiteSetting::set('whatsapp_reminder_hours', (string) max(1, min(168, (int) ($validated['whatsapp_reminder_hours'] ?? 24))));
         SiteSetting::set('whatsapp_template_lang', trim($validated['whatsapp_template_lang'] ?? 'ar') ?: 'ar');
 
         SiteSetting::clearWhatsappApiCache();
@@ -472,7 +671,11 @@ class DashboardController extends Controller
         $message = 'تم حفظ إعدادات واتساب';
 
         if ($request->boolean('send_test') && ! empty($validated['test_phone'])) {
-            $sent = app(WhatsAppNotifier::class)->sendTestMessage($validated['test_phone']);
+            $sent = app(WhatsAppNotifier::class)->sendTestMessage(
+                $validated['test_phone'],
+                'اختبار',
+                $validated['test_template'] ?? 'received'
+            );
             $message .= $sent ? ' — وتم إرسال رسالة تجريبية' : ' — فشل الإرسال التجريبي (راجع السجل أو القوالب في Meta)';
         }
 

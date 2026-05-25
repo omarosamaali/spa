@@ -7,6 +7,7 @@
     $cardCat = $category ?? 'all';
     $cardBookingUrl = $bookingUrl ?? route('booking');
     $cardVariant = $variant ?? 'home';
+    $cardIcon = isset($icon) && $icon !== '' ? $icon : null;
     $fallbackImg = \App\Models\Service::categoryStockImage($cardCat !== 'all' ? $cardCat : null);
 @endphp
 <a href="{{ $cardBookingUrl }}"
@@ -23,7 +24,10 @@
     <span class="service-card__duration">⏱ {{ $cardDuration }} د</span>
     @endif
     <div class="service-card__content">
-        <h3 class="service-card__title">{{ $cardName }}</h3>
+        <h3 class="service-card__title">
+            @if($cardIcon)<span class="service-card__icon" aria-hidden="true">{{ $cardIcon }}</span>@endif
+            <span>{{ $cardName }}</span>
+        </h3>
         @if($cardDesc)
         <p class="service-card__desc">{{ $cardDesc }}</p>
         @endif

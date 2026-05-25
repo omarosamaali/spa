@@ -10,10 +10,12 @@ class Appointment extends Model
         'client_name', 'client_phone', 'client_email',
         'service_id', 'duration_minutes', 'staff_id', 'equipment_id',
         'appointment_date', 'appointment_time', 'status', 'notes', 'ghl_contact_id',
+        'whatsapp_reminder_sent_at',
     ];
 
     protected $casts = [
         'appointment_date' => 'date',
+        'whatsapp_reminder_sent_at' => 'datetime',
     ];
 
     public function service()
