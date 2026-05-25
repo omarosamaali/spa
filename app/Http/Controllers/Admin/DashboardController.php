@@ -7,15 +7,20 @@ use App\Models\Appointment;
 use App\Models\ContactMessage;
 use App\Models\Equipment;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\Staff;
+use App\Models\HomeGalleryItem;
 use App\Models\Testimonial;
+use App\Services\HomeGallery;
 use App\Models\HeroSlide;
 use App\Models\SiteSetting;
 use App\Models\SiteTheme;
 use App\Services\BookingAvailability;
+use App\Services\HomeCategoryFilter;
 use App\Services\WhatsAppNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
@@ -150,6 +155,75 @@ class DashboardController extends Controller
         return back()->with('success', 'تم تحديث حالة الحجز بنجاح');
     }
 
+    public function rescheduleAppointment(Request $request, Appointment $appointment)
+    {
+        if ($appointment->status === 'cancelled') {
+            return back()->withErrors([
+                'appointment_date' => 'لا يمكن تعديل موعد حجز ملغي — غيّري الحالة إلى انتظار أو تأكيد أولاً',
+            ]);
+        }
+
+        $validated = $request->validate([
+            'appointment_date' => 'required|date',
+            'appointment_time' => 'required',
+        ], [
+            'appointment_date.required' => 'يرجى اختيار التاريخ',
+            'appointment_time.required' => 'يرجى اختيار الوقت',
+        ]);
+
+        $appointment->load('service');
+        $service = $appointment->service;
+        if (! $service) {
+            return back()->withErrors(['appointment_date' => 'الخدمة المرتبطة بالحجز غير موجودة'])->withInput();
+        }
+
+        $availability = app(BookingAvailability::class);
+        $staffId = $appointment->staff_id ? (int) $appointment->staff_id : null;
+
+        $time = substr($validated['appointment_time'], 0, 5);
+        $slots = $availability->availableSlots(
+            $validated['appointment_date'],
+            $service,
+            $staffId,
+            $appointment->id,
+        );
+
+        if (! in_array($time, $slots, true)) {
+            return back()
+                ->withErrors([
+                    'appointment_time' => $availability->slotRejectionMessage(
+                        $validated['appointment_date'],
+                        $time,
+                        $service,
+                        $staffId,
+                        $appointment->id,
+                    ),
+                ])
+                ->withInput([
+                    'reschedule_appointment_id' => $appointment->id,
+                    'appointment_date'          => $validated['appointment_date'],
+                    'appointment_time'          => $time,
+                ]);
+        }
+
+        $oldDate = $appointment->appointment_date->format('Y/m/d');
+        $oldTime = substr((string) $appointment->appointment_time, 0, 5);
+
+        $appointment->update([
+            'appointment_date'          => $validated['appointment_date'],
+            'appointment_time'          => $time.':00',
+            'whatsapp_reminder_sent_at' => null,
+        ]);
+
+        $label = '#'.str_pad((string) $appointment->id, 4, '0', STR_PAD_LEFT);
+        $newDate = $appointment->appointment_date->format('Y/m/d');
+        $newTime = substr((string) $appointment->appointment_time, 0, 5);
+
+        return redirect()
+            ->route('admin.appointments', $request->only(['status', 'date', 'service_id']))
+            ->with('success', "تم تعديل موعد الحجز {$label}: من {$oldDate} {$oldTime} إلى {$newDate} {$newTime}");
+    }
+
     public function destroyAppointment(Appointment $appointment)
     {
         $label = '#'.str_pad((string) $appointment->id, 4, '0', STR_PAD_LEFT);
@@ -158,14 +232,199 @@ class DashboardController extends Controller
         return back()->with('success', "تم حذف الحجز {$label} نهائياً");
     }
 
+    // =================== ABOUT PAGE SETTINGS ===================
+
+    public function aboutSettings()
+    {
+        $years = SiteSetting::get('about_years_experience', '');
+        $aboutWho = SiteSetting::aboutWhoWeAre();
+        $settings = [];
+        foreach (SiteSetting::aboutWhoKeys() as $key) {
+            $settings[$key] = SiteSetting::get($key, SiteSetting::defaults()[$key] ?? '');
+        }
+
+        return view('admin.about-settings', [
+            'years'    => $years !== '' ? (int) $years : SiteSetting::aboutYearsExperience(),
+            'aboutWho' => $aboutWho,
+            'settings' => $settings,
+        ]);
+    }
+
+    public function updateAboutSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'about_years_experience' => 'required|integer|min:1|max:99',
+            'about_who_badge'        => 'required|string|max:100',
+            'about_who_title'        => 'required|string|max:500',
+            'about_who_text_1'       => 'required|string|max:3000',
+            'about_who_text_2'       => 'nullable|string|max:3000',
+            'about_who_image'        => 'nullable|image|max:4096',
+        ], [
+            'about_years_experience.required' => 'عدد سنوات الخبرة مطلوب',
+            'about_who_badge.required'        => 'شارة «من نحن» مطلوبة',
+            'about_who_title.required'        => 'عنوان القسم مطلوب',
+            'about_who_text_1.required'       => 'الفقرة الأولى مطلوبة',
+            'about_who_image.image'           => 'يجب أن يكون الملف صورة',
+        ]);
+
+        SiteSetting::set('about_years_experience', (string) $validated['about_years_experience']);
+        SiteSetting::set('about_who_badge', $validated['about_who_badge']);
+        SiteSetting::set('about_who_title', $validated['about_who_title']);
+        SiteSetting::set('about_who_text_1', $validated['about_who_text_1']);
+        SiteSetting::set('about_who_text_2', $validated['about_who_text_2'] ?? '');
+
+        $imagePath = SiteSetting::get('about_who_image', '');
+        if ($request->boolean('remove_about_who_image') && $imagePath) {
+            Storage::disk('public')->delete($imagePath);
+            SiteSetting::set('about_who_image', '');
+            $imagePath = '';
+        }
+        if ($request->hasFile('about_who_image')) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            SiteSetting::set('about_who_image', $request->file('about_who_image')->store('about', 'public'));
+        }
+
+        return redirect()->route('admin.about-settings')->with('success', 'تم حفظ إعدادات صفحة عن المركز');
+    }
+
+    // =================== HOME SERVICE FILTER (اختاري ما يناسبك) ===================
+
+    public function homeServiceFilters()
+    {
+        $config = HomeCategoryFilter::config();
+        $categoryLabels = Service::categoryLabelsForAdmin();
+
+        return view('admin.home-service-filters', compact('config', 'categoryLabels'));
+    }
+
+    public function updateHomeServiceFilters(Request $request)
+    {
+        $labels = Service::categoryLabelsForAdmin();
+        $visibleInput = $request->input('visible', []);
+
+        $visible = [];
+        foreach (array_keys($labels) as $key) {
+            $visible[$key] = ! empty($visibleInput[$key]);
+        }
+
+        $showAll = $request->boolean('show_all');
+        $default = $request->input('default', 'all');
+
+        $tabs = [];
+        if ($showAll) {
+            $tabs[] = 'all';
+        }
+        foreach ($labels as $key => $_label) {
+            if ($visible[$key] ?? false) {
+                $tabs[] = $key;
+            }
+        }
+
+        if ($tabs === []) {
+            return back()->withErrors(['visible' => 'يجب تفعيل قسم واحد على الأقل أو إظهار «الكل»'])->withInput();
+        }
+
+        if (! in_array($default, $tabs, true)) {
+            return back()->withErrors(['default' => 'الفلتر الافتراضي يجب أن يكون من الأقسام الظاهرة'])->withInput();
+        }
+
+        HomeCategoryFilter::save($showAll, $default, $visible);
+
+        return redirect()->route('admin.home-service-filters')->with('success', 'تم حفظ إعدادات فلتر الخدمات في الرئيسية');
+    }
+
+    // =================== SERVICE CATEGORIES (تصنيفات الخدمات) ===================
+
+    public function serviceCategories()
+    {
+        ServiceCategory::seedDefaultsIfEmpty();
+        $categories = ServiceCategory::orderBy('sort_order')->orderBy('id')->get();
+
+        return view('admin.service-categories', compact('categories'));
+    }
+
+    public function storeServiceCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'label'      => 'required|string|max:100',
+            'slug'       => 'nullable|string|max:50|regex:/^[a-z0-9_]+$/|unique:service_categories,slug',
+            'sort_order' => 'nullable|integer|min:0|max:999',
+        ], [
+            'label.required' => 'اسم التصنيف مطلوب',
+            'slug.regex'     => 'المعرّف بالإنجليزية: حروف صغيرة وأرقام و _ فقط (مثل laser)',
+            'slug.unique'    => 'هذا المعرّف مستخدم مسبقاً',
+        ]);
+
+        $slug = trim($validated['slug'] ?? '');
+        if ($slug === '') {
+            $slug = ServiceCategory::makeUniqueSlug($validated['label']);
+        }
+
+        ServiceCategory::create([
+            'slug'       => $slug,
+            'label'      => $validated['label'],
+            'sort_order' => (int) ($validated['sort_order'] ?? ServiceCategory::max('sort_order') + 1),
+            'is_active'  => $request->boolean('is_active', true),
+        ]);
+
+        ServiceCategory::clearCache();
+
+        return redirect()->route('admin.service-categories')->with('success', 'تم إضافة التصنيف');
+    }
+
+    public function updateServiceCategory(Request $request, ServiceCategory $serviceCategory)
+    {
+        $validated = $request->validate([
+            'label'      => 'required|string|max:100',
+            'sort_order' => 'nullable|integer|min:0|max:999',
+        ], [
+            'label.required' => 'اسم التصنيف مطلوب',
+        ]);
+
+        $serviceCategory->update([
+            'label'      => $validated['label'],
+            'sort_order' => (int) ($validated['sort_order'] ?? $serviceCategory->sort_order),
+            'is_active'  => $request->boolean('is_active'),
+        ]);
+
+        ServiceCategory::clearCache();
+
+        return redirect()->route('admin.service-categories')->with('success', 'تم تحديث التصنيف');
+    }
+
+    public function destroyServiceCategory(ServiceCategory $serviceCategory)
+    {
+        if ($serviceCategory->servicesCount() > 0) {
+            return back()->withErrors([
+                'category' => 'لا يمكن حذف «'.$serviceCategory->label.'» — مرتبط بـ '.$serviceCategory->servicesCount().' خدمة. غيّري تصنيف الخدمات أولاً أو عطّلي التصنيف.',
+            ]);
+        }
+
+        $serviceCategory->delete();
+        ServiceCategory::clearCache();
+
+        return redirect()->route('admin.service-categories')->with('success', 'تم حذف التصنيف');
+    }
+
+    public function toggleServiceCategory(ServiceCategory $serviceCategory)
+    {
+        $serviceCategory->update(['is_active' => ! $serviceCategory->is_active]);
+        ServiceCategory::clearCache();
+
+        return back()->with('success', 'تم تحديث حالة التصنيف');
+    }
+
     // =================== SERVICES CRUD ===================
 
     public function services()
     {
         $services = Service::with('equipment:id,name')->orderBy('sort_order')->get();
         $equipmentList = Equipment::orderBy('sort_order')->orderBy('name')->get();
+        $categories = ServiceCategory::orderBy('sort_order')->orderBy('id')->get();
 
-        return view('admin.services', compact('services', 'equipmentList'));
+        return view('admin.services', compact('services', 'equipmentList', 'categories'));
     }
 
     public function storeService(Request $request)
@@ -177,7 +436,7 @@ class DashboardController extends Controller
             'description'      => 'required|string|max:1000',
             'price'            => 'nullable|numeric|min:0',
             'duration_minutes' => 'required|integer|min:5|max:480',
-            'category'         => 'nullable|string|max:50',
+            'category'         => $this->serviceCategoryRules(),
             'equipment_id'     => 'nullable|exists:equipment,id',
             'icon'             => 'nullable|string|max:16',
             'sort_order'       => 'nullable|integer|min:0',
@@ -191,6 +450,7 @@ class DashboardController extends Controller
         $validated['is_active']  = $request->boolean('is_active', true);
         $validated['sort_order'] = $validated['sort_order'] ?? Service::max('sort_order') + 1;
         $validated['equipment_id'] = $validated['equipment_id'] ?? null;
+        $validated['category'] = $validated['category'] ?: null;
 
         Service::create($validated);
 
@@ -200,8 +460,9 @@ class DashboardController extends Controller
     public function editService(Service $service)
     {
         $equipmentList = Equipment::orderBy('sort_order')->orderBy('name')->get();
+        $categories = ServiceCategory::orderBy('sort_order')->orderBy('id')->get();
 
-        return view('admin.service-edit', compact('service', 'equipmentList'));
+        return view('admin.service-edit', compact('service', 'equipmentList', 'categories'));
     }
 
     public function updateService(Request $request, Service $service)
@@ -213,7 +474,7 @@ class DashboardController extends Controller
             'description'      => 'required|string|max:1000',
             'price'            => 'nullable|numeric|min:0',
             'duration_minutes' => 'required|integer|min:5|max:480',
-            'category'         => 'nullable|string|max:50',
+            'category'         => $this->serviceCategoryRules(),
             'equipment_id'     => 'nullable|exists:equipment,id',
             'icon'             => 'nullable|string|max:16',
             'sort_order'       => 'nullable|integer|min:0',
@@ -264,8 +525,22 @@ class DashboardController extends Controller
             'description.required'      => 'الوصف مطلوب',
             'price.numeric'             => 'السعر يجب أن يكون رقماً صحيحاً أو يُترك فارغاً',
             'duration_minutes.required' => 'مدة الجلسة مطلوبة',
+            'category.in'               => 'التصنيف غير صالح — اختاري من قائمة التصنيفات',
             'image.image'               => 'يجب أن يكون الملف صورة',
             'image.max'                 => 'حجم الصورة يجب أن لا يتجاوز 2 ميغابايت',
+        ];
+    }
+
+    /** @return array<int, mixed> */
+    private function serviceCategoryRules(): array
+    {
+        ServiceCategory::seedDefaultsIfEmpty();
+
+        return [
+            'nullable',
+            'string',
+            'max:50',
+            Rule::in(array_keys(ServiceCategory::labelsMap(false))),
         ];
     }
 
@@ -435,6 +710,106 @@ class DashboardController extends Controller
         $equipment->update(['is_active' => ! $equipment->is_active]);
 
         return back()->with('success', 'تم تحديث حالة الجهاز');
+    }
+
+    // =================== HOME GALLERY (لحظات من العناية) ===================
+
+    public function homeGallery()
+    {
+        $items = HomeGalleryItem::orderBy('sort_order')->orderBy('id')->get();
+        $section = [
+            'enabled' => SiteSetting::get(HomeGallery::SETTING_ENABLED, '1') === '1',
+            'badge'   => SiteSetting::get(HomeGallery::SETTING_BADGE, 'معرضنا'),
+            'title'   => SiteSetting::get(HomeGallery::SETTING_TITLE, 'لحظات من العناية'),
+        ];
+
+        return view('admin.home-gallery', compact('items', 'section'));
+    }
+
+    public function updateHomeGallerySection(Request $request)
+    {
+        $validated = $request->validate([
+            'badge' => 'required|string|max:100',
+            'title' => 'required|string|max:200',
+        ], [
+            'badge.required' => 'عنوان الشارة مطلوب',
+            'title.required' => 'عنوان القسم مطلوب',
+        ]);
+
+        HomeGallery::saveSection(
+            $request->boolean('enabled', true),
+            $validated['badge'],
+            $validated['title'],
+        );
+
+        return redirect()->route('admin.home-gallery')->with('success', 'تم حفظ إعدادات القسم');
+    }
+
+    public function storeHomeGalleryItem(Request $request)
+    {
+        $validated = $request->validate([
+            'image'      => 'required|image|max:4096',
+            'alt'        => 'nullable|string|max:255',
+            'sort_order' => 'nullable|integer|min:0|max:999',
+        ], [
+            'image.required' => 'صورة المعرض مطلوبة',
+            'image.image'    => 'يجب أن يكون الملف صورة',
+        ]);
+
+        $path = $request->file('image')->store('home-gallery', 'public');
+
+        HomeGalleryItem::create([
+            'image'      => $path,
+            'alt'        => $validated['alt'] ?? null,
+            'sort_order' => (int) ($validated['sort_order'] ?? 0),
+            'is_active'  => $request->boolean('is_active', true),
+        ]);
+
+        return redirect()->route('admin.home-gallery')->with('success', 'تم إضافة الصورة للمعرض');
+    }
+
+    public function updateHomeGalleryItem(Request $request, HomeGalleryItem $homeGalleryItem)
+    {
+        $validated = $request->validate([
+            'image'      => 'nullable|image|max:4096',
+            'alt'        => 'nullable|string|max:255',
+            'sort_order' => 'nullable|integer|min:0|max:999',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($homeGalleryItem->image) {
+                Storage::disk('public')->delete($homeGalleryItem->image);
+            }
+            $validated['image'] = $request->file('image')->store('home-gallery', 'public');
+        } else {
+            unset($validated['image']);
+        }
+
+        $homeGalleryItem->update([
+            'image'      => $validated['image'] ?? $homeGalleryItem->image,
+            'alt'        => $validated['alt'] ?? null,
+            'sort_order' => (int) ($validated['sort_order'] ?? $homeGalleryItem->sort_order),
+            'is_active'  => $request->boolean('is_active'),
+        ]);
+
+        return redirect()->route('admin.home-gallery')->with('success', 'تم تحديث الصورة');
+    }
+
+    public function destroyHomeGalleryItem(HomeGalleryItem $homeGalleryItem)
+    {
+        if ($homeGalleryItem->image) {
+            Storage::disk('public')->delete($homeGalleryItem->image);
+        }
+        $homeGalleryItem->delete();
+
+        return redirect()->route('admin.home-gallery')->with('success', 'تم حذف الصورة');
+    }
+
+    public function toggleHomeGalleryItem(HomeGalleryItem $homeGalleryItem)
+    {
+        $homeGalleryItem->update(['is_active' => ! $homeGalleryItem->is_active]);
+
+        return back()->with('success', 'تم تحديث حالة الصورة');
     }
 
     // =================== TESTIMONIALS CRUD ===================

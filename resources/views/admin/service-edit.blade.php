@@ -66,11 +66,15 @@
                     <label class="form-label">التصنيف</label>
                     <select name="category" class="form-input">
                         <option value="">بدون تصنيف</option>
-                        @foreach(\App\Models\Service::categoryLabels() as $val => $label)
-                        <option value="{{ $val }}" {{ old('category', $service->category) == $val ? 'selected' : '' }}>{{ $label }}</option>
+                        @foreach($categories as $cat)
+                        <option value="{{ $cat->slug }}" {{ old('category', $service->category) == $cat->slug ? 'selected' : '' }}>
+                            {{ $cat->label }}@if(! $cat->is_active) (معطّل) @endif
+                        </option>
                         @endforeach
                     </select>
-                    <p class="text-xs mt-1.5" style="color:#64748b;">كل خدمة فرعية تُضاف كسجل منفصل — مثلاً: ليزر الوجه، ليزر الجسم، كلها بتصنيف «الليزر».</p>
+                    <p class="text-xs mt-1.5" style="color:#64748b;">
+                        إدارة أسماء التصنيفات من <a href="{{ route('admin.service-categories') }}" class="font-bold" style="color:#c9888e">تصنيفات الخدمات</a>.
+                    </p>
                 </div>
                 <div>
                     <label class="form-label">الجهاز / الغرفة</label>

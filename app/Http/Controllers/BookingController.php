@@ -138,18 +138,21 @@ class BookingController extends Controller
     public function availableTimes(Request $request)
     {
         $request->validate([
-            'date'       => 'required|date',
-            'service_id' => 'required|exists:services,id',
-            'staff_id'   => 'nullable|exists:staff,id',
+            'date'                   => 'required|date',
+            'service_id'             => 'required|exists:services,id',
+            'staff_id'               => 'nullable|exists:staff,id',
+            'except_appointment_id'  => 'nullable|integer|exists:appointments,id',
         ]);
 
         $service = Service::with('equipment:id,name,capacity')->findOrFail($request->service_id);
+        $exceptId = $request->filled('except_appointment_id') ? (int) $request->except_appointment_id : null;
 
         return response()->json(
             $this->availability->availableSlots(
                 $request->date,
                 $service,
-                $request->staff_id ? (int) $request->staff_id : null
+                $request->staff_id ? (int) $request->staff_id : null,
+                $exceptId,
             )
         );
     }

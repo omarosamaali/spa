@@ -17,13 +17,13 @@ class BookingAvailability
 
     public const SLOT_STEP_MINUTES = 15;
 
-    public function availableSlots(string $date, Service $service, ?int $staffId = null): array
+    public function availableSlots(string $date, Service $service, ?int $staffId = null, ?int $exceptAppointmentId = null): array
     {
         $duration = max(5, (int) $service->duration_minutes);
         $dayStart = Carbon::parse("{$date} ".sprintf('%02d:00', self::OPEN_HOUR));
         $dayEnd = Carbon::parse("{$date} ".sprintf('%02d:00', self::CLOSE_HOUR));
 
-        $booked = $this->bookedAppointmentsForDate($date);
+        $booked = $this->bookedAppointmentsForDate($date, $exceptAppointmentId);
         $eligibleStaff = $this->eligibleStaffFor($service);
         $equipment = $this->equipmentForService($service);
         $slots = [];
@@ -52,19 +52,19 @@ class BookingAvailability
         return $slots;
     }
 
-    public function isSlotAvailable(string $date, string $time, Service $service, ?int $staffId = null): bool
+    public function isSlotAvailable(string $date, string $time, Service $service, ?int $staffId = null, ?int $exceptAppointmentId = null): bool
     {
         $time = substr($time, 0, 5);
 
-        return in_array($time, $this->availableSlots($date, $service, $staffId), true);
+        return in_array($time, $this->availableSlots($date, $service, $staffId, $exceptAppointmentId), true);
     }
 
-    public function slotRejectionMessage(string $date, string $time, Service $service, ?int $staffId = null): string
+    public function slotRejectionMessage(string $date, string $time, Service $service, ?int $staffId = null, ?int $exceptAppointmentId = null): string
     {
         $duration = max(5, (int) $service->duration_minutes);
         $start = Carbon::parse("{$date} {$time}");
         $end = $start->copy()->addMinutes($duration);
-        $booked = $this->bookedAppointmentsForDate($date);
+        $booked = $this->bookedAppointmentsForDate($date, $exceptAppointmentId);
         $equipment = $this->equipmentForService($service);
 
         if ($equipment && ! $this->equipmentHasCapacity($booked, $equipment, $start, $end)) {
@@ -104,9 +104,10 @@ class BookingAvailability
         return $service->staff()->count() === 0;
     }
 
-    private function bookedAppointmentsForDate(string $date): Collection
+    private function bookedAppointmentsForDate(string $date, ?int $exceptAppointmentId = null): Collection
     {
         return Appointment::where('appointment_date', $date)
+            ->when($exceptAppointmentId, fn ($q) => $q->where('id', '!=', $exceptAppointmentId))
             ->whereIn('status', ['pending', 'confirmed'])
             ->with(['service:id,duration_minutes,equipment_id', 'staff:id'])
             ->get();

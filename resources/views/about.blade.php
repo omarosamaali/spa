@@ -14,17 +14,12 @@
     {{-- Who We Are --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
         <div>
-            <div class="badge-spa mb-4">من نحن</div>
-            <h2 class="text-3xl font-black mb-4 text-white">مركز تجميل متكامل<br>يهتم بكل تفصيلة</h2>
-            <p class="leading-loose mb-4" style="color:rgba(255,255,255,0.6)">
-                NAY SPA مركز متخصص في تقديم أفضل خدمات التجميل والعناية بالبشرة،
-                نستخدم أحدث التقنيات وأفضل المنتجات العالمية لضمان نتائج مثالية
-                وتجربة فريدة لكل عميلة.
-            </p>
-            <p class="leading-loose" style="color:rgba(255,255,255,0.6)">
-                فريقنا من الخبيرات المتخصصات يحرص على تقديم خدمة شخصية راقية
-                تناسب احتياجات كل عميلة في بيئة آمنة ومعقمة بأعلى المعايير.
-            </p>
+            <div class="badge-spa mb-4">{{ $aboutWho['badge'] }}</div>
+            <h2 class="text-3xl font-black mb-4 text-white">{!! nl2br(e($aboutWho['title'])) !!}</h2>
+            <p class="leading-loose mb-4" style="color:rgba(255,255,255,0.6)">{{ $aboutWho['text_1'] }}</p>
+            @if($aboutWho['text_2'])
+            <p class="leading-loose" style="color:rgba(255,255,255,0.6)">{{ $aboutWho['text_2'] }}</p>
+            @endif
             <div class="flex flex-wrap gap-3 mt-8">
                 <a href="{{ route('booking') }}" class="btn-primary">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -36,8 +31,11 @@
             </div>
         </div>
 
-        {{-- Decorative visual --}}
         <div class="rounded-3xl overflow-hidden relative" style="height:380px; background:linear-gradient(135deg,#3d2b2e,#1a1a1a)">
+            @if($aboutWho['has_image'])
+            <img src="{{ $aboutWho['image_url'] }}" alt="{{ $aboutWho['badge'] }}"
+                 class="w-full h-full object-cover">
+            @else
             <div class="absolute inset-0" style="background:radial-gradient(ellipse at 40% 40%, rgba(232,180,184,0.2) 0%, transparent 60%)"></div>
             <div class="absolute inset-0 flex items-center justify-center">
                 <div class="text-center text-white">
@@ -66,8 +64,9 @@
                     <div class="text-sm mt-1" style="color:rgba(255,255,255,0.5); letter-spacing:3px">BEAUTY & SPA</div>
                 </div>
             </div>
-            <div class="absolute top-5 right-5 w-10 h-10" style="border-top:2px solid rgba(201,169,110,0.4); border-right:2px solid rgba(201,169,110,0.4); border-radius:0 6px 0 0"></div>
-            <div class="absolute bottom-5 left-5 w-10 h-10" style="border-bottom:2px solid rgba(201,169,110,0.4); border-left:2px solid rgba(201,169,110,0.4); border-radius:0 0 0 6px"></div>
+            @endif
+            <div class="absolute top-5 right-5 w-10 h-10 pointer-events-none" style="border-top:2px solid rgba(201,169,110,0.4); border-right:2px solid rgba(201,169,110,0.4); border-radius:0 6px 0 0"></div>
+            <div class="absolute bottom-5 left-5 w-10 h-10 pointer-events-none" style="border-bottom:2px solid rgba(201,169,110,0.4); border-left:2px solid rgba(201,169,110,0.4); border-radius:0 0 0 6px"></div>
         </div>
     </div>
 

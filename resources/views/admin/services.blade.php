@@ -148,8 +148,10 @@
                     <label class="form-label">التصنيف</label>
                     <select name="category" class="form-input">
                         <option value="">بدون تصنيف</option>
-                        @foreach(\App\Models\Service::categoryLabels() as $val => $label)
-                        <option value="{{ $val }}" {{ old('category') == $val ? 'selected' : '' }}>{{ $label }}</option>
+                        @foreach($categories as $cat)
+                        <option value="{{ $cat->slug }}" {{ old('category') == $cat->slug ? 'selected' : '' }}>
+                            {{ $cat->label }}@if(! $cat->is_active) (معطّل) @endif
+                        </option>
                         @endforeach
                     </select>
                 </div>

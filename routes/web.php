@@ -45,7 +45,23 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/appointments', [DashboardController::class, 'appointments'])->name('appointments');
     Route::post('/appointments', [DashboardController::class, 'storeAppointment'])->name('appointments.store');
     Route::patch('/appointments/{appointment}/status', [DashboardController::class, 'updateStatus'])->name('appointments.status');
+    Route::patch('/appointments/{appointment}/schedule', [DashboardController::class, 'rescheduleAppointment'])->name('appointments.schedule');
     Route::delete('/appointments/{appointment}', [DashboardController::class, 'destroyAppointment'])->name('appointments.destroy');
+
+    // About page settings
+    Route::get('/about-settings', [DashboardController::class, 'aboutSettings'])->name('about-settings');
+    Route::put('/about-settings', [DashboardController::class, 'updateAboutSettings'])->name('about-settings.update');
+
+    // Service categories (تصنيفات: ليزر، بشرة، …)
+    Route::get('/service-categories', [DashboardController::class, 'serviceCategories'])->name('service-categories');
+    Route::post('/service-categories', [DashboardController::class, 'storeServiceCategory'])->name('service-categories.store');
+    Route::put('/service-categories/{serviceCategory}', [DashboardController::class, 'updateServiceCategory'])->name('service-categories.update');
+    Route::delete('/service-categories/{serviceCategory}', [DashboardController::class, 'destroyServiceCategory'])->name('service-categories.destroy');
+    Route::patch('/service-categories/{serviceCategory}/toggle', [DashboardController::class, 'toggleServiceCategory'])->name('service-categories.toggle');
+
+    // Homepage service category filter (اختاري ما يناسبك)
+    Route::get('/home-service-filters', [DashboardController::class, 'homeServiceFilters'])->name('home-service-filters');
+    Route::put('/home-service-filters', [DashboardController::class, 'updateHomeServiceFilters'])->name('home-service-filters.update');
 
     // Services CRUD
     Route::get('/services', [DashboardController::class, 'services'])->name('services');
@@ -69,6 +85,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('/equipment/{equipment}', [DashboardController::class, 'updateEquipment'])->name('equipment.update');
     Route::delete('/equipment/{equipment}', [DashboardController::class, 'destroyEquipment'])->name('equipment.destroy');
     Route::patch('/equipment/{equipment}/toggle', [DashboardController::class, 'toggleEquipment'])->name('equipment.toggle');
+
+    // Home gallery (لحظات من العناية)
+    Route::get('/home-gallery', [DashboardController::class, 'homeGallery'])->name('home-gallery');
+    Route::put('/home-gallery/section', [DashboardController::class, 'updateHomeGallerySection'])->name('home-gallery.section');
+    Route::post('/home-gallery/items', [DashboardController::class, 'storeHomeGalleryItem'])->name('home-gallery.items.store');
+    Route::put('/home-gallery/items/{homeGalleryItem}', [DashboardController::class, 'updateHomeGalleryItem'])->name('home-gallery.items.update');
+    Route::delete('/home-gallery/items/{homeGalleryItem}', [DashboardController::class, 'destroyHomeGalleryItem'])->name('home-gallery.items.destroy');
+    Route::patch('/home-gallery/items/{homeGalleryItem}/toggle', [DashboardController::class, 'toggleHomeGalleryItem'])->name('home-gallery.items.toggle');
 
     // Testimonials (آراء العملاء)
     Route::get('/testimonials', [DashboardController::class, 'testimonials'])->name('testimonials');

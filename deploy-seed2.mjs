@@ -40,7 +40,8 @@ async function main() {
   console.log('\n--- Migrate ---');
   await run(conn, `cd ${APP} && php artisan migrate --force 2>&1`);
 
-  console.log('\n--- Seed site settings (if needed) ---');
+  console.log('\n--- Seed categories & settings ---');
+  await run(conn, `cd ${APP} && php artisan db:seed --class=ServiceCategoriesSeeder --force 2>&1`);
   await run(conn, `cd ${APP} && php artisan db:seed --class=SiteSettingsSeeder --force 2>&1`);
   await run(conn, `cd ${APP} && php artisan db:seed --class=HeroSlidesSeeder --force 2>&1`);
 

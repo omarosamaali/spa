@@ -66,7 +66,82 @@ class SiteSetting extends Model
             'whatsapp_reminder_enabled' => '0',
             'whatsapp_reminder_hours' => '24',
             'whatsapp_template_lang' => 'ar',
+            'about_years_experience' => '',
+            'about_who_badge'        => 'من نحن',
+            'about_who_title'        => "مركز تجميل متكامل\nيهتم بكل تفصيلة",
+            'about_who_text_1'       => 'NAY SPA مركز متخصص في تقديم أفضل خدمات التجميل والعناية بالبشرة، نستخدم أحدث التقنيات وأفضل المنتجات العالمية لضمان نتائج مثالية وتجربة فريدة لكل عميلة.',
+            'about_who_text_2'       => 'فريقنا من الخبيرات المتخصصات يحرص على تقديم خدمة شخصية راقية تناسب احتياجات كل عميلة في بيئة آمنة ومعقمة بأعلى المعايير.',
+            'about_who_image'        => '',
         ];
+    }
+
+    public static function aboutWhoKeys(): array
+    {
+        return [
+            'about_who_badge',
+            'about_who_title',
+            'about_who_text_1',
+            'about_who_text_2',
+            'about_who_image',
+        ];
+    }
+
+    /** @return array{badge: string, title: string, text_1: string, text_2: string, image_url: ?string, has_image: bool} */
+    public static function buildAboutWhoPayload(array $values): array
+    {
+        $defaults = static::defaults();
+        $imagePath = trim($values['about_who_image'] ?? '');
+
+        return [
+            'badge'      => trim($values['about_who_badge'] ?? '') ?: $defaults['about_who_badge'],
+            'title'      => trim($values['about_who_title'] ?? '') ?: $defaults['about_who_title'],
+            'text_1'     => trim($values['about_who_text_1'] ?? '') ?: $defaults['about_who_text_1'],
+            'text_2'     => trim($values['about_who_text_2'] ?? '') ?: $defaults['about_who_text_2'],
+            'image_url'  => static::assetUrl($imagePath),
+            'has_image'  => (bool) static::assetUrl($imagePath),
+        ];
+    }
+
+    public static function aboutWhoWeAre(): array
+    {
+        $defaults = static::defaults();
+
+        if (! static::tableReady()) {
+            return static::buildAboutWhoPayload($defaults);
+        }
+
+        return Cache::remember('site_setting_about_who', 3600, function () use ($defaults) {
+            $values = $defaults;
+            foreach (static::aboutWhoKeys() as $key) {
+                $stored = static::where('key', $key)->value('value');
+                if ($stored !== null && $stored !== '') {
+                    $values[$key] = $stored;
+                }
+            }
+
+            return static::buildAboutWhoPayload($values);
+        });
+    }
+
+    public static function clearAboutCache(): void
+    {
+        Cache::forget('site_setting_about_who');
+        Cache::forget('site_setting_about_years_experience');
+        foreach (static::aboutWhoKeys() as $key) {
+            Cache::forget("site_setting_{$key}");
+        }
+    }
+
+    /** سنوات الخبرة في صفحة «عن المركز» — يدوي من اللوحة، أو تلقائي من 2019 إن فاضي */
+    public static function aboutYearsExperience(): int
+    {
+        $stored = static::get('about_years_experience', '');
+
+        if ($stored !== '' && $stored !== null) {
+            return max(1, (int) $stored);
+        }
+
+        return max(1, now()->year - 2019);
     }
 
     public static function whatsappApiKeys(): array
@@ -323,6 +398,9 @@ class SiteSetting extends Model
         }
         if (in_array($key, static::themeKeys(), true)) {
             static::clearThemeCache();
+        }
+        if ($key === 'about_years_experience' || str_starts_with($key, 'about_who_')) {
+            static::clearAboutCache();
         }
     }
 

@@ -37,6 +37,6 @@ class Equipment extends Model
 
     public static function categoryLabels(): array
     {
-        return Service::categoryLabels();
+        return Service::categoryLabelsForAdmin();
     }
 }

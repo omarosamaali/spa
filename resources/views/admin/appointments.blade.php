@@ -11,7 +11,7 @@
     </button>
 </div>
 
-@if($errors->any() && old('client_name'))
+@if($errors->any())
 <div class="mb-6 p-4 rounded-xl text-sm" style="background:#fee2e2; color:#dc2626;">
     <ul class="list-disc pr-5 space-y-1">
         @foreach($errors->all() as $error)
@@ -29,6 +29,7 @@
     <strong style="color:#1a1a1a">سير العمل:</strong>
     كل حجز جديد من الموقع يدخل بحالة <strong>انتظار</strong> — تواصلي مع العميلة عبر واتساب ثم غيّري الحالة إلى <strong>تأكيد</strong>.
     اختيار <strong>إلغاء</strong> يعني إلغاء الموعد (يُطلب تأكيد قبل الحفظ).
+    <strong>تعديل الموعد</strong> يغيّر التاريخ والوقت بعد الاتفاق مع العميلة (الخدمة والأخصائية كما هي).
     <strong>حذف</strong> يزيل السجل نهائياً من النظام (لا يمكن التراجع).
     @if($appointments->where('status', 'cancelled')->count() > 0)
     <span class="block mt-2" style="color:#dc2626">
@@ -119,6 +120,23 @@
                     </td>
                     <td class="p-4">
                         <div class="flex flex-wrap items-center gap-2">
+                            @if($a->status !== 'cancelled')
+                            <button type="button"
+                                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:opacity-80"
+                                    style="background:#e0e7ff; color:#4338ca"
+                                    title="تعديل التاريخ والوقت"
+                                    onclick="openRescheduleModal(this)"
+                                    data-id="{{ $a->id }}"
+                                    data-label="#{{ str_pad($a->id, 4, '0', STR_PAD_LEFT) }}"
+                                    data-client="{{ $a->client_name }}"
+                                    data-service="{{ $a->service->name ?? '-' }}"
+                                    data-service-id="{{ $a->service_id }}"
+                                    data-staff-id="{{ $a->staff_id ?? '' }}"
+                                    data-date="{{ $a->appointment_date->format('Y-m-d') }}"
+                                    data-time="{{ substr($a->appointment_time, 0, 5) }}">
+                                تعديل الموعد
+                            </button>
+                            @endif
                             <form method="POST" action="{{ route('admin.appointments.status', $a) }}" class="appointment-status-form">
                                 @csrf @method('PATCH')
                                 <select name="status"
@@ -159,6 +177,47 @@
         {{ $appointments->appends(request()->query())->links() }}
     </div>
     @endif
+</div>
+
+{{-- Reschedule appointment modal --}}
+<div id="rescheduleAppointmentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.55)">
+    <div class="bg-white rounded-2xl p-8 w-full shadow-xl max-h-[92vh] overflow-y-auto" style="max-width:480px">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-xl font-black" style="color:#1a1a1a">تعديل موعد الحجز</h2>
+                <p class="text-sm mt-1" id="rescheduleModalSubtitle" style="color:#888"></p>
+            </div>
+            <button type="button" onclick="document.getElementById('rescheduleAppointmentModal').classList.add('hidden')"
+                    class="w-8 h-8 rounded-xl flex items-center justify-center" style="background:#f5f5f5; color:#888">✕</button>
+        </div>
+
+        <form method="POST" id="rescheduleForm" class="space-y-4">
+            @csrf
+            @method('PATCH')
+            <input type="hidden" name="reschedule_appointment_id" id="rescheduleAppointmentId" value="{{ old('reschedule_appointment_id') }}">
+
+            <div class="p-3 rounded-xl text-sm" style="background:#fdf8f5; color:#555">
+                <div><strong>الخدمة:</strong> <span id="rescheduleServiceName">—</span></div>
+            </div>
+
+            <div>
+                <label class="form-label">تاريخ الموعد الجديد *</label>
+                <input type="date" name="appointment_date" id="rescheduleDateInput" class="form-input" required>
+            </div>
+            <div>
+                <label class="form-label">وقت الموعد الجديد *</label>
+                <select name="appointment_time" id="rescheduleTimeSelect" class="form-input" required>
+                    <option value="">— اختاري التاريخ —</option>
+                </select>
+            </div>
+            <p class="text-xs" style="color:#888">يُعرض الوقت الحالي ضمن الخيارات إن كان لا يزال متاحاً. تذكير واتساب يُعاد جدولته للموعد الجديد.</p>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn-primary flex-1 justify-center">حفظ الموعد الجديد</button>
+                <button type="button" class="flex-1 py-3 rounded-xl font-bold" style="background:#f5f0f0; color:#666"
+                        onclick="document.getElementById('rescheduleAppointmentModal').classList.add('hidden')">إلغاء</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 {{-- Create appointment modal --}}
@@ -251,6 +310,21 @@ const adminServiceMeta = document.getElementById('adminServiceMeta');
 const preselectedAdminServiceId = @json(old('service_id'));
 const preselectedAdminStaffId = @json(old('staff_id'));
 const preselectedAdminTime = @json(old('appointment_time'));
+
+const rescheduleModal = document.getElementById('rescheduleAppointmentModal');
+const rescheduleForm = document.getElementById('rescheduleForm');
+const rescheduleDateInput = document.getElementById('rescheduleDateInput');
+const rescheduleTimeSelect = document.getElementById('rescheduleTimeSelect');
+const rescheduleAppointmentId = document.getElementById('rescheduleAppointmentId');
+const rescheduleModalSubtitle = document.getElementById('rescheduleModalSubtitle');
+const rescheduleServiceName = document.getElementById('rescheduleServiceName');
+const scheduleUrlBase = @json(url('/admin/appointments'));
+let rescheduleServiceId = null;
+let rescheduleStaffId = null;
+let reschedulePreferredTime = null;
+const preselectedRescheduleId = @json(old('reschedule_appointment_id'));
+const preselectedRescheduleDate = @json(old('appointment_date'));
+const preselectedRescheduleTime = @json(old('appointment_time'));
 
 function updateAdminServiceMeta() {
     const opt = adminServiceSelect.selectedOptions[0];
@@ -352,10 +426,88 @@ document.getElementById('createAppointmentModal')?.addEventListener('click', fun
     if (e.target === this) this.classList.add('hidden');
 });
 
+rescheduleModal?.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.add('hidden');
+});
+
+function openRescheduleModal(btn) {
+    const id = btn.dataset.id;
+    rescheduleAppointmentId.value = id;
+    rescheduleForm.action = `${scheduleUrlBase}/${id}/schedule`;
+    rescheduleModalSubtitle.textContent = `${btn.dataset.label} — ${btn.dataset.client}`;
+    rescheduleServiceName.textContent = btn.dataset.service;
+    rescheduleServiceId = btn.dataset.serviceId;
+    rescheduleStaffId = btn.dataset.staffId || '';
+    reschedulePreferredTime = btn.dataset.time;
+    rescheduleDateInput.value = btn.dataset.date;
+    rescheduleModal.classList.remove('hidden');
+    loadRescheduleTimes();
+}
+
+async function loadRescheduleTimes() {
+    const date = rescheduleDateInput.value;
+    const appointmentId = rescheduleAppointmentId.value;
+    if (!date || !rescheduleServiceId || !appointmentId) {
+        rescheduleTimeSelect.innerHTML = '<option value="">— اختاري التاريخ —</option>';
+        return;
+    }
+    rescheduleTimeSelect.innerHTML = '<option>جاري التحميل...</option>';
+    try {
+        let url = `{{ route('booking.times') }}?date=${date}&service_id=${rescheduleServiceId}&except_appointment_id=${appointmentId}`;
+        if (rescheduleStaffId) url += `&staff_id=${rescheduleStaffId}`;
+        const res = await fetch(url);
+        const times = await res.json();
+        rescheduleTimeSelect.innerHTML = '';
+        if (!times.length) {
+            rescheduleTimeSelect.innerHTML = '<option value="">لا توجد أوقات متاحة</option>';
+            return;
+        }
+        times.forEach(t => {
+            const o = document.createElement('option');
+            o.value = t;
+            o.textContent = formatAdminTimeLabel(t);
+            rescheduleTimeSelect.appendChild(o);
+        });
+        const pick = preselectedRescheduleTime
+            ? String(preselectedRescheduleTime).substring(0, 5)
+            : reschedulePreferredTime;
+        if (pick && [...rescheduleTimeSelect.options].some(o => o.value === pick)) {
+            rescheduleTimeSelect.value = pick;
+        }
+    } catch (e) {
+        rescheduleTimeSelect.innerHTML = '<option value="">تعذر تحميل الأوقات</option>';
+    }
+}
+
+rescheduleDateInput?.addEventListener('change', () => {
+    reschedulePreferredTime = null;
+    loadRescheduleTimes();
+});
+
 @if($errors->any() && old('client_name'))
 document.getElementById('createAppointmentModal')?.classList.remove('hidden');
 updateAdminServiceMeta();
 loadAdminStaff();
+@endif
+
+@if($errors->any() && old('reschedule_appointment_id'))
+(function reopenRescheduleFromValidation() {
+    const id = @json(old('reschedule_appointment_id'));
+    const btn = document.querySelector(`button[data-id="${id}"][onclick="openRescheduleModal(this)"]`);
+    if (btn) {
+        openRescheduleModal(btn);
+        if (@json(old('appointment_date'))) {
+            rescheduleDateInput.value = @json(old('appointment_date'));
+            loadRescheduleTimes();
+        }
+    } else {
+        rescheduleAppointmentId.value = id;
+        rescheduleForm.action = `${scheduleUrlBase}/${id}/schedule`;
+        rescheduleDateInput.value = @json(old('appointment_date', ''));
+        rescheduleModal.classList.remove('hidden');
+        loadRescheduleTimes();
+    }
+})();
 @endif
 
 if (preselectedAdminServiceId && adminServiceSelect) {

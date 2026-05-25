@@ -9,6 +9,8 @@ use App\Models\SiteSetting;
 use App\Models\SiteTheme;
 use App\Models\Staff;
 use App\Models\Testimonial;
+use App\Services\HomeCategoryFilter;
+use App\Services\HomeGallery;
 
 class HomeController extends Controller
 {
@@ -23,7 +25,10 @@ class HomeController extends Controller
             ? HeroSlide::active()->get()
             : collect();
 
-        return view('home', compact('services', 'testimonials', 'stats', 'heroSlides'));
+        $homeFilter = HomeCategoryFilter::config();
+        $homeGallery = HomeGallery::forHomepage();
+
+        return view('home', compact('services', 'testimonials', 'stats', 'heroSlides', 'homeFilter', 'homeGallery'));
     }
 
     public function services()
@@ -38,8 +43,10 @@ class HomeController extends Controller
         $staff = Staff::where('is_active', true)->get();
 
         $stats = $this->homeStats();
+        $stats['years'] = SiteSetting::aboutYearsExperience();
+        $aboutWho = SiteSetting::aboutWhoWeAre();
 
-        return view('about', compact('staff', 'stats'));
+        return view('about', compact('staff', 'stats', 'aboutWho'));
     }
 
     public function contact()
@@ -74,7 +81,10 @@ class HomeController extends Controller
         // Override the globally shared $siteTheme with the preview theme for this request
         \Illuminate\Support\Facades\View::share('siteTheme', $previewTheme);
 
-        return view('home', compact('services', 'testimonials', 'stats', 'heroSlides'));
+        $homeFilter = HomeCategoryFilter::config();
+        $homeGallery = HomeGallery::forHomepage();
+
+        return view('home', compact('services', 'testimonials', 'stats', 'heroSlides', 'homeFilter', 'homeGallery'));
     }
 
     /** @return array{clients: int, services: int, experts: int, years: int, rating: int} */

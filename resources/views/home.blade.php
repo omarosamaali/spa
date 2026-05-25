@@ -386,16 +386,22 @@
         </div>
 
         {{-- Category Tabs --}}
+        @php
+            $homeFilter = $homeFilter ?? \App\Services\HomeCategoryFilter::config();
+            $filterTabs = $homeFilter['tabs'] ?? [];
+            $filterDefault = $homeFilter['default'] ?? 'all';
+        @endphp
+        @if(count($filterTabs) > 0)
         <div class="flex flex-wrap justify-center gap-2 mb-10" id="cat-tabs">
-            @php $cats = array_merge(['all' => 'الكل'], \App\Models\Service::categoryLabels()); @endphp
-            @foreach($cats as $key => $label)
-            <button onclick="filterServices('{{ $key }}')" data-cat="{{ $key }}"
-                    class="cat-tab px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 {{ $key==='all' ? 'cat-tab-active' : '' }}"
-                    style="{{ $key!=='all' ? 'background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.1);' : '' }}">
-                {{ $label }}
+            @foreach($filterTabs as $tab)
+            <button type="button" onclick="filterServices('{{ $tab['key'] }}')" data-cat="{{ $tab['key'] }}"
+                    class="cat-tab px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 {{ $tab['key'] === $filterDefault ? 'cat-tab-active' : '' }}"
+                    style="{{ $tab['key'] !== $filterDefault ? 'background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.1);' : '' }}">
+                {{ $tab['label'] }}
             </button>
             @endforeach
         </div>
+        @endif
 
         {{-- Services Grid — full-bleed image cards --}}
         <div class="services-grid-home" id="services-grid">
@@ -553,30 +559,33 @@
 </section>
 @endif
 
-{{-- =================== GALLERY (SPA INTERIORS ONLY) =================== --}}
+{{-- =================== GALLERY (لحظات من العناية) =================== --}}
+@if($homeGallery['enabled'] ?? true)
 <section class="py-20" style="background:var(--spa-dark-3);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-12">
-            <div class="badge-spa mb-4">معرضنا</div>
-            <h2 class="text-3xl md:text-4xl font-black text-white mb-3">لحظات من العناية</h2>
+            <div class="badge-spa mb-4">{{ $homeGallery['badge'] }}</div>
+            <h2 class="text-3xl md:text-4xl font-black text-white mb-3">{{ $homeGallery['title'] }}</h2>
             <div class="section-divider mt-4"></div>
         </div>
 
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;" class="md:grid-cols-3">
-            @foreach([
-                ['url'=>'https://images.unsplash.com/photo-1583416750470-965b2707b355?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'قاعة السبا الفاخرة'],
-                ['url'=>'https://images.unsplash.com/photo-1563788240-4a32624c5e46?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أحجار الاسترخاء'],
-                ['url'=>'https://images.unsplash.com/photo-1556760544-74068565f05c?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'منتجات العناية'],
-                ['url'=>'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'كريمات البشرة'],
-                ['url'=>'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'أجواء السبا'],
-                ['url'=>'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=450&q=80&auto=format&fit=crop','alt'=>'غرفة الاسترخاء'],
-            ] as $gimg)
-            <div class="rounded-2xl overflow-hidden group cursor-pointer" style="height:220px;">
-                <img src="{{ $gimg['url'] }}" alt="{{ $gimg['alt'] }}"
-                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-            </div>
-            @endforeach
+            @if($homeGallery['items']->isNotEmpty())
+                @foreach($homeGallery['items'] as $gitem)
+                <div class="rounded-2xl overflow-hidden group cursor-pointer" style="height:220px;">
+                    <img src="{{ $gitem->imageUrl() }}" alt="{{ $gitem->alt ?? 'صورة من المعرض' }}"
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                </div>
+                @endforeach
+            @else
+                @foreach($homeGallery['placeholders'] as $gimg)
+                <div class="rounded-2xl overflow-hidden group cursor-pointer" style="height:220px;">
+                    <img src="{{ $gimg['url'] }}" alt="{{ $gimg['alt'] }}"
+                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                </div>
+                @endforeach
+            @endif
         </div>
 
         <div class="text-center mt-10">
@@ -587,6 +596,7 @@
         </div>
     </div>
 </section>
+@endif
 
 {{-- =================== TESTIMONIALS SLIDER =================== --}}
 <section class="py-20" style="background:var(--spa-dark);">
@@ -781,7 +791,12 @@
         watchOverflow: true,
     });
 
-    // Category filter — uses CSS vars instead of hardcoded colors
+    // Category filter — default tab from admin settings
+    const homeFilterDefault = @json($filterDefault ?? 'all');
+    if (document.querySelector('.cat-tab')) {
+        filterServices(homeFilterDefault);
+    }
+
     function filterServices(cat) {
         document.querySelectorAll('.service-card').forEach(card => {
             card.style.display = (cat === 'all' || card.dataset.category === cat) ? '' : 'none';
