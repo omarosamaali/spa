@@ -726,7 +726,7 @@
 
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;">
             @foreach([
-                ['val'=>($stats['clients']>0?'+'.$stats['clients']:'+500'),'label'=>'جلسة مكتملة',   'sub'=>'عميلة وثقت بنا','icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','accent'=>'primary'],
+                ['val'=>($stats['completed_sessions']>0?$stats['completed_sessions'].'+':(string)$stats['completed_sessions']),'label'=>'جلسة مكتملة','sub'=>'تُحدَّث من الحجوزات المكتملة','icon'=>'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>','accent'=>'primary'],
                 ['val'=>'4.9',                                              'label'=>'تقييم العملاء','sub'=>'من أصل 5 نجوم','icon'=>'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>','accent'=>'gold'],
                 ['val'=>($stats['experts']>0?$stats['experts'].'+':'10+'),  'label'=>'خبراء متخصصين','sub'=>'فريق احترافي مدرّب','icon'=>'<circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/>','accent'=>'gold'],
                 ['val'=>'100%',                                             'label'=>'رضا العملاء',  'sub'=>'ضماننا الدائم لكِ','icon'=>'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>','accent'=>'primary'],

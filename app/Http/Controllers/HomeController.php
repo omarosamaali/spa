@@ -87,15 +87,16 @@ class HomeController extends Controller
         return view('home', compact('services', 'testimonials', 'stats', 'heroSlides', 'homeFilter', 'homeGallery'));
     }
 
-    /** @return array{clients: int, services: int, experts: int, years: int, rating: int} */
+    /** @return array{clients: int, completed_sessions: int, services: int, experts: int, years: int, rating: int} */
     private function homeStats(): array
     {
         return [
-            'clients'  => Appointment::distinct('client_phone')->count('client_phone'),
-            'services' => Service::active()->count(),
-            'experts'  => Staff::where('is_active', true)->count(),
-            'years'    => max(1, now()->year - 2019),
-            'rating'   => 100,
+            'clients'             => Appointment::distinct('client_phone')->count('client_phone'),
+            'completed_sessions'  => Appointment::where('status', 'completed')->count(),
+            'services'            => Service::active()->count(),
+            'experts'             => Staff::where('is_active', true)->count(),
+            'years'               => max(1, now()->year - 2019),
+            'rating'              => 100,
         ];
     }
 }

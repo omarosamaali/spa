@@ -558,9 +558,10 @@ class DashboardController extends Controller
 
     public function staff()
     {
-        $staffMembers = Staff::orderBy('name')->get();
+        $staffMembers = Staff::with('services:id,name')->orderBy('name')->get();
+        $allServices = Service::orderBy('category')->orderBy('sort_order')->get();
 
-        return view('admin.staff', compact('staffMembers'));
+        return view('admin.staff', compact('staffMembers', 'allServices'));
     }
 
     public function storeStaff(Request $request)
